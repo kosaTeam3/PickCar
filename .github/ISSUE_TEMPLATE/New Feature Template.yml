@@ -1,0 +1,21 @@
+name: "Feature"
+description: "기능 추가"
+title: "Feat: "
+labels: ["Feature"]
+type: "Feature"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 목적
+        - 
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 작업 내용
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 기타
