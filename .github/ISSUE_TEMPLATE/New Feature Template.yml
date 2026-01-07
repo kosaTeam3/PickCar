@@ -2,20 +2,45 @@ name: "Feature"
 description: "기능 추가"
 title: "Feat: "
 labels: ["Feature"]
-type: "Feature"
 body:
   - type: markdown
     attributes:
       value: |
         ## 목적
-        - 
+        - 아래 입력칸에 작성
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 목적
+      placeholder: 예) 예외 처리 로직 공통화
+    validations:
+      required: true
 
   - type: markdown
     attributes:
       value: |
         ## 작업 내용
 
+  - type: textarea
+    id: work
+    attributes:
+      label: 작업 내용
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
   - type: markdown
     attributes:
       value: |
         ## 기타
+
+  - type: textarea
+    id: etc
+    attributes:
+      label: 기타
+      placeholder: 참고/주의사항/링크
+    validations:
+      required: false
