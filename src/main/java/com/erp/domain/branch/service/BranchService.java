@@ -1,6 +1,7 @@
 package com.erp.domain.branch.service;
 
 import com.erp.domain.branch.dto.request.CreateBranch;
+import com.erp.domain.branch.dto.request.UpdateBranch;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.employee.entity.Employee;
@@ -38,5 +39,24 @@ public class BranchService {
                 .build();
 
         branchRepository.save(branch);
+    }
+
+    public void updateBranch(Long branchId, UpdateBranch dto) {
+        Branch branch = branchRepository.findById(branchId).orElseThrow(
+                () -> new CustomException(404, "지점을 찾을 수 없습니다.")
+        );
+
+        Employee manager = null;
+        if (dto.employeeId() != null) {
+            manager = employeeRepository.findById(dto.employeeId()).orElseThrow(
+                    () -> new CustomException(404, "직원을 찾을 수 없습니다."));
+        }
+
+        if (dto.name() != null) branch.setName(dto.name());
+        if (dto.phoneNumber() != null) branch.setPhoneNumber(dto.phoneNumber());
+        if (dto.address() != null) branch.setAddress(dto.address());
+        if (manager != null) branch.setManager(manager);
+        if (dto.latitude() != null) branch.setLatitude(dto.latitude());
+        if (dto.longitude() != null) branch.setLongitude(dto.longitude());
     }
 }
