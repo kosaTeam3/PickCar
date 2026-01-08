@@ -34,7 +34,7 @@ public class BranchService {
                 .latitude(dto.latitude())
                 .longitude(dto.longitude())
                 .managerName(dto.employeeId() != null ? manager.getName() : null)
-                .employCount(0)
+                .employeeCount(0)
                 .carCount(0)
                 .build();
 
@@ -46,21 +46,37 @@ public class BranchService {
                 () -> new CustomException(404, "지점을 찾을 수 없습니다.")
         );
 
-        Employee manager = null;
         if (dto.employeeId() != null) {
-            manager = employeeRepository.findById(dto.employeeId()).orElseThrow(
-                    () -> new CustomException(404, "직원을 찾을 수 없습니다."));
+            Employee manager = employeeRepository.findById(dto.employeeId()).orElseThrow(
+                    () -> new CustomException(404, "직원을 찾을 수 없습니다.")
+            );
+
+            branch.setManager(manager);
+            branch.setManagerName(manager.getName());
         }
 
-        if (dto.name() != null) branch.setName(dto.name());
-        if (dto.phoneNumber() != null) branch.setPhoneNumber(dto.phoneNumber());
-        if (dto.address() != null) branch.setAddress(dto.address());
-        if (manager != null) branch.setManager(manager);
-        if (dto.latitude() != null) branch.setLatitude(dto.latitude());
-        if (dto.longitude() != null) branch.setLongitude(dto.longitude());
+        if (dto.name() != null) {
+            branch.setName(dto.name());
+        }
+        if (dto.phoneNumber() != null) {
+            branch.setPhoneNumber(dto.phoneNumber());
+        }
+        if (dto.address() != null) {
+            branch.setAddress(dto.address());
+        }
+        if (dto.latitude() != null) {
+            branch.setLatitude(dto.latitude());
+        }
+        if (dto.longitude() != null) {
+            branch.setLongitude(dto.longitude());
+        }
     }
 
     public void deleteBranch(Long branchId) {
+        if (!branchRepository.existsById(branchId)) {
+            throw new CustomException(404, "지점을 찾을 수 없습니다.");
+        }
+
         branchRepository.deleteById(branchId);
     }
 }
