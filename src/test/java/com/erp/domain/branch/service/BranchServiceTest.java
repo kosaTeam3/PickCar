@@ -248,8 +248,6 @@ class BranchServiceTest {
         @DisplayName("지점이 없으면 실패한다")
         void failWithNotExistBranch() {
             //given
-            Long branchId = 999L;
-
             var dto = new UpdateBranch(
                     "변경지점명",
                     "02-123-4567",
@@ -259,10 +257,10 @@ class BranchServiceTest {
                     127.02761
             );
 
-            given(branchRepository.findById(branchId)).willReturn(Optional.empty());
+            given(branchRepository.findById(anyLong())).willReturn(Optional.empty());
 
             //when & then
-            assertThatThrownBy(() -> branchService.updateBranch(branchId, dto))
+            assertThatThrownBy(() -> branchService.updateBranch(999L, dto))
                     .isInstanceOf(CustomException.class);
 
             then(employeeRepository).shouldHaveNoInteractions();
@@ -311,6 +309,39 @@ class BranchServiceTest {
             assertThat(branch.getName()).isEqualTo("기존지점명");
             assertThat(branch.getManager()).isEqualTo(manager);
             assertThat(branch.getManagerName()).isEqualTo("홍길동");
+        }
+    }
+
+    @Nested
+    @DisplayName("Branch 삭제 시 ")
+    class BranchDelete {
+
+        @Test
+        @DisplayName("성공한다")
+        void success() {
+            //given
+            given(branchRepository.existsById(anyLong())).willReturn(true);
+
+            //when
+            branchService.deleteBranch(1L);
+
+            //then
+            then(branchRepository).should().existsById(1L);
+            then(branchRepository).should().deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("지점이 없으면 실패한다")
+        void failWithNotExistBranch() {
+            //given
+            given(branchRepository.existsById(anyLong())).willReturn(false);
+
+            //when & then
+            assertThatThrownBy(() -> branchService.deleteBranch(999L))
+                    .isInstanceOf(CustomException.class);
+
+            then(branchRepository).should().existsById(anyLong());
+            then(branchRepository).should(never()).deleteById(anyLong());
         }
     }
 }
