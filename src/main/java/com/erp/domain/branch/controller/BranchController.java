@@ -25,4 +25,10 @@ public class BranchController {
         branchService.updateBranch(branchId, dto);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{branchId}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable Long branchId){
+        branchService.deleteBranch(branchId);
+        return ResponseEntity.noContent().build();
+    }
 }

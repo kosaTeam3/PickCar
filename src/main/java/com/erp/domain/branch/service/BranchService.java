@@ -59,4 +59,8 @@ public class BranchService {
         if (dto.latitude() != null) branch.setLatitude(dto.latitude());
         if (dto.longitude() != null) branch.setLongitude(dto.longitude());
     }
+
+    public void deleteBranch(Long branchId) {
+        branchRepository.deleteById(branchId);
+    }
 }
