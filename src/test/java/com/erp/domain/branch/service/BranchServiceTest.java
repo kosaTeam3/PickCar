@@ -1,6 +1,7 @@
 package com.erp.domain.branch.service;
 
 import com.erp.domain.branch.dto.request.CreateBranch;
+import com.erp.domain.branch.dto.request.UpdateBranch;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.employee.entity.Employee;
@@ -132,6 +133,184 @@ class BranchServiceTest {
                     .isInstanceOf(CustomException.class);
 
             then(branchRepository).should(never()).save(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Branch 업데이트 시 ")
+    class BranchUpdate {
+
+        @Test
+        @DisplayName("성공한다")
+        void success() {
+            //given
+            var oldManager = Employee.builder()
+                    .id(10L)
+                    .name("구매니저")
+                    .build();
+
+            var newManager = Employee.builder()
+                    .id(20L)
+                    .name("신매니저")
+                    .build();
+
+            var branch = Branch.builder()
+                    .name("기존지점명")
+                    .phoneNumber("02-000-0000")
+                    .address("기존주소")
+                    .manager(oldManager)
+                    .managerName(oldManager.getName())
+                    .latitude(37.0)
+                    .longitude(127.0)
+                    .employeeCount(3)
+                    .carCount(5)
+                    .build();
+
+            var dto = new UpdateBranch(
+                    "변경지점명",
+                    null,
+                    "변경주소",
+                    20L,
+                    36.0,
+                    null
+            );
+
+            given(branchRepository.findById(anyLong())).willReturn(Optional.of(branch));
+            given(employeeRepository.findById(anyLong())).willReturn(Optional.of(newManager));
+
+            //when
+            branchService.updateBranch(1L, dto);
+
+            //then
+            then(branchRepository).should().findById(anyLong());
+            then(employeeRepository).should().findById(20L);
+
+            assertThat(branch.getName()).isEqualTo("변경지점명");
+            assertThat(branch.getPhoneNumber()).isEqualTo("02-000-0000");
+            assertThat(branch.getAddress()).isEqualTo("변경주소");
+            assertThat(branch.getManager()).isEqualTo(newManager);
+            assertThat(branch.getManagerName()).isEqualTo("신매니저");
+            assertThat(branch.getLatitude()).isEqualTo(36.0);
+            assertThat(branch.getLongitude()).isEqualTo(127.0);
+            assertThat(branch.getEmployeeCount()).isEqualTo(3);
+            assertThat(branch.getCarCount()).isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("EmployeeId가 존재하지 않아도 성공한다")
+        void successWithoutEmployeeId() {
+            //given
+            var manager = Employee.builder()
+                    .id(10L)
+                    .name("홍길동")
+                    .build();
+
+            var branch = Branch.builder()
+                    .name("기존지점명")
+                    .phoneNumber("02-000-0000")
+                    .address("기존주소")
+                    .latitude(37.0)
+                    .longitude(127.0)
+                    .manager(manager)
+                    .managerName("홍길동")
+                    .employeeCount(3)
+                    .carCount(5)
+                    .build();
+
+            var dto = new UpdateBranch(
+                    null,
+                    "02-123-4567",
+                    null,
+                    null,
+                    null,
+                    127.02761
+            );
+
+            given(branchRepository.findById(anyLong())).willReturn(Optional.of(branch));
+
+            //when
+            branchService.updateBranch(1L, dto);
+
+            //then
+            verifyNoInteractions(employeeRepository);
+            then(branchRepository).should().findById(anyLong());
+
+            assertThat(branch.getName()).isEqualTo("기존지점명");
+            assertThat(branch.getPhoneNumber()).isEqualTo("02-123-4567");
+            assertThat(branch.getAddress()).isEqualTo("기존주소");
+            assertThat(branch.getManager()).isEqualTo(manager);
+            assertThat(branch.getManagerName()).isEqualTo("홍길동");
+            assertThat(branch.getLatitude()).isEqualTo(37.0);
+            assertThat(branch.getLongitude()).isEqualTo(127.02761);
+        }
+
+        @Test
+        @DisplayName("지점이 없으면 실패한다")
+        void failWithNotExistBranch() {
+            //given
+            Long branchId = 999L;
+
+            var dto = new UpdateBranch(
+                    "변경지점명",
+                    "02-123-4567",
+                    "변경주소",
+                    1L,
+                    37.498095,
+                    127.02761
+            );
+
+            given(branchRepository.findById(branchId)).willReturn(Optional.empty());
+
+            //when & then
+            assertThatThrownBy(() -> branchService.updateBranch(branchId, dto))
+                    .isInstanceOf(CustomException.class);
+
+            then(employeeRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 EmployeeId면 실패한다")
+        void failWithNotExistEmployeeId() {
+            //given
+            var manager = Employee.builder()
+                    .id(10L)
+                    .name("홍길동")
+                    .build();
+
+            var branch = Branch.builder()
+                    .name("기존지점명")
+                    .phoneNumber("02-000-0000")
+                    .address("기존주소")
+                    .manager(manager)
+                    .managerName(manager.getName())
+                    .latitude(37.0)
+                    .longitude(127.0)
+                    .employeeCount(3)
+                    .carCount(5)
+                    .build();
+
+            var dto = new UpdateBranch(
+                    "변경지점명",
+                    null,
+                    null,
+                    999L, // 없는 직원
+                    null,
+                    null
+            );
+
+            given(branchRepository.findById(anyLong())).willReturn(Optional.of(branch));
+            given(employeeRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            //when & then
+            assertThatThrownBy(() -> branchService.updateBranch(1L, dto))
+                    .isInstanceOf(CustomException.class);
+
+            then(branchRepository).should().findById(anyLong());
+            then(employeeRepository).should().findById(999L);
+
+            assertThat(branch.getName()).isEqualTo("기존지점명");
+            assertThat(branch.getManager()).isEqualTo(manager);
+            assertThat(branch.getManagerName()).isEqualTo("홍길동");
         }
     }
 }
