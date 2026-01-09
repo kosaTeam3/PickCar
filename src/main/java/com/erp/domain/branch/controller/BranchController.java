@@ -3,7 +3,7 @@ package com.erp.domain.branch.controller;
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
 import com.erp.domain.branch.dto.response.BranchDetail;
-import com.erp.domain.branch.dto.response.BranchList;
+import com.erp.domain.branch.dto.response.BranchNameList;
 import com.erp.domain.branch.service.BranchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class BranchController {
     }
 
     @GetMapping("/list")
-    public List<BranchList> branchNameList() {
+    public List<BranchNameList> branchNameList() {
         return branchService.branchNameList();
     }
 }

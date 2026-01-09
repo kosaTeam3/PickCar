@@ -1,6 +1,6 @@
 package com.erp.domain.branch.dto.response;
 
-public record BranchList(
+public record BranchNameList(
         Long branchId,
         String branchName
 ) {
