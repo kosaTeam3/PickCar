@@ -3,6 +3,7 @@ package com.erp.domain.branch.controller;
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
 import com.erp.domain.branch.dto.response.BranchDetail;
+import com.erp.domain.branch.dto.response.BranchEmployeeList;
 import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.dto.response.BranchNameList;
 import com.erp.domain.branch.service.BranchService;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +56,10 @@ public class BranchController {
     @GetMapping("/list")
     public List<BranchNameList> branchNameList() {
         return branchService.branchNameList();
+    }
+
+    @GetMapping("/employees/{branchId}")
+    public Slice<BranchEmployeeList> getBranchEmployeeList(@PageableDefault(size = 20) Pageable pageRequest, @PathVariable Long branchId) {
+        return branchService.getBranchEmployeeList(pageRequest, branchId);
     }
 }

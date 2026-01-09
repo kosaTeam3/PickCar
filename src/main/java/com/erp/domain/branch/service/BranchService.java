@@ -3,6 +3,7 @@ package com.erp.domain.branch.service;
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
 import com.erp.domain.branch.dto.response.BranchDetail;
+import com.erp.domain.branch.dto.response.BranchEmployeeList;
 import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.dto.response.BranchNameList;
 import com.erp.domain.branch.entity.Branch;
@@ -13,6 +14,7 @@ import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,6 +115,7 @@ public class BranchService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public Page<BranchList> getBranchList(Pageable pageRequest) {
         return branchRepository.findAll(pageRequest).map(branch -> BranchList.builder()
                 .branchId(branch.getId())
@@ -125,5 +128,14 @@ public class BranchService {
                 .employeeCount(branch.getEmployeeCount())
                 .carCount(branch.getCarCount())
                 .build());
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<BranchEmployeeList> getBranchEmployeeList(Pageable pageRequest, Long branchId) {
+        if (!branchRepository.existsById(branchId)) {
+            throw new CustomException(404, "지점을 찾을 수 없습니다.");
+        }
+
+        return employeeRepository.findByBranchId(branchId, pageRequest, BranchEmployeeList.class);
     }
 }
