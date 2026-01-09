@@ -2,6 +2,7 @@ package com.erp.domain.branch.service;
 
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
+import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.employee.entity.Employee;
@@ -10,6 +11,8 @@ import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -78,5 +81,10 @@ public class BranchService {
         }
 
         branchRepository.deleteById(branchId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BranchList> branchNameList() {
+        return branchRepository.findAllBranchName();
     }
 }
