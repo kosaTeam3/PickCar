@@ -11,7 +11,7 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query(value = "SELECT b.*, " +
             "(ST_Distance_Sphere(point(b.longitude, b.latitude), point(:userLongitude, :userLatitude)) / 1000) AS distance " +
             "FROM branch b " +
-            "ORDER BY distance", nativeQuery = true)
+            "ORDER BY distance ASC", nativeQuery = true)
     List<BranchWithDistance> findBranchesByDistance(@Param("userLatitude") Double userLatitude,
                                                     @Param("userLongitude") Double userLongitude);
 }
