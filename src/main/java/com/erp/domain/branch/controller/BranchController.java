@@ -2,6 +2,7 @@ package com.erp.domain.branch.controller;
 
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
+import com.erp.domain.branch.dto.response.BranchDetail;
 import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.service.BranchService;
 import jakarta.validation.Valid;
@@ -34,6 +35,11 @@ public class BranchController {
     public ResponseEntity<Void> deleteBranch(@PathVariable Long branchId) {
         branchService.deleteBranch(branchId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{branchId}")
+    public BranchDetail getBranchDetail(@PathVariable Long branchId) {
+        return branchService.getBranchDetail(branchId);
     }
 
     @GetMapping("/list")

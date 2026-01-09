@@ -2,6 +2,7 @@ package com.erp.domain.branch.service;
 
 import com.erp.domain.branch.dto.request.CreateBranch;
 import com.erp.domain.branch.dto.request.UpdateBranch;
+import com.erp.domain.branch.dto.response.BranchDetail;
 import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
@@ -86,5 +87,25 @@ public class BranchService {
     @Transactional(readOnly = true)
     public List<BranchList> branchNameList() {
         return branchRepository.findAllBranchName();
+    }
+
+    @Transactional(readOnly = true)
+    public BranchDetail getBranchDetail(Long branchId) {
+        Branch branch = branchRepository.findById(branchId).orElseThrow(
+                () -> new CustomException(404, "지점을 찾을 수 없습니다.")
+        );
+
+        Long managerId = (branch.getManager() != null) ? branch.getManager().getId() : null;
+
+        return BranchDetail.builder()
+                .branchId(branch.getId())
+                .branchName(branch.getName())
+                .branchPhoneNumber(branch.getPhoneNumber())
+                .branchAddress(branch.getAddress())
+                .managerId(managerId)
+                .managerName(branch.getManagerName())
+                .employeeCount(branch.getEmployeeCount())
+                .carCount(branch.getCarCount())
+                .build();
     }
 }
