@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query(value = """
-        SELECT b.id, b.name, b.latitude, b.longitude
+        SELECT b.id, b.name, b.latitude, b.longitude,
             (ST_Distance_Sphere(point(b.longitude, b.latitude), point(:userLongitude, :userLatitude)) / 1000) AS distance
         FROM branch b
         ORDER BY distance ASC""", nativeQuery = true)
