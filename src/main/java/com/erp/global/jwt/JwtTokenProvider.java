@@ -66,6 +66,7 @@ public class JwtTokenProvider {
 
     // 3. Token Info 추출 : 토큰 복호화(암호 역으로 풀기) - 누구의 것인지 알아내기
     public Authentication getAuthentication(String accessToken) {
+
         // 토큰 복호화
         Claims claims = parseClaim(accessToken);
 
@@ -101,7 +102,6 @@ public class JwtTokenProvider {
         }
         return false;
     }
-
     // 토큰 파싱
     private Claims parseClaim(String accessToekn) {
         try {

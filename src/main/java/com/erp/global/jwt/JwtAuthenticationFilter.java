@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             // 4. SecurityContextHolder에 저장 -> 이제부터 스프링은 이 유저를 "로그인 된 사람"으로 취급
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         // 5. 다음 필터로 넘기기 (이게 없으면 요청이 여기서 멈춤)
         filterChain.doFilter(request, response);
 
@@ -42,6 +41,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     // header에서 "Bearer " 문자열 떼고 토큰만 가져오기
     private String resolveToken(HttpServletRequest request) {
+
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);

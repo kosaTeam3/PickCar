@@ -1,8 +1,10 @@
 package com.erp.domain.client.controller;
 
 import com.erp.domain.client.dto.request.EmailCheckRequestDto;
+import com.erp.domain.client.dto.request.LoginRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
 import com.erp.domain.client.service.ClientService;
+import com.erp.global.jwt.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +21,7 @@ public class ClientController {
 
     // 이메일 중복 확인
     @PostMapping("/validation")
-    public ResponseEntity<String> checkEmail(@RequestBody EmailCheckRequestDto requestDto){
+    public ResponseEntity<String> checkEmail(@RequestBody EmailCheckRequestDto requestDto) {
 
         boolean isDuplicate = clientService.checkEmailDuplicate(requestDto.email());
 
@@ -31,9 +33,8 @@ public class ClientController {
 
     // 로그인 페이지
     @PostMapping("/login")
-    public String login() {
-
-        return "d";
+    public TokenInfo login(@RequestBody LoginRequestDto loginRequestDto) {
+        return clientService.login(loginRequestDto);
     }
 
     // 회원가입

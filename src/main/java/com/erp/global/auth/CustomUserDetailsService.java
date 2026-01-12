@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    /**
+    /*
      * UserDetailsService
      * Repository를 이용해 유저를 찾고 만들기
      */
@@ -23,16 +23,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        return null;
+        // 1. ClientRepository를 이용해  DB에서 유저 찾기
+        return clientRepository.findByEmail(email)
+                .map(this::createUserDetails)
+                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
     }
 
-
-    private UserDetails createUserDetails(Client client){
+    // 2. Client Entity -> UserDetails 변환 메서드
+    private UserDetails createUserDetails(Client client) {
         return User.builder()
                 .username(client.getEmail())
-                .password(client.getPassword())
-                .roles("employee")
+                .password(client.getPassword())  // db에 있는 암호화된 비번이어야 함
+                .roles("employee")  // Security Config와 맞춰야 함
                 .build();
     }
 }
