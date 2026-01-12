@@ -144,6 +144,7 @@ public class BranchService {
         return employeeRepository.findByBranchId(branchId, pageRequest, BranchEmployeeList.class);
     }
 
+    @Transactional(readOnly = true)
     public List<BranchResponse> getAvailableBranches(BranchSearchRequest request) {
         // Time Parsing
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
