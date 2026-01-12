@@ -46,7 +46,8 @@ public class Client extends BaseTimeEntity {
     private String password;
 
     @Column(name = "blacklisted", nullable = false)
-    private Boolean blacklisted;
+    @Builder.Default
+    private Boolean blacklisted = false;
 
     @Column(name = "blacklist_info")
     private String blacklistInfo;
