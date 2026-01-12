@@ -53,27 +53,80 @@ public class CarService {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new CustomException(404, "해당 차량이 존재하지 않습니다."));
 
-        Branch branch = branchRepository.findById(request.branchId())
-                .orElseThrow(() -> new CustomException(404, "해당 지점이 존재하지 않습니다."));
+        if (request.vehicleIdNumber() != null) {
+            car.setVehicleIdNumber(request.vehicleIdNumber());
+        }
 
-        car.setBranch(branch);
-        car.setVehicleIdNumber(request.vehicleIdNumber());
-        car.setModel(request.model());
-        car.setPrice(request.price());
-        car.setBrand(request.brand());
-        car.setYear(request.year());
-        car.setAgeLimit(request.ageLimit());
-        car.setFuelType(request.fuelType());
-        car.setImage(request.carImage());
-        car.setCarNumber(request.carNumber());
-        car.setMileage(request.mileage());
-        car.setMaintenanceDate(request.maintenanceDate());
-        car.setInsuranceName(request.insuranceName());
-        car.setStatus(request.status());
-        car.setPurchasePrice(request.purchasePrice());
-        car.setModelPrice(request.modelPrice());
-        car.setSeater(request.seater());
-        car.setColor(request.color());
+        if (request.model() != null) {
+            car.setModel(request.model());
+        }
+
+        if (request.price() != null) {
+            car.setPrice(request.price());
+        }
+
+        if (request.brand() != null) {
+            car.setBrand(request.brand());
+        }
+
+        if (request.year() != null) {
+            car.setYear(request.year());
+        }
+
+        if (request.ageLimit() != null) {
+            car.setAgeLimit(request.ageLimit());
+        }
+
+        if (request.fuelType() != null) {
+            car.setFuelType(request.fuelType());
+        }
+
+        if (request.carImage() != null) {
+            car.setImage(request.carImage());
+        }
+
+        if (request.carNumber() != null) {
+            car.setCarNumber(request.carNumber());
+        }
+
+        if (request.mileage() != null) {
+            car.setMileage(request.mileage());
+        }
+
+        if (request.maintenanceDate() != null) {
+            car.setMaintenanceDate(request.maintenanceDate());
+        }
+
+        if (request.insuranceName() != null) {
+            car.setInsuranceName(request.insuranceName());
+        }
+
+        if (request.status() != null) {
+            car.setStatus(request.status());
+        }
+
+        if (request.purchasePrice() != null) {
+            car.setPurchasePrice(request.purchasePrice());
+        }
+
+        if (request.modelPrice() != null) {
+            car.setModelPrice(request.modelPrice());
+        }
+
+        if (request.seater() != null) {
+            car.setSeater(request.seater());
+        }
+
+        if (request.color() != null) {
+            car.setColor(request.color());
+        }
+
+        if (request.branchId() != null) {
+            Branch branch = branchRepository.findById(request.branchId())
+                    .orElseThrow(() -> new CustomException(404, "해당 지점이 존재하지 않습니다."));
+            car.setBranch(branch);
+        }
+
     }
 
     @Transactional
