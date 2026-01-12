@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @AllArgsConstructor
 public class ClientService {
 
@@ -66,7 +66,7 @@ public class ClientService {
     }
 
     // 회원 렌트 기록
-    @Transactional(readOnly = true)
+
     public List<ClientRentHistoryResponse> getRentHistory(Long clientId) {
         if (!clientRepository.existsById(clientId)) {
             throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
@@ -77,7 +77,6 @@ public class ClientService {
     }
 
     // 회원 사고 기록
-    @Transactional(readOnly = true)
     public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
         if (!clientRepository.existsById(clientId)) {
             throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
@@ -89,6 +88,7 @@ public class ClientService {
     }
 
     // 회원 블랙리스트 추가
+    @Transactional
     public void addBlacklist(Long clientId, AddClientBlacklist dto) {
         Client client = getClient(clientId);
         client.setBlacklisted(true);
