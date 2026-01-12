@@ -1,0 +1,142 @@
+package com.erp.domain.client.service;
+
+import com.erp.domain.accident.entity.Accident;
+import com.erp.domain.accident.repository.AccidentRepository;
+import com.erp.domain.client.dto.request.AddClientBlacklist;
+import com.erp.domain.client.dto.responce.ClientAccidentHistoryResponse;
+import com.erp.domain.client.dto.responce.ClientDetailResponse;
+import com.erp.domain.client.dto.responce.ClientRentHistoryResponse;
+import com.erp.domain.client.dto.responce.ClientSummaryResponse;
+import com.erp.domain.client.entity.Client;
+import com.erp.domain.client.repository.ClientRepository;
+import com.erp.domain.rent.entity.Rent;
+import com.erp.domain.rent.repository.RentRepository;
+import com.erp.global.exception.CustomException;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+public class ClientService {
+
+    private final ClientRepository clientRepository;
+
+    private final AccidentRepository accidentRepository;
+
+    private final RentRepository rentRepository;
+
+    // 회원목록 조회
+    public List<ClientSummaryResponse> getClients() {
+        return clientRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+                .stream()
+                .map(this::toSummary)
+                .toList();
+    }
+
+    // 회원 검색
+    public List<ClientSummaryResponse> searchClients(String keyword) {
+        return clientRepository
+                .searchClient(keyword)
+                .stream()
+                .map(this::toSummary)
+                .toList();
+    }
+
+    // 회원 상세정보
+    public ClientDetailResponse getClientDetail(Long clientId) {
+        Client client = getClient(clientId);
+        return new ClientDetailResponse(
+                client.getId(),
+                client.getName(),
+                client.getEmail(),
+                client.getPhoneNumber(),
+                client.getBirthday(),
+                client.getGender(),
+                client.getLicenceNumber(),
+                client.getCreatedAt(),
+                client.getLicenceDay(),
+                client.getBlacklisted(),
+                client.getBlacklistInfo()
+        );
+    }
+
+    // 회원 렌트 기록
+    @Transactional(readOnly = true)
+    public List<ClientRentHistoryResponse> getRentHistory(Long clientId) {
+        if (!clientRepository.existsById(clientId)) {
+            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
+        }
+        return rentRepository.findByClientId_Id(clientId).stream()
+                .map(this::toRentHistory)
+                .toList();
+    }
+
+    // 회원 사고 기록
+    @Transactional(readOnly = true)
+    public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
+        if (!clientRepository.existsById(clientId)) {
+            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
+        }
+
+        // 명시적으로 accidentRepository.findByClientId(clientId)를 호출하는지 확인
+        return accidentRepository.findByClientId(clientId).stream()
+                .map((Accident accident) -> toAccidentHistory(accident)) // (Accident accident)로 타입 명시
+                .toList();
+    }
+
+    // 회원 블랙리스트 추가
+    public void addBlacklist(Long clientId, AddClientBlacklist dto) {
+        Client client = getClient(clientId);
+        client.setBlacklisted(true);
+        client.setBlacklistInfo(dto.blacklistInfo());
+    }
+
+    private ClientSummaryResponse toSummary(Client client) {
+        return new ClientSummaryResponse(
+                client.getId(),
+                client.getName(),
+                client.getEmail(),
+                client.getPhoneNumber(),
+                client.getCreatedAt(),
+                client.getBlacklisted()
+        );
+    }
+
+    private ClientAccidentHistoryResponse toAccidentHistory(Accident accident) {
+        return new ClientAccidentHistoryResponse(
+                accident.getId(),
+                accident.getAccidentTime(),
+                accident.getAccidentStatus(),
+                accident.getAccidentDetail(),
+                accident.getAccidentLocate(),
+                accident.getAccidentPart(),
+                accident.getAccidentImage(),
+                accident.getInsuranceInfo(),
+                accident.getBrand(),
+                accident.getModel(),
+                accident.getYear()
+        );
+    }
+
+    private Client getClient(Long clientId) {
+        return clientRepository.findById(clientId)
+                .orElseThrow(() -> new CustomException(404, "회원 정보를 찾을 수 없습니다."));
+    }
+
+    private ClientRentHistoryResponse toRentHistory(Rent rent) {
+        return new ClientRentHistoryResponse(
+                rent.getId(),
+                rent.getCarName(),
+                rent.getModel(),
+                rent.getBrand(),
+                rent.getYear(),
+                rent.getPrice(),
+                rent.getStartRentDateTime(),
+                rent.getEndRentDateTime()
+        );
+    }
+}
