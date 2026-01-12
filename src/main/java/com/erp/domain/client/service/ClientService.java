@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 @AllArgsConstructor
 public class ClientService {
 
@@ -70,7 +71,7 @@ public class ClientService {
         if (!clientRepository.existsById(clientId)) {
             throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
         }
-        return rentRepository.findByClientId_Id(clientId).stream()
+        return rentRepository.findRentHistoryByClient(clientId).stream()
                 .map(this::toRentHistory)
                 .toList();
     }
@@ -82,9 +83,8 @@ public class ClientService {
             throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
         }
 
-        // 명시적으로 accidentRepository.findByClientId(clientId)를 호출하는지 확인
         return accidentRepository.findByClientId(clientId).stream()
-                .map((Accident accident) -> toAccidentHistory(accident)) // (Accident accident)로 타입 명시
+                .map(this::toAccidentHistory)
                 .toList();
     }
 
