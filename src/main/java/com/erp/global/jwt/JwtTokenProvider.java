@@ -25,8 +25,7 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-
-    // 1. 암호화 키 셋팅 : : application.yml에서 가져온 비밀키 사용
+    // 1. 암호화 키 셋팅 : : application.yml`에서 가져온 비밀키 사용
     public JwtTokenProvider(@Value("${jwt.secret_key}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -47,7 +46,7 @@ public class JwtTokenProvider {
         // Create Access Token
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())  // Payload에 유저네임(email) 저장
-                .claim("auth", authorities)  // Payload claim에 권한 정보 젖아
+                .claim("auth", authorities)  // Payload claim에 권한 정보
                 .setExpiration(accessTokenExpiration)  //만료시간 설정
                 .signWith(key, SignatureAlgorithm.HS256)  // Signature
                 .compact();

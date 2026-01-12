@@ -33,6 +33,9 @@ public class Client extends BaseTimeEntity {
     @Column(name = "gender", nullable = false)
     private Gender gender;
 
+    @Column(name = "resident_number", nullable = false)
+    private String residentNumber;
+
     @Column(name = "licence_number", nullable = false)
     private String licenceNumber;
 

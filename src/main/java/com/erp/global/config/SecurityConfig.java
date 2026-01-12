@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    /**
+    /*
      * Spring Security의 AuthenticationManager
      * -> Spring이 알아서 UserDetailsService와 PasswordEncoder를 가져다 씀
      * 로그인 시 사용자의 인증(Authentication) 담당

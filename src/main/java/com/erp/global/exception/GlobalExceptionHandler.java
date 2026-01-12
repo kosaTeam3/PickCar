@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> entity(Exception e){
-        return ResponseEntity.status(404).body(new ErrorResponse(404,e.getMessage()));
+    public ResponseEntity<ErrorResponse> entity(Exception e) {
+        return ResponseEntity.status(404).body(new ErrorResponse(404, e.getMessage()));
     }
 }

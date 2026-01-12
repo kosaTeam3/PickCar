@@ -1,8 +1,10 @@
 package com.erp.global.auth;
 
 
+import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +24,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
+        return null;
     }
 
+
+    private UserDetails createUserDetails(Client client){
+        return User.builder()
+                .username(client.getEmail())
+                .password(client.getPassword())
+                .roles("employee")
+                .build();
+    }
 }
