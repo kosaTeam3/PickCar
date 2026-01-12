@@ -35,7 +35,7 @@ public class Branch extends BaseTimeEntity {
     private Double longitude;
 
     @Column(name = "employ_count", nullable = false)
-    private Integer employCount;
+    private Integer employeeCount;
 
     @Column(name = "car_count", nullable = false)
     private Integer carCount;
