@@ -2,6 +2,7 @@ package com.erp.domain.car.controller;
 
 import com.erp.domain.car.dto.request.CarCreateRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
+import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
 import com.erp.domain.car.service.CarService;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,12 @@ public class CarController {
             @PageableDefault(size = 20, sort = "id") Pageable pageable
     ) {
         return ResponseEntity.ok(carService.getCarList(pageable));
+    }
+
+    /* 차량 기본 정보 조회(상세조회) */
+    @GetMapping("/{carId}")
+    public ResponseEntity<CarDetailResponse> getCarDetail(@PathVariable Long carId) {
+        return ResponseEntity.ok(carService.getCarDetail(carId));
     }
 
 }
