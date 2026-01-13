@@ -4,12 +4,18 @@ import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.car.dto.request.CarCreateRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
+import com.erp.domain.car.dto.response.CarDetailResponse;
+import com.erp.domain.car.dto.response.CarListResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -135,5 +141,60 @@ public class CarService {
                 .orElseThrow(() -> new CustomException(404, "해당 차량이 존재하지 않습니다."));
 
         carRepository.delete(car);
+    }
+
+    /* 전체 차량 목록 조회 */
+    public Page<CarListResponse> getCarList(Pageable pageable) {
+        return carRepository.findAll(pageable)
+                .map(car -> CarListResponse.builder()
+                        .carId(car.getId())
+                        .vehicleIdNumber(car.getVehicleIdNumber())
+                        .image(car.getImage())
+                        .model(car.getModel())
+                        .branchId(Optional.ofNullable(car.getBranch())
+                                .map(Branch::getId).orElse(null))
+                        .branchName(Optional.ofNullable(car.getBranch())
+                                .map(Branch::getName).orElse(null))
+                        .carNumber(car.getCarNumber())
+                        .ageLimit(car.getAgeLimit())
+                        .mileage(car.getMileage())
+                        .status(car.getStatus().name())
+                        .fuelType(car.getFuelType().name())
+                        .seater(car.getSeater())
+                        .color(car.getColor().name())
+                        .build());
+
+    }
+
+    /* 차량 기본 정보 조회(상세조회) */
+    public CarDetailResponse getCarDetail(Long carId) {
+
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new CustomException(404, "해당 차량이 존재하지 않습니다."));
+
+        Long branchId = (car.getBranch() != null) ? car.getBranch().getId() : null;
+
+        return CarDetailResponse.builder()
+                .carId(car.getId())
+                .vehicleIdNumber(car.getVehicleIdNumber())
+                .model(car.getModel())
+                .price(car.getPrice())
+                .brand(car.getBrand())
+                .year(car.getYear())
+                .ageLimit(car.getAgeLimit())
+                .fuelType(car.getFuelType().name())
+                .image(car.getImage())
+                .branchId(branchId)
+                .carNumber(car.getCarNumber())
+                .mileage(car.getMileage())
+                .maintenanceDate(car.getMaintenanceDate())
+                .insuranceName(car.getInsuranceName())
+                .status(car.getStatus().name())
+                .purchasePrice(car.getPurchasePrice())
+                .modelPrice(car.getModelPrice())
+                .seater(car.getSeater())
+                .color(car.getColor().name())
+                .build();
+
     }
 }
