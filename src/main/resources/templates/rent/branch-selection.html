@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>PickCar - 지점 선택</title>
+</head>
+<body>
+<header>
+    <nav>
+        <a th:href="@{/rent/time}">← 이전</a>
+        <strong>환영합니다 홍길동님</strong>
+    </nav>
+    <section>
+        <div>
+            <span>🕒 시작 시간: </span>
+            <span id="displayStartTime" th:text="${searchRequest.startRentDateTime}"></span>
+        </div>
+    </section>
+</header>
+
+<main>
+    <section id="map-area">
+        <h2>지점 선택</h2>
+        <div id="map" style="width:100%; height:400px; background:#eee;">지도 영역</div>
+    </section>
+
+    <aside>
+        <h3>지점 목록</h3>
+        <div id="branch-list">
+            <p>데이터를 불러오는 중입니다...</p>
+        </div>
+    </aside>
+</main>
+
+<script th:inline="javascript">
+    // 주석 처리로 IDE 문법 오류를 방지하고, 서버 실행 시 실제 객체로 치환
+    const searchRequest = /*[[${searchRequest}]]*/ null;
+
+    async function fetchBranches() {
+        // 시간 형식을 변환 (T를 공백으로, 초 단위 추가)
+        const start = searchRequest.startRentDateTime.replace('T', ' ') + ':00';
+        const end = searchRequest.endRentDateTime.replace('T', ' ') + ':00';
+
+        // 쿼리 파라미터 생성
+        const params = new URLSearchParams({
+            startRentDateTime: start,
+            endRentDateTime: end,
+            userLatitude: searchRequest.userLatitude,
+            userLongitude: searchRequest.userLongitude
+        });
+
+        try {
+            // 정의된 API(/api/client/branches)를 호출
+            const response = await fetch(`/api/client/branches?${params.toString()}`);
+            const branches = await response.json(); // List<BranchResponse> 형태의 데이터 수신
+
+            renderBranchList(branches);
+        } catch (error) {
+            console.error('데이터 조회 실패:', error);
+        }
+    }
+
+    function renderBranchList(branches) {
+        const listDiv = document.getElementById('branch-list');
+        listDiv.innerHTML = ''; // 기존 문구 제거
+
+        if (branches.length === 0) {
+            listDiv.innerHTML = '<p>이용 가능한 지점이 없습니다.</p>';
+            return;
+        }
+
+        branches.forEach(branch => {
+            const item = document.createElement('article');
+            item.innerHTML = `
+                    <div>
+                        <strong>${branch.branchName}</strong><br>
+                        이용 가능 차량: ${branch.availableVehicles}대<br>
+                        거리: ${branch.distance.toFixed(2)}km
+                    </div>
+                    <hr>
+                `;
+            listDiv.appendChild(item);
+        });
+    }
+
+    // 페이지 로드 시 API 호출 시작
+    window.onload = fetchBranches;
+</script>
+</body>
+</html>
