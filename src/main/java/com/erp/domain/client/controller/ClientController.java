@@ -24,11 +24,7 @@ public class ClientController {
     @PostMapping("/validation")
     public ResponseEntity<String> checkEmail(@RequestBody EmailCheckRequestDto requestDto) {
 
-        boolean isDuplicate = clientService.checkEmailDuplicate(requestDto.email());
-
-        if (isDuplicate) {
-            return ResponseEntity.status(409).body("이미 존재하는 이메일입니다.");
-        }
+        clientService.checkEmailDuplicate(requestDto.email());
         return ResponseEntity.ok("사용 가능한 이메일입니다.");
     }
 

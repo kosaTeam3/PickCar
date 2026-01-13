@@ -48,8 +48,10 @@ public class ClientService {
     }
 
     // email 중복조회
-    public boolean checkEmailDuplicate(String email) {
-        return clientRepository.existsByEmail(email);
+    public void checkEmailDuplicate(String email) {
+        if(clientRepository.existsByEmail(email)){
+            throw new CustomException(409, "이미 존재하는 이메일입니다.");
+        }
     }
 
     // 회원가입
