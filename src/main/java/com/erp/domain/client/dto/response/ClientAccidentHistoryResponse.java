@@ -1,4 +1,4 @@
-package com.erp.domain.client.dto.responce;
+package com.erp.domain.client.dto.response;
 
 import com.erp.domain.accident.entity.AccidentStatus;
 

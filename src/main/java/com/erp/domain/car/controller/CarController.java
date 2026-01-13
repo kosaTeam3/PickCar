@@ -21,13 +21,12 @@ public class CarController {
 
     /* 차량 등록 */
     @PostMapping
-    public ResponseEntity<Long> createCar(@RequestBody CarCreateRequest request) {
-        Long carId = carService.createCar(request);
-        return ResponseEntity.ok(carId);
+    public Long createCar(@RequestBody CarCreateRequest request) {
+        return carService.createCar(request);
     }
 
     /* 차량 수정 */
-    @PutMapping("/{carId}")
+    @PatchMapping("/{carId}")
     public ResponseEntity<Void> updateCar(@RequestBody CarUpdateRequest request, @PathVariable Long carId) {
         carService.updateCar(carId, request);
         return ResponseEntity.noContent().build();
@@ -42,16 +41,16 @@ public class CarController {
 
     /* 전체 차량 목록 조회 */
     @GetMapping
-    public ResponseEntity<Page<CarListResponse>> getCarList(
+    public Page<CarListResponse> getCarList(
             @PageableDefault(size = 20, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(carService.getCarList(pageable));
+        return carService.getCarList(pageable);
     }
 
     /* 차량 기본 정보 조회(상세조회) */
     @GetMapping("/{carId}")
-    public ResponseEntity<CarDetailResponse> getCarDetail(@PathVariable Long carId) {
-        return ResponseEntity.ok(carService.getCarDetail(carId));
+    public CarDetailResponse getCarDetail(@PathVariable Long carId) {
+        return carService.getCarDetail(carId);
     }
 
 }

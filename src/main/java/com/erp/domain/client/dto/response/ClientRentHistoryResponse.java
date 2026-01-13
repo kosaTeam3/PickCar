@@ -1,6 +1,7 @@
-package com.erp.domain.client.dto.responce;
+package com.erp.domain.client.dto.response;
 
 import lombok.Builder;
+
 import java.time.LocalDateTime;
 
 @Builder
