@@ -1,10 +1,10 @@
 package com.erp.domain.client.controller;
 
 import com.erp.domain.client.dto.request.AddClientBlacklist;
-import com.erp.domain.client.dto.responce.ClientAccidentHistoryResponse;
-import com.erp.domain.client.dto.responce.ClientDetailResponse;
-import com.erp.domain.client.dto.responce.ClientRentHistoryResponse;
-import com.erp.domain.client.dto.responce.ClientSummaryResponse;
+import com.erp.domain.client.dto.response.ClientAccidentHistoryResponse;
+import com.erp.domain.client.dto.response.ClientDetailResponse;
+import com.erp.domain.client.dto.response.ClientRentHistoryResponse;
+import com.erp.domain.client.dto.response.ClientSummaryResponse;
 import com.erp.domain.client.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,28 +22,28 @@ public class ClientController {
 
 
     @GetMapping(params = "keyword")
-    public ResponseEntity<List<ClientSummaryResponse>> searchClients(@RequestParam String keyword) {
-        return ResponseEntity.ok(clientService.searchClients(keyword));
+    public List<ClientSummaryResponse> searchClients(@RequestParam String keyword) {
+        return clientService.searchClients(keyword);
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientSummaryResponse>> getClients() {
-        return ResponseEntity.ok(clientService.getClients());
+    public List<ClientSummaryResponse> getClients() {
+        return clientService.getClients();
     }
 
     @GetMapping("/{clientId}")
-    public ResponseEntity<ClientDetailResponse> getClient(@PathVariable Long clientId) {
-        return ResponseEntity.ok(clientService.getClientDetail(clientId));
+    public ClientDetailResponse getClient(@PathVariable Long clientId) {
+        return clientService.getClientDetail(clientId);
     }
 
     @GetMapping("/rent/{clientId}")
-    public ResponseEntity<List<ClientRentHistoryResponse>> getRentHistory(@PathVariable Long clientId) {
-        return ResponseEntity.ok(clientService.getRentHistory(clientId));
+    public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
+        return clientService.getRentHistory(clientId);
     }
 
     @GetMapping("/accident/{clientId}")
-    public ResponseEntity<List<ClientAccidentHistoryResponse>> getAccidentHistory(@PathVariable Long clientId) {
-        return ResponseEntity.ok(clientService.getAccidentHistory(clientId));
+    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
+        return clientService.getAccidentHistory(clientId);
     }
 
     @PostMapping("/black/{clientId}")
