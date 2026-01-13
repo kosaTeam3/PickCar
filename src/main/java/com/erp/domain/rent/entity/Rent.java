@@ -3,6 +3,7 @@ package com.erp.domain.rent.entity;
 import com.erp.common.entity.BaseTimeEntity;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.FuelType;
+import com.erp.domain.client.entity.Client;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,10 @@ public class Rent extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client clientId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
