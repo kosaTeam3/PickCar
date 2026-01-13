@@ -1,6 +1,7 @@
 package com.erp.domain.car.controller;
 
 import com.erp.domain.car.dto.request.CarCreateRequest;
+import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
@@ -39,12 +40,13 @@ public class CarController {
         return ResponseEntity.noContent().build();
     }
 
-    /* 전체 차량 목록 조회 */
+    /* 전체 차량 목록 조회 + 조건 검색 통합 */
     @GetMapping
     public Page<CarListResponse> getCarList(
+            @ModelAttribute CarSearchRequest request,
             @PageableDefault(size = 20, sort = "id") Pageable pageable
     ) {
-        return carService.getCarList(pageable);
+        return carService.searchCars(request, pageable);
     }
 
     /* 차량 기본 정보 조회(상세조회) */

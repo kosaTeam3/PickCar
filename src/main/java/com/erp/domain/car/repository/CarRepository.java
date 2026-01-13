@@ -24,6 +24,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
                                 @Param("status") CarStatus status,
                                 @Param("rentedCarIds") List<Long> rentedCarIds);
 
+
+    /* 차량 검색 */
     @Query("SELECT c FROM Car c " +
             "WHERE (:branchId IS NULL OR c.branch.id = :branchId) " +
             "AND (:brand IS NULL OR c.brand = :brand) " +
@@ -35,6 +37,6 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("brand") String brand,
             @Param("model") String model,
             @Param("fuelType") FuelType fuelType,
-            @Param("rentedCarIds") CarStatus status,
+            @Param("status") CarStatus status,
             Pageable pageable);
 }
