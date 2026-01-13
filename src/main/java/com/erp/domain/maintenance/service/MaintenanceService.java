@@ -13,9 +13,7 @@ import com.erp.domain.maintenance.repository.MaintenanceRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,6 +81,7 @@ public class MaintenanceService {
         if (request.detail() != null) {
             maintenance.setDetail(request.detail());
         }
+        maintenanceRepository.save(maintenance);
     }
 
     @Transactional
@@ -94,11 +93,6 @@ public class MaintenanceService {
     }
 
     public Page<MaintenanceListResponse> getMaintenanceList(Pageable pageable, Long branchId, MaintenanceStatus status, String keyword) {
-        Pageable sortedByDesc = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by("id").descending()
-        );
         return maintenanceRepository.search(branchId, status, keyword, pageable);
     }
 
