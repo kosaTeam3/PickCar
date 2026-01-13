@@ -23,6 +23,10 @@ public class Rent extends BaseTimeEntity {
     @Column(name = "id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client clientId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
     private Car car;

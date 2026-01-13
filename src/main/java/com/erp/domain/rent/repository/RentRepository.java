@@ -14,4 +14,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             "WHERE r.startRentDateTime < :endRentDateTime AND r.endRentDateTime > :startRentDateTime")
     List<Long> findRentedCarIds(@Param("startRentDateTime") LocalDateTime startRentDateTime,
                                 @Param("endRentDateTime") LocalDateTime endRentDateTime);
+
+    @Query("SELECT r FROM Rent r WHERE r.clientId.id = :id")
+    List<Rent> findRentHistoryByClient(@Param("id") Long clientId);
 }
