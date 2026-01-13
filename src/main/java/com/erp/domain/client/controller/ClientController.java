@@ -5,6 +5,7 @@ import com.erp.domain.client.dto.request.LoginRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
 import com.erp.domain.client.service.ClientService;
 import com.erp.global.jwt.TokenInfo;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,9 +40,9 @@ public class ClientController {
 
     // 회원가입
     @PostMapping("/register")
-    public ResponseEntity<String> registerClient(@RequestBody RegisterClientRequestDto requestDto) {
+    public ResponseEntity<String> registerClient(@Valid @RequestBody RegisterClientRequestDto requestDto) {
 
         clientService.registerClient(requestDto);
-        return ResponseEntity.ok("회원가입 성공");
+        return ResponseEntity.noContent().build();
     }
 }

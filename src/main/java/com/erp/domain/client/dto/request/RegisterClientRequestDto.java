@@ -16,29 +16,27 @@ public record RegisterClientRequestDto(
         String password,
 
         @NotBlank(message = "휴대폰 번호")
-        String phone_number,
+        String phoneNumber,
 
         @NotBlank(message = "이름")
         String name,
 
-        @NotBlank(message = "성별")
-        Gender gender,
-
-        @NotBlank(message = "생년월일")
-        String birthday,
-
         // 주민 뒷번호 한국인 1~4 , 외국인 5~8
         @NotBlank(message = "주민번호")
         @Pattern(regexp = "^\\d{6}-[1-8]$", message = "주민번호 형식이 올바르지 않습니다.")
-        String resident_number,
+        String residentNumber,
 
         @NotBlank(message = "면허증 번호")
-        String licence_number,
+        @Pattern(regexp = "^\\d{2}-\\d{2}-\\d{6}-\\d{2}$",
+                message = "면허증 번호 형식이 올바르지 않습니다. (예: 11-22-333333-44)\"")
+        String licenceNumber,
 
         @NotBlank(message = "면허 발급처")
-        String licence_area,
+        String licenceArea,
 
         @NotBlank(message = "면허 발급일자")
-        String licence_day
+        @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$",
+                message = "발급일자는 YYYY-MM-DD 형식이어야 합니다.")
+        String licenceDay
 ) {
 }
