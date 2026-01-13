@@ -21,9 +21,8 @@ public class MaintenanceController {
     private final MaintenanceService maintenanceService;
 
     @PostMapping("/{carId}")
-    public ResponseEntity<Long> createMaintenance(@PathVariable Long carId, @RequestBody MaintenanceRequest request) {
-        Long maintenanceId = maintenanceService.createMaintenance(carId, request);
-        return ResponseEntity.ok(maintenanceId);
+    public Long createMaintenance(@PathVariable Long carId, @RequestBody MaintenanceRequest request) {
+        return maintenanceService.createMaintenance(carId, request);
     }
 
     @PatchMapping("/{maintenanceId}")
