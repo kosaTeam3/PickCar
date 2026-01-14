@@ -26,12 +26,15 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
 
     /* 차량 검색 */
-    @Query("SELECT c FROM Car c " +
-            "WHERE (:branchId IS NULL OR c.branch.id = :branchId) " +
-            "AND (:brand IS NULL OR c.brand = :brand) " +
-            "AND (:model IS NULL OR c.model LIKE %:model%) " +
-            "AND (:fuelType IS NULL OR c.fuelType = :fuelType) " +
-            "AND (:status IS NULL OR c.status = :status)")
+    @Query("""
+    SELECT c
+    FROM Car c
+    WHERE (:branchId IS NULL OR c.branch.id = :branchId)
+      AND (:brand IS NULL OR c.brand = :brand)
+      AND (:model IS NULL OR c.model LIKE %:model%)
+      AND (:fuelType IS NULL OR c.fuelType = :fuelType)
+      AND (:status IS NULL OR c.status = :status)
+    """)
     Page<Car> searchCars(
             @Param("branchId") Long branchId,
             @Param("brand") String brand,
