@@ -16,10 +16,11 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     int countByBranchIdAndStatus(Long branchId, CarStatus status);
 
     // 특정 지점의 WAITING 상태 차량 중, 예약된 차량들을 제외하고 카운트
-    @Query("SELECT COUNT(c) FROM Car c " +
-            "WHERE c.branch.id = :branchId " +
-            "AND c.status = :status " +
-            "AND c.id NOT IN :rentedCarIds")
+    @Query("""
+        SELECT COUNT(c) FROM Car c
+        WHERE c.branch.id = :branchId
+        AND c.status = :status
+        AND c.id NOT IN :rentedCarIds""")
     int countAvailableCarsNotIn(@Param("branchId") Long branchId,
                                 @Param("status") CarStatus status,
                                 @Param("rentedCarIds") List<Long> rentedCarIds);
