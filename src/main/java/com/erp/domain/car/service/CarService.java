@@ -4,6 +4,7 @@ import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.car.dto.request.AvailableCarSearchRequest;
 import com.erp.domain.car.dto.request.CarCreateRequest;
+import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.AvailableCarResponse;
 import com.erp.domain.car.dto.response.CarDetailResponse;
@@ -235,5 +236,35 @@ public class CarService {
                         car.getColor()
                 ))
                 .toList();
+    }
+
+    /* 차량 검색 (조건 필터 적용) */
+    @Transactional(readOnly = true)
+    public Page<CarListResponse> searchCars(CarSearchRequest request, Pageable pageable) {
+
+        Page<Car> cars = carRepository.searchCars(
+                request.branchId(),
+                request.brand(),
+                request.model(),
+                request.fuelType(),
+                request.status(),
+                pageable
+        );
+
+        return cars.map(car -> CarListResponse.builder()
+                .carId(car.getId())
+                .vehicleIdNumber(car.getVehicleIdNumber())
+                .model(car.getModel())
+                .image(car.getImage())
+                .branchId(car.getBranch() != null ? car.getBranch().getId() : null)
+                .branchName(car.getBranch() != null ? car.getBranch().getName() : null)
+                .status(car.getStatus().name())
+                .fuelType(car.getFuelType().name())
+                .carNumber(car.getCarNumber())
+                .ageLimit(car.getAgeLimit())
+                .mileage(car.getMileage())
+                .seater(car.getSeater())
+                .color(car.getColor().name())
+                .build());
     }
 }
