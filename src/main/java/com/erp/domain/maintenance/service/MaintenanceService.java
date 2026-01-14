@@ -81,6 +81,7 @@ public class MaintenanceService {
         if (request.detail() != null) {
             maintenance.setDetail(request.detail());
         }
+        maintenanceRepository.save(maintenance);
     }
 
     @Transactional

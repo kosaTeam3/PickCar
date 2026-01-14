@@ -209,36 +209,6 @@ public class CarService {
 
     }
 
-    /* 차량 검색 (조건 필터 적용) */
-    @Transactional(readOnly = true)
-    public Page<CarListResponse> searchCars(CarSearchRequest request, Pageable pageable) {
-
-        Page<Car> cars = carRepository.searchCars(
-                request.branchId(),
-                request.brand(),
-                request.model(),
-                request.fuelType(),
-                request.status(),
-                pageable
-        );
-
-        return cars.map(car -> CarListResponse.builder()
-                .carId(car.getId())
-                .vehicleIdNumber(car.getVehicleIdNumber())
-                .model(car.getModel())
-                .image(car.getImage())
-                .branchId(car.getBranch() != null ? car.getBranch().getId() : null)
-                .branchName(car.getBranch() != null ? car.getBranch().getName() : null)
-                .status(car.getStatus().name())
-                .fuelType(car.getFuelType().name())
-                .carNumber(car.getCarNumber())
-                .ageLimit(car.getAgeLimit())
-                .mileage(car.getMileage())
-                .seater(car.getSeater())
-                .color(car.getColor().name())
-                .build());
-    }
-
     /* 차량 기본 정보 조회(상세조회) */
     public CarDetailResponse getCarDetail(Long carId) {
 
@@ -268,7 +238,36 @@ public class CarService {
                 .seater(car.getSeater())
                 .color(car.getColor().name())
                 .build();
+    }
 
+    /* 차량 검색 (조건 필터 적용) */
+    @Transactional(readOnly = true)
+    public Page<CarListResponse> searchCars(CarSearchRequest request, Pageable pageable) {
+
+        Page<Car> cars = carRepository.searchCars(
+                request.branchId(),
+                request.brand(),
+                request.model(),
+                request.fuelType(),
+                request.status(),
+                pageable
+        );
+
+        return cars.map(car -> CarListResponse.builder()
+                .carId(car.getId())
+                .vehicleIdNumber(car.getVehicleIdNumber())
+                .model(car.getModel())
+                .image(car.getImage())
+                .branchId(car.getBranch() != null ? car.getBranch().getId() : null)
+                .branchName(car.getBranch() != null ? car.getBranch().getName() : null)
+                .status(car.getStatus().name())
+                .fuelType(car.getFuelType().name())
+                .carNumber(car.getCarNumber())
+                .ageLimit(car.getAgeLimit())
+                .mileage(car.getMileage())
+                .seater(car.getSeater())
+                .color(car.getColor().name())
+                .build());
     }
 
     public CarMaintenanceAlertResponse getMaintenanceAlerts(Long carId) {
