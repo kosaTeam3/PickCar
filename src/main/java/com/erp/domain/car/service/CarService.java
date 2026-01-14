@@ -2,12 +2,16 @@ package com.erp.domain.car.service;
 
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
+import com.erp.domain.car.dto.request.AvailableCarSearchRequest;
 import com.erp.domain.car.dto.request.CarCreateRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
+import com.erp.domain.car.dto.response.AvailableCarResponse;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
+import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +31,7 @@ public class CarService {
 
     private final CarRepository carRepository;
     private final BranchRepository branchRepository;
+    private final RentRepository rentRepository;
 
     @Transactional
     public Long createCar(CarCreateRequest request) {
@@ -196,5 +204,36 @@ public class CarService {
                 .color(car.getColor().name())
                 .build();
 
+    }
+
+    public List<AvailableCarResponse> getAvailableCarsByBranch(Long branchId, AvailableCarSearchRequest request) {
+        // Time Parsing
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startRentDateTime = LocalDateTime.parse(request.startRentDateTime(), formatter);
+        LocalDateTime endRentDateTime = LocalDateTime.parse(request.endRentDateTime(), formatter);
+
+        // 해당 기간에 예약된 차량 ID 조회
+        List<Long> rentedCarIds = rentRepository.findRentedCarIds(startRentDateTime, endRentDateTime);
+
+        List<Car> availableCars = carRepository.findAvailableCars(
+                branchId,
+                CarStatus.WAITING,
+                rentedCarIds.isEmpty() ? null : rentedCarIds
+        );
+
+        return availableCars.stream()
+                .map(car -> new AvailableCarResponse(
+                        car.getId(),
+                        car.getImage(),
+                        car.getModel(),
+                        car.getPrice(),
+                        car.getBrand(),
+                        car.getYear(),
+                        car.getAgeLimit(),
+                        car.getFuelType(),
+                        car.getSeater(),
+                        car.getColor()
+                ))
+                .toList();
     }
 }
