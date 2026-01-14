@@ -4,6 +4,7 @@ import com.erp.common.entity.BaseTimeEntity;
 import com.erp.domain.branch.entity.Branch;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -52,4 +53,9 @@ public class Employee extends BaseTimeEntity {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "join_change_password", nullable = false,columnDefinition = "TINYINT(1)")
+    @ColumnDefault("1")
+    @Builder.Default
+    private Boolean joinChangePassword = true;
 }
