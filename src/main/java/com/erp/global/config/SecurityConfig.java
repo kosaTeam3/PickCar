@@ -12,6 +12,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                // .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화 (Postman 테스트를 위해 필수)
                 .authorizeHttpRequests(
                         auth -> auth
                                 .anyRequest().permitAll()

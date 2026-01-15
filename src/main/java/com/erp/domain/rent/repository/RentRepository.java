@@ -12,8 +12,10 @@ import java.util.Optional;
 
 public interface RentRepository extends JpaRepository<Rent, Long> {
     // 요청 기간 (start ~ end)에 겹치는 예약이 있는 car_id 목록 조회
-    @Query("SELECT r.car.id FROM Rent r " +
-            "WHERE r.startRentDateTime < :endRentDateTime AND r.endRentDateTime > :startRentDateTime")
+    @Query("""
+        SELECT r.car.id FROM Rent r
+        WHERE r.startRentDateTime < :endRentDateTime
+            AND r.endRentDateTime > :startRentDateTime""")
     List<Long> findRentedCarIds(@Param("startRentDateTime") LocalDateTime startRentDateTime,
                                 @Param("endRentDateTime") LocalDateTime endRentDateTime);
 
