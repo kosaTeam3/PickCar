@@ -21,7 +21,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
         WHERE c.branch.id = :branchId
         AND c.status = :status
         AND c.id NOT IN :rentedCarIds""")
-    int countAvailableCarsNotIn(@Param("branchId") Long branchId,
+    Integer countAvailableCarsNotIn(@Param("branchId") Long branchId,
                                 @Param("status") CarStatus status,
                                 @Param("rentedCarIds") List<Long> rentedCarIds);
 

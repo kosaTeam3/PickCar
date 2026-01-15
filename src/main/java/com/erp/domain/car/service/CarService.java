@@ -208,10 +208,8 @@ public class CarService {
     }
 
     public List<AvailableCarResponse> getAvailableCarsByBranch(Long branchId, AvailableCarSearchRequest request) {
-        // Time Parsing
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startRentDateTime = LocalDateTime.parse(request.startRentDateTime(), formatter);
-        LocalDateTime endRentDateTime = LocalDateTime.parse(request.endRentDateTime(), formatter);
+        LocalDateTime startRentDateTime = request.startRentDateTime();
+        LocalDateTime endRentDateTime = request.endRentDateTime();
 
         // 해당 기간에 예약된 차량 ID 조회
         List<Long> rentedCarIds = rentRepository.findRentedCarIds(startRentDateTime, endRentDateTime);
