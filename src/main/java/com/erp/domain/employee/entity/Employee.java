@@ -72,7 +72,11 @@ public class Employee extends BaseTimeEntity {
         if(grade != null) this.grade = grade;
         if(authority != null) this.authority = authority;
         if(quitDate != null) this.quitDate = quitDate;
+    }
 
-
+    // Soft Delete
+    // 외부에서 퇴사처리하면 오늘로 퇴사날짜를 찍습니다.
+    public void resign(){
+        this.quitDate = LocalDate.now();
     }
 }

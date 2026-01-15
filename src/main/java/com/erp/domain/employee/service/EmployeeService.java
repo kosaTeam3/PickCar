@@ -28,6 +28,19 @@ public class EmployeeService {
     private static final int PHONE_LAST_DIGIT_LENGTH = 4;
     private static final String SEQUENCE_FORMAT = "%04d";
 
+    // 직원 퇴사 (삭제)
+    @Transactional
+    public void deleteEmployee(Long employeeId){
+
+        // 조회 (검증)
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
+
+        // 퇴사 처리 (DB 상태변경)
+        employee.resign();
+        //  JPA의 Dirty Checking에 의해 트랜잭션 종료 시 Update 쿼리 실행
+    }
+
     // 직원 정보 수정
     @Transactional
     public void updateEmployee (Long employeeId, UpdateEmployeeRequestDto request){
@@ -57,9 +70,7 @@ public class EmployeeService {
                 request.quitDate()
         );
         // 트랜잭션이 알아서 Update 쿼리를 날림 (save 필요없음)
-
     }
-
 
     // 직원 생성
     @Transactional
