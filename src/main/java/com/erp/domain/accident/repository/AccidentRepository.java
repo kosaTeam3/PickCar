@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AccidentRepository extends JpaRepository<Accident, Long> {
-    @Query("SELECT a FROM Accident a WHERE a.client.id = :clientId")
-    List<Accident> findByClientId(Long clientId);
+//    @Query("SELECT a FROM Accident a WHERE a.client.id = :clientId")
+//    List<Accident> findByClientId(Long clientId);
 }

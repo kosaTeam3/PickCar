@@ -77,15 +77,15 @@ public class ClientService {
     }
 
     // 회원 사고 기록
-    public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
-        if (!clientRepository.existsById(clientId)) {
-            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
-        }
-
-        return accidentRepository.findByClientId(clientId).stream()
-                .map(this::toAccidentHistory)
-                .toList();
-    }
+//    public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
+//        if (!clientRepository.existsById(clientId)) {
+//            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
+//        }
+//
+//        return accidentRepository.findByClientId(clientId).stream()
+//                .map(this::toAccidentHistory)
+//                .toList();
+//    }
 
     // 회원 블랙리스트 추가
     @Transactional
@@ -106,21 +106,21 @@ public class ClientService {
         );
     }
 
-    private ClientAccidentHistoryResponse toAccidentHistory(Accident accident) {
-        return new ClientAccidentHistoryResponse(
-                accident.getId(),
-                accident.getAccidentTime(),
-                accident.getAccidentStatus(),
-                accident.getAccidentDetail(),
-                accident.getAccidentLocate(),
-                accident.getAccidentPart(),
-                accident.getAccidentImage(),
-                accident.getInsuranceInfo(),
-                accident.getBrand(),
-                accident.getModel(),
-                accident.getYear()
-        );
-    }
+//    private ClientAccidentHistoryResponse toAccidentHistory(Accident accident) {
+//        return new ClientAccidentHistoryResponse(
+//                accident.getId(),
+//                accident.getAccidentTime(),
+//                accident.getAccidentStatus(),
+//                accident.getAccidentDetail(),
+//                accident.getAccidentLocate(),
+//                accident.getAccidentPart(),
+//                accident.getAccidentImage(),
+//                accident.getInsuranceInfo(),
+//                accident.getBrand(),
+//                accident.getModel(),
+//                accident.getYear()
+//        );
+//    }
 
     private Client getClient(Long clientId) {
         return clientRepository.findById(clientId)

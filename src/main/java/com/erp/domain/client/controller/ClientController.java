@@ -41,10 +41,10 @@ public class ClientController {
         return clientService.getRentHistory(clientId);
     }
 
-    @GetMapping("/accident/{clientId}")
-    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
-        return clientService.getAccidentHistory(clientId);
-    }
+//    @GetMapping("/accident/{clientId}")
+//    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
+//        return clientService.getAccidentHistory(clientId);
+//    }
 
     @PostMapping("/black/{clientId}")
     public ResponseEntity<Void> addBlacklist(@PathVariable Long clientId, @Valid @RequestBody AddClientBlacklist dto) {
