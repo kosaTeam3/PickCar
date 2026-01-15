@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -146,10 +145,8 @@ public class BranchService {
 
     @Transactional(readOnly = true)
     public List<BranchResponse> getAvailableBranches(BranchSearchRequest request) {
-        // Time Parsing
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startRentDateTime = LocalDateTime.parse(request.startRentDateTime(), formatter);
-        LocalDateTime endRentDateTime = LocalDateTime.parse(request.endRentDateTime(), formatter);
+        LocalDateTime startRentDateTime = request.startRentDateTime();
+        LocalDateTime endRentDateTime = request.endRentDateTime();
 
         // 거리순(ASC) 지점 목록 조회
         List<BranchWithDistance> branches = branchRepository.findBranchesByDistance(
