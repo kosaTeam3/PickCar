@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+
 
 public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> {
     @Query("""
@@ -35,5 +37,20 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
                                          @Param("status") MaintenanceStatus status,
                                          @Param("keyword") String keyword,
                                          Pageable pageable);
+
+    /* 차량 정비 이력 조회 */
+    @Query("""
+            SELECT m
+            FROM Maintenance m
+            JOIN FETCH m.employee e
+            WHERE m.car.id = :cardId
+            AND m.maintenanceDate <= :now
+            ORDER BY m.maintenanceDate DESC
+    """)
+    Page<Maintenance> findMaintenanceHistory(
+            @Param("cardId") Long cardId,
+            @Param("now") LocalDate now,
+            Pageable pageable);
+
 }
 
