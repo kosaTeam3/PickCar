@@ -5,6 +5,7 @@ import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,12 @@ public class CarController {
     public ResponseEntity<Void> deleteCar(@PathVariable Long carId) {
         carService.deleteCar(carId);
         return ResponseEntity.noContent().build();
+    }
+
+    /* 차량 상태별 수량 조회 */
+    @GetMapping("/status")
+    public CarStatusCountResponse getCarStatusCount() {
+        return carService.getCarStatusCount();
     }
 
     /* 전체 차량 목록 조회 + 조건 검색 통합 */
