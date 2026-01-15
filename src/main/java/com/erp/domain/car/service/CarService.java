@@ -165,7 +165,7 @@ public class CarService {
 
         // 3. 주행거리 업데이트 시 알람 생성 트리거 (정비 완료 직후라면 리셋된 기준으로 계산됨)
         if (request.mileage() != null) {
-            List<String> dueItems = getDueConsumables(car);
+            List<String> dueItems = getDueConsumableItems(car);
             if (!dueItems.isEmpty()) {
                 alertService.createConsumableAlerts(car, dueItems);
             }
@@ -241,7 +241,6 @@ public class CarService {
     }
 
     /* 차량 검색 (조건 필터 적용) */
-    @Transactional(readOnly = true)
     public Page<CarListResponse> searchCars(CarSearchRequest request, Pageable pageable) {
 
         Page<Car> cars = carRepository.searchCars(
@@ -293,7 +292,7 @@ public class CarService {
         );
     }
 
-    private List<String> getDueConsumables(Car car) {
+    public List<String> getDueConsumableItems(Car car) {
         return CONSUMABLE_RULES.stream()
                 .map(rule -> toConsumableAlert(rule, car))
                 .filter(ConsumableAlertResponse::due)

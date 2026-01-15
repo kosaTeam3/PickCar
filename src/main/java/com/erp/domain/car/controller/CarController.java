@@ -58,7 +58,7 @@ public class CarController {
 
     /* 차량 정비 알림 조회 */
     @GetMapping("/{carId}/maintenanceAlerts")
-    public ResponseEntity<CarMaintenanceAlertResponse> getMaintenanceAlerts(@PathVariable Long carId) {
-        return ResponseEntity.ok(carService.getMaintenanceAlerts(carId));
+    public CarMaintenanceAlertResponse getMaintenanceAlerts(@PathVariable Long carId) {
+        return carService.getMaintenanceAlerts(carId);
     }
 }
