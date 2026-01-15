@@ -1,5 +1,6 @@
 package com.erp.domain.car.repository;
 
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.entity.FuelType;
@@ -52,4 +53,16 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("fuelType") FuelType fuelType,
             @Param("status") CarStatus status,
             Pageable pageable);
+
+    /* 차량 상태별 수량 조회 */
+    @Query("""
+        SELECT new com.erp.domain.car.dto.response.CarStatusCountResponse(
+            COUNT(c),
+            COUNT(CASE WHEN c.status = 'DRIVING' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'MAINTENANCE' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'WAITING' THEN 1 END)
+        )
+        FROM Car c
+    """)
+    CarStatusCountResponse countCarByStatus();
 }

@@ -9,6 +9,7 @@ import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.AvailableCarResponse;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -264,5 +264,10 @@ public class CarService {
                 .seater(car.getSeater())
                 .color(car.getColor().name())
                 .build());
+    }
+
+    /* 차량 상태별 수량 조회 */
+    public CarStatusCountResponse getCarStatusCount() {
+        return carRepository.countCarByStatus();
     }
 }
