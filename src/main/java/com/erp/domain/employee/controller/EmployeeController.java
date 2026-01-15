@@ -1,13 +1,16 @@
 package com.erp.domain.employee.controller;
 
 
-import com.erp.domain.employee.dto.RegisterEmployeeRequestDto;
-import com.erp.domain.employee.dto.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.response.EmployeeListResponse;
 import com.erp.domain.employee.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +20,14 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    // 직원 전체 조회(퇴사자 미포함)
+    @GetMapping("/employees")
+    public ResponseEntity<List<EmployeeListResponse>> getEmployees() {
+
+        List<EmployeeListResponse> response = employeeService.getEmployeeList();
+
+        return ResponseEntity.ok(response);
+    }
 
     // 직원 삭제(퇴사) - Soft Delete
     @DeleteMapping("/employees/{employeeId}")

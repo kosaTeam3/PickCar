@@ -3,8 +3,9 @@ package com.erp.domain.employee.service;
 
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
-import com.erp.domain.employee.dto.RegisterEmployeeRequestDto;
-import com.erp.domain.employee.dto.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.response.EmployeeListResponse;
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.global.exception.CustomException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,9 +30,34 @@ public class EmployeeService {
     private static final int PHONE_LAST_DIGIT_LENGTH = 4;
     private static final String SEQUENCE_FORMAT = "%04d";
 
+
+    // 직원 전체 조회
+    @Transactional(readOnly = true)  // 조회 전용
+    public List<EmployeeListResponse> getEmployeeList() {
+
+        // 1. DB에서 퇴사하지 않은 직원들만 가져오기
+        List<Employee> employees = employeeRepository.findAllByQuitDateIsNull();
+
+        // 2. Entity -> Dto 변환
+        return employees.stream()
+                .map(employee -> EmployeeListResponse.builder()
+                        .employId(employee.getId())
+                        .employName(employee.getName())
+                        .employCall(employee.getPhoneNumber())
+                        .employGrade(employee.getGrade())
+                        .branchId(employee.getBranch().getId())
+                        .entryDate(employee.getEntryDate())
+                        .quitDate(employee.getQuitDate())
+                        .employEmail(employee.getEmail())
+                        .loginId(employee.getLoginId())
+                        .build()
+                )
+                .toList();
+    }
+
     // 직원 퇴사 (삭제)
     @Transactional
-    public void deleteEmployee(Long employeeId){
+    public void deleteEmployee(Long employeeId) {
 
         // 조회 (검증)
         Employee employee = employeeRepository.findById(employeeId)
@@ -43,7 +70,7 @@ public class EmployeeService {
 
     // 직원 정보 수정
     @Transactional
-    public void updateEmployee (Long employeeId, UpdateEmployeeRequestDto request){
+    public void updateEmployee(Long employeeId, UpdateEmployeeRequestDto request) {
 
         // 직원 조회 (없으면 404)
         Employee employee = employeeRepository.findById(employeeId)
@@ -54,7 +81,7 @@ public class EmployeeService {
         if (request.branchId() != null) {
             // 지점 ID가 들어온다는 건 지점을 옮기겠다는 것 -> 그 때는 DB 조회
             branch = branchRepository.findById(request.branchId())
-                    .orElseThrow(()-> new CustomException(404, "해당 지점이 없습니다."));
+                    .orElseThrow(() -> new CustomException(404, "해당 지점이 없습니다."));
         }
 
         // 3. 정보 변경 (Entity의 메서드 호출)
