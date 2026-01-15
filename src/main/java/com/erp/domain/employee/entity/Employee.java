@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "employee")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -54,8 +53,26 @@ public class Employee extends BaseTimeEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "join_change_password", nullable = false,columnDefinition = "TINYINT(1)")
+    @Column(name = "join_change_password", nullable = false, columnDefinition = "TINYINT(1)")
     @ColumnDefault("1")
     @Builder.Default
     private Boolean passwordChangeRequired = true;
+
+    public void update(Branch branch,
+                       String name,
+                       String phoneNumber,
+                       String email,
+                       String grade,
+                       EmployeeAuthority authority,
+                       LocalDate quitDate) {
+        if (branch != null) this.branch = branch;
+        if (name != null) this.name = name;
+        if (phoneNumber != null) this.phoneNumber = phoneNumber;
+        if (email != null) this.email = email;
+        if(grade != null) this.grade = grade;
+        if(authority != null) this.authority = authority;
+        if(quitDate != null) this.quitDate = quitDate;
+
+
+    }
 }
