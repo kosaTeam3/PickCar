@@ -5,6 +5,7 @@ import com.erp.domain.statistics.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -18,7 +19,10 @@ public class StatisticsController {
 
     /* 월간 대여 건수 조회 */
     @GetMapping("/case/month")
-    public List<StatisticsResponse> getMonthlyCaseStats() {
-        return statisticsService.getMonthlyRentStats();
+    public List<StatisticsResponse> getMonthlyCaseStats(
+            @RequestParam String startMonth,
+            @RequestParam String endMonth
+    ) {
+        return statisticsService.getMonthlyRentStats(startMonth, endMonth);
     }
 }

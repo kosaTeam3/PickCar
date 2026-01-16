@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -17,13 +18,15 @@ public class StatisticsService {
     private final StatisticsRepository rentStatisticsRepository;
 
     /* 월간 대여 건수 통계(최근 1년) */
-    public List<StatisticsResponse> getMonthlyRentStats() {
-        LocalDateTime oneYearAgo = LocalDateTime.now()
-                .minusYears(1)
-                .withDayOfMonth(1)
-                .withHour(0).withMinute(0).withSecond(0);
+    public List<StatisticsResponse> getMonthlyRentStats(String startMonth, String endMonth) {
 
-        return rentStatisticsRepository.findMonthlyRentCount(oneYearAgo)
+        YearMonth start = YearMonth.parse(startMonth);
+        LocalDateTime startDate = start.atDay(1).atStartOfDay();
+
+        YearMonth end = YearMonth.parse(endMonth);
+        LocalDateTime endDate = end.atEndOfMonth().atTime(23, 59, 59);
+
+        return rentStatisticsRepository.findMonthlyRentCount(startDate, endDate)
                 .stream()
                 .map(row -> new StatisticsResponse(
                         row.getLabel(),
