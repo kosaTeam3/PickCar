@@ -7,10 +7,12 @@ import com.erp.domain.employee.dto.response.EmployeeListResponse;
 import com.erp.domain.employee.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,11 +24,10 @@ public class EmployeeController {
 
     // 직원 전체 조회(퇴사자 미포함)
     @GetMapping("/employees")
-    public ResponseEntity<List<EmployeeListResponse>> getEmployees() {
-
-        List<EmployeeListResponse> response = employeeService.getEmployeeList();
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Page<EmployeeListResponse>> getEmployees(
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(employeeService.getEmployeeList(pageable));
     }
 
     // 직원 삭제(퇴사) - Soft Delete

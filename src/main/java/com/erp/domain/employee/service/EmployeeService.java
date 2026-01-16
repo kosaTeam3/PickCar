@@ -10,15 +10,17 @@ import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class EmployeeService {
 
@@ -31,28 +33,20 @@ public class EmployeeService {
     private static final String SEQUENCE_FORMAT = "%04d";
 
 
-    // 직원 전체 조회
+    // 직원 전체조회 + 페이징
     @Transactional(readOnly = true)  // 조회 전용
-    public List<EmployeeListResponse> getEmployeeList() {
-
-        // 1. DB에서 퇴사하지 않은 직원들만 가져오기
-        List<Employee> employees = employeeRepository.findAllByQuitDateIsNull();
-
-        // 2. Entity -> Dto 변환
-        return employees.stream()
-                .map(employee -> EmployeeListResponse.builder()
-                        .employId(employee.getId())
-                        .employName(employee.getName())
-                        .employCall(employee.getPhoneNumber())
-                        .employGrade(employee.getGrade())
-                        .branchId(employee.getBranch().getId())
-                        .entryDate(employee.getEntryDate())
-                        .quitDate(employee.getQuitDate())
-                        .employEmail(employee.getEmail())
-                        .loginId(employee.getLoginId())
-                        .build()
-                )
-                .toList();
+    public Page<EmployeeListResponse> getEmployeeList(Pageable pageable) {
+        return employeeRepository.findAllByQuitDateIsNull(pageable)
+                .map(entity -> EmployeeListResponse.builder()
+                        .employId(entity.getId())
+                        .employName(entity.getName())
+                        .employCall(entity.getPhoneNumber())
+                        .employGrade(entity.getGrade())
+                        .branchId(entity.getBranch().getId())
+                        .entryDate(entity.getEntryDate())
+                        .quitDate(entity.getQuitDate())
+                        .loginId(entity.getLoginId())
+                        .build());
     }
 
     // 직원 퇴사 (삭제)
