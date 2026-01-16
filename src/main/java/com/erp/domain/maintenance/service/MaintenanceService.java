@@ -1,7 +1,9 @@
 package com.erp.domain.maintenance.service;
 
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
+import com.erp.domain.car.service.CarService;
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.domain.maintenance.dto.request.MaintenanceRequest;
@@ -18,9 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,7 @@ public class MaintenanceService {
     private final MaintenanceRepository maintenanceRepository;
     private final CarRepository carRepository;
     private final EmployeeRepository employeeRepository;
+    private final CarService carService;
 
     @Transactional
     public Long createMaintenance(Long carId, MaintenanceRequest request) {
@@ -51,15 +52,19 @@ public class MaintenanceService {
                 .cost(request.cost())
                 .status(request.status())
                 .detail(request.detail())
+                .consumables(resolveConsumables(car, request))
                 .build();
-
-        return maintenanceRepository.save(maintenance).getId();
+        Maintenance savedMaintenance = maintenanceRepository.save(maintenance);
+        applyCarMaintenanceStateIfCompleted(savedMaintenance, car);
+        return savedMaintenance.getId();
     }
 
     @Transactional
     public void updateMaintenance(Long maintenanceId, MaintenanceRequest request) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new CustomException(404, "해당 정비 정보가 존재하지 않습니다."));
+
+        MaintenanceStatus previousStatus = maintenance.getStatus();
 
         if (request.employeeId() != null) {
             Employee employee = employeeRepository.findById(request.employeeId())
@@ -87,6 +92,17 @@ public class MaintenanceService {
         if (request.detail() != null) {
             maintenance.setDetail(request.detail());
         }
+
+        if (request.consumables() != null) {
+            maintenance.setConsumables(resolveConsumables(maintenance.getCar(), request));
+        }
+
+        maintenanceRepository.save(maintenance);
+
+        if (request.status() != null && request.status() != previousStatus) {
+            applyCarMaintenanceStateIfCompleted(maintenance, maintenance.getCar());
+        }
+
         maintenanceRepository.save(maintenance);
     }
 
@@ -154,8 +170,54 @@ public class MaintenanceService {
                 maintenance.getMaintenanceDate(),
                 maintenance.getCost(),
                 maintenance.getStatus(),
-                maintenance.getDetail()
+                maintenance.getDetail(),
+                parseConsumables(maintenance.getConsumables())
         );
+    }
+
+    private String resolveConsumables(Car car, MaintenanceRequest request) {
+        List<String> requestedItems = request.consumables();
+        List<String> dueItems = carService.getDueConsumableItems(car);
+
+        if (requestedItems == null || requestedItems.isEmpty()) {
+            return joinConsumables(dueItems);
+        }
+
+        List<String> filtered = requestedItems.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(item -> !item.isBlank())
+                .filter(dueItems::contains)
+                .toList();
+
+        return joinConsumables(filtered);
+    }
+
+    private void applyCarMaintenanceStateIfCompleted(Maintenance maintenance, Car car) {
+        if (maintenance.getStatus() != MaintenanceStatus.COMPLETED) {
+            if (maintenance.getStatus() == MaintenanceStatus.ONGOING) {
+                car.setStatus(CarStatus.MAINTENANCE);
+            }
+            return;
+        }
+        car.setStatus(CarStatus.WAITING);
+        car.setLastMaintenanceMileage(car.getMileage());
+        car.setMaintenanceDate(maintenance.getMaintenanceDate() != null ? maintenance.getMaintenanceDate() : LocalDate.now());
+        carRepository.save(car);
+    }
+
+    private String joinConsumables(List<String> consumables) {
+        if (consumables == null || consumables.isEmpty()) {
+            return null;
+        }
+        return String.join(",", consumables);
+    }
+
+    private List<String> parseConsumables(String consumables) {
+        if (consumables == null || consumables.isBlank()) {
+            return Collections.emptyList();
+        }
+        return List.of(consumables.split(","));
     }
 
     private DateRange resolveRange(MaintenancePeriod period, LocalDate baseDate) {
@@ -178,8 +240,9 @@ public class MaintenanceService {
         };
     }
 
-    private record DateRange(LocalDate startDate, LocalDate endDate) {}
-  
+    private record DateRange(LocalDate startDate, LocalDate endDate) {
+    }
+
     /* 차량 정비 이력 조회 */
     public Page<MaintenanceHistoryResponse> getMaintenanceHistory(Long carId, Pageable pageable) {
 

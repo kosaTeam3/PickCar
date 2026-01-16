@@ -78,4 +78,8 @@ public class Car extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "color", nullable = false)
     private CarColor color;
+
+    @Column(name = "last_maintenance_mileage", nullable = false, columnDefinition = "bigint default 0")
+    @Builder.Default
+    private Long lastMaintenanceMileage = 0L;
 }

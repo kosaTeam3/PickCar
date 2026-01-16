@@ -3,6 +3,7 @@ package com.erp.domain.maintenance.dto.request;
 import com.erp.domain.maintenance.entity.MaintenanceStatus;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record MaintenanceRequest(
         Long employeeId,
@@ -10,6 +11,7 @@ public record MaintenanceRequest(
         LocalDate maintenanceDate,
         Long cost,
         MaintenanceStatus status,
-        String detail
+        String detail,
+        List<String> consumables
 ) {
 }

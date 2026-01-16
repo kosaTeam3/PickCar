@@ -33,4 +33,8 @@ public class Alert extends BaseTimeEntity {
 
     @Column(name = "date")
     private LocalDate date;
+
+    @Column(name = "is_read", nullable = false)
+    @Builder.Default
+    private boolean read = false;
 }

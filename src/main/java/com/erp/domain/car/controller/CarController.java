@@ -5,6 +5,7 @@ import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
+import com.erp.domain.car.dto.response.CarMaintenanceAlertResponse;
 import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.service.CarService;
 import lombok.RequiredArgsConstructor;
@@ -62,4 +63,9 @@ public class CarController {
         return carService.getCarDetail(carId);
     }
 
+    /* 차량 정비 알림 조회 */
+    @GetMapping("/{carId}/maintenanceAlerts")
+    public CarMaintenanceAlertResponse getMaintenanceAlerts(@PathVariable Long carId) {
+        return carService.getMaintenanceAlerts(carId);
+    }
 }
