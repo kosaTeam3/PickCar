@@ -3,6 +3,8 @@ package com.erp.domain.maintenance.controller;
 import com.erp.domain.maintenance.dto.request.MaintenanceRequest;
 import com.erp.domain.maintenance.dto.response.MaintenanceDetailResponse;
 import com.erp.domain.maintenance.dto.response.MaintenanceListResponse;
+import com.erp.domain.maintenance.dto.response.MaintenancePeriod;
+import com.erp.domain.maintenance.dto.response.MaintenanceStatusGroupResponse;
 import com.erp.domain.maintenance.entity.MaintenanceStatus;
 import com.erp.domain.maintenance.service.MaintenanceService;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/manager/maint")
@@ -45,6 +50,16 @@ public class MaintenanceController {
             @RequestParam(required = false) String keyword
     ) {
         return maintenanceService.getMaintenanceList(pageable, branchId, status, keyword);
+    }
+
+    @GetMapping("/grouped")
+    public MaintenanceStatusGroupResponse getMaintenanceGroupedList(
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) MaintenancePeriod period,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate baseDate
+    ) {
+        return maintenanceService.getMaintenanceGroupedList(branchId, keyword, period, baseDate);
     }
 
     @GetMapping("/{maintenanceId}")
