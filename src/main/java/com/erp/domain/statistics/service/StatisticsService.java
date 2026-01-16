@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -17,7 +18,7 @@ public class StatisticsService {
 
     private final StatisticsRepository rentStatisticsRepository;
 
-    /* 월간 대여 건수 통계(최근 1년) */
+    /* 월간 대여 건수 통계 */
     public List<StatisticsResponse> getMonthlyRentStats(String startMonth, String endMonth) {
 
         YearMonth start = YearMonth.parse(startMonth);
@@ -35,4 +36,22 @@ public class StatisticsService {
                 .toList();
 
     }
+
+    /* 일간 대여 건수 통계 */
+    public List<StatisticsResponse> getDailyRentStats(String startDateStr, String endDateStr) {
+
+        LocalDate start = LocalDate.parse(startDateStr);
+        LocalDateTime startDate = start.atStartOfDay();
+
+        LocalDate end = LocalDate.parse(endDateStr);
+        LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        return rentStatisticsRepository.findDailyRentCount(startDate, endDate)
+                .stream()
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
 }

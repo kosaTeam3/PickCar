@@ -12,13 +12,14 @@ import java.util.List;
 @Repository
 public interface StatisticsRepository extends JpaRepository<Rent, Long> {
 
+    /* 월간 대여 건수 조회 */
     @Query(
             value = """
             SELECT
                 DATE_FORMAT(r.start_rent_date_time, '%Y-%m') AS label,
                 COUNT(r.id) AS count
             FROM rent r
-            WHERE r.start_rent_date_time >= :startDate
+            WHERE r.start_rent_date_time >= :startDate AND :endDate
               AND r.end_rent_date_time IS NOT NULL
             GROUP BY label
             ORDER BY label ASC
@@ -26,6 +27,25 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             nativeQuery = true
     )
     List<StatisticsProjection> findMonthlyRentCount(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    /* 일간 대여 건수 조회 */
+    @Query(
+            value = """
+            SELECT
+                DATE_FORMAT(r.start_rent_date_time, '%Y-%m-%d') AS label,
+                COUNT(r.id) AS count
+            FROM rent r
+            WHERE r.start_rent_date_time BETWEEN :startDate AND :endDate
+              AND r.end_rent_date_time IS NOT NULL
+            GROUP BY label
+            ORDER BY label ASC
+        """,
+            nativeQuery = true
+    )
+    List<StatisticsProjection> findDailyRentCount(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );

@@ -25,4 +25,13 @@ public class StatisticsController {
     ) {
         return statisticsService.getMonthlyRentStats(startMonth, endMonth);
     }
+
+    /* 일간 대여 건수 조회 */
+    @GetMapping("/case/day")
+    public List<StatisticsResponse> getDailyCaseStats(
+            @RequestParam String startDate, // 예: 2026-01-01
+            @RequestParam String endDate    // 예: 2026-01-31
+    ) {
+        return statisticsService.getDailyRentStats(startDate, endDate);
+    }
 }
