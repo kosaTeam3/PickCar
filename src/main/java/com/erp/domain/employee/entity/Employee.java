@@ -60,8 +60,7 @@ public class Employee extends BaseTimeEntity {
     private Boolean passwordChangeRequired = true;
 
     // Soft Delete
-    // 외부에서 퇴사처리하면 오늘로 퇴사날짜를 찍습니다.
-    public void resign() {
-        this.quitDate = LocalDate.now();
+    public void resign(LocalDate date) {
+        this.quitDate = date;
     }
 }

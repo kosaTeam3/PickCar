@@ -49,14 +49,14 @@ public class EmployeeService {
     }
 
     // 직원 퇴사 (삭제)
-    public void deleteEmployee(Long employeeId) {
+    public void deleteEmployee(Long employeeId, LocalDate date) {
 
         // 조회 (검증)
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
 
         // 퇴사 처리 (DB 상태변경)
-        employee.resign();
+        employee.resign(date);
         //  JPA의 Dirty Checking에 의해 트랜잭션 종료 시 Update 쿼리 실행
     }
 

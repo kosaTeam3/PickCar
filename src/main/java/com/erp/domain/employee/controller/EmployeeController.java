@@ -14,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/manager")
@@ -33,9 +35,10 @@ public class EmployeeController {
     // 직원 삭제(퇴사) - Soft Delete
     @DeleteMapping("/employees/{employeeId}")
     public ResponseEntity<Void> deleteEmployee(
-            @PathVariable Long employeeId) {
-
-        employeeService.deleteEmployee(employeeId);
+            @PathVariable Long employeeId,
+            @RequestParam LocalDate date
+    ) {
+        employeeService.deleteEmployee(employeeId, date);
 
         return ResponseEntity.noContent().build();  // 204
     }
