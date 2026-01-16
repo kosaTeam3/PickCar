@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -121,7 +120,6 @@ public class EmployeeService {
 
         String phone = request.phoneNumber().replace("-", "");
 
-
         // 초기 비밀번호 생성
         String tempPw = loginId + phone.substring(phone.length() - PHONE_LAST_DIGIT_LENGTH) + "!";
 
@@ -155,28 +153,12 @@ public class EmployeeService {
         // 사번에 들어갈 지점코드
         String branchCode = String.format("%03d", branch.getId());
 
-
         // 사번 prefix
         String prefix = COMPANY_PREFIX + year + branchCode;
 
-        //
-        Optional<String> lastEmployee =
-                employeeRepository.findLastLoginId(prefix);
-
-        int nextSeq = 1;
-//        nextSeq = 1;  // 첫 직원이면 1번으로
-
-
-        if (lastEmployee.isPresent()) {
-
-            String lastLoginId = lastEmployee.get();
-            // PC20260010005 에서 뒤에 4자리 (0005)만 잘라 +1 -> 6
-            String lastSeqStr = lastLoginId.substring(lastLoginId.length() - PHONE_LAST_DIGIT_LENGTH);
-            nextSeq = Integer.parseInt(lastSeqStr) + 1;
-        }
-
+        Long employeeCount = employeeRepository.countByBranch_Id(branch.getId()) + 1;
 
         // %04d : 빈 자리를 0으로 채우는 숫자 포맷
-        return prefix + String.format(SEQUENCE_FORMAT, nextSeq);
+        return prefix + String.format(SEQUENCE_FORMAT, employeeCount);
     }
 }
