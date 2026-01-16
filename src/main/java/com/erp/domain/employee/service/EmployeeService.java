@@ -3,6 +3,7 @@ package com.erp.domain.employee.service;
 
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
+import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
 import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
 import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
@@ -31,6 +32,32 @@ public class EmployeeService {
     private static final int PHONE_LAST_DIGIT_LENGTH = 4;
     private static final String SEQUENCE_FORMAT = "%04d";
 
+
+    // 비밀번호 변경 ( 첫 로그인시 강제 변경 포함)
+    public void changePassword(Long employeeId, PasswordChangeRequestDto requestDto){
+
+        // 1. 직원 조회
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
+
+        // 2. 새 비번 , 확인 비번 일치여부 검증
+        if (!requestDto.newPassword().equals(requestDto.checkPassword())){
+            throw new CustomException(400, "비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 기존 비밀번호와 동일한지 검증
+        if (passwordEncoder.matches(requestDto.newPassword(), employee.getPassword())){
+            throw new CustomException(400, "기존 비밀번호와 동일하게 변경할 수 없습니다.");
+        }
+
+        // 4. 비밀번호 암호화 및 변경
+        String encodedPw = passwordEncoder.encode(requestDto.newPassword());
+        employee.setPassword(encodedPw);
+
+        // 5. DB의 join_change_password 컬럼을 0(false)로 변경
+        // 이로서 초기 비밀번호 변경 완료
+        employee.setPasswordChangeRequired(false);
+    }
 
     // 직원 전체조회 + 페이징
     @Transactional(readOnly = true)  // 조회 전용
