@@ -19,13 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.time.temporal.WeekFields;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -179,7 +174,7 @@ public class MaintenanceService {
                 parseConsumables(maintenance.getConsumables())
         );
     }
-  
+
     private String resolveConsumables(Car car, MaintenanceRequest request) {
         List<String> requestedItems = request.consumables();
         List<String> dueItems = carService.getDueConsumableItems(car);
@@ -223,7 +218,8 @@ public class MaintenanceService {
             return Collections.emptyList();
         }
         return List.of(consumables.split(","));
-      
+    }
+
     private DateRange resolveRange(MaintenancePeriod period, LocalDate baseDate) {
         return switch (period) {
             case YEAR -> new DateRange(
@@ -244,8 +240,9 @@ public class MaintenanceService {
         };
     }
 
-    private record DateRange(LocalDate startDate, LocalDate endDate) {}
-  
+    private record DateRange(LocalDate startDate, LocalDate endDate) {
+    }
+
     /* 차량 정비 이력 조회 */
     public Page<MaintenanceHistoryResponse> getMaintenanceHistory(Long carId, Pageable pageable) {
 
