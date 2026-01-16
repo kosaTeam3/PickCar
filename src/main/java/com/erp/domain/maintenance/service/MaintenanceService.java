@@ -8,6 +8,7 @@ import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.domain.maintenance.dto.request.MaintenanceRequest;
 import com.erp.domain.maintenance.dto.response.MaintenanceDetailResponse;
+import com.erp.domain.maintenance.dto.response.MaintenanceHistoryResponse;
 import com.erp.domain.maintenance.dto.response.MaintenanceListResponse;
 import com.erp.domain.maintenance.entity.Maintenance;
 import com.erp.domain.maintenance.entity.MaintenanceStatus;
@@ -183,5 +184,25 @@ public class MaintenanceService {
             return Collections.emptyList();
         }
         return List.of(consumables.split(","));
+    /* 차량 정비 이력 조회 */
+    public Page<MaintenanceHistoryResponse> getMaintenanceHistory(Long carId, Pageable pageable) {
+
+        Page<Maintenance> maintenanceList = maintenanceRepository.findMaintenanceHistory(
+                carId,
+                LocalDate.now(),
+                pageable
+        );
+
+        return maintenanceList.map(m -> MaintenanceHistoryResponse.builder()
+                .maintenanceId(m.getId())
+                .title(m.getTitle())
+                .detail(m.getDetail())
+                .maintenanceDate(m.getMaintenanceDate())
+                .cost(m.getCost())
+                .employeeId(m.getEmployee().getId())
+                .employeeName(m.getEmployeeName())
+                .status(m.getStatus())
+                .build()
+        );
     }
 }

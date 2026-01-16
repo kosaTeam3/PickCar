@@ -3,13 +3,18 @@ package com.erp.domain.car.service;
 import com.erp.domain.alert.service.AlertService;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
+import com.erp.domain.car.dto.request.AvailableCarSearchRequest;
 import com.erp.domain.car.dto.request.CarCreateRequest;
 import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
-import com.erp.domain.car.dto.response.*;
+import com.erp.domain.car.dto.response.AvailableCarResponse;
+import com.erp.domain.car.dto.response.CarDetailResponse;
+import com.erp.domain.car.dto.response.CarListResponse;
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
+import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +35,7 @@ public class CarService {
     private final CarRepository carRepository;
     private final BranchRepository branchRepository;
     private final AlertService alertService;
+    private final RentRepository rentRepository;
 
     private static final List<ConsumableRule> CONSUMABLE_RULES = List.of(
             new ConsumableRule("엔진오일", 10_000L),
@@ -44,6 +50,7 @@ public class CarService {
             new ConsumableRule("와이퍼 블레이드", 10_000L),
             new ConsumableRule("타이어", 50_000L)
     );
+ 
 
     @Transactional
     public Long createCar(CarCreateRequest request) {
@@ -240,6 +247,35 @@ public class CarService {
                 .build();
     }
 
+    public List<AvailableCarResponse> getAvailableCarsByBranch(Long branchId, AvailableCarSearchRequest request) {
+        LocalDateTime startRentDateTime = request.startRentDateTime();
+        LocalDateTime endRentDateTime = request.endRentDateTime();
+
+        // 해당 기간에 예약된 차량 ID 조회
+        List<Long> rentedCarIds = rentRepository.findRentedCarIds(startRentDateTime, endRentDateTime);
+
+        List<Car> availableCars = carRepository.findAvailableCars(
+                branchId,
+                CarStatus.WAITING,
+                rentedCarIds.isEmpty() ? null : rentedCarIds
+        );
+
+        return availableCars.stream()
+                .map(car -> new AvailableCarResponse(
+                        car.getId(),
+                        car.getImage(),
+                        car.getModel(),
+                        car.getPrice(),
+                        car.getBrand(),
+                        car.getYear(),
+                        car.getAgeLimit(),
+                        car.getFuelType(),
+                        car.getSeater(),
+                        car.getColor()
+                ))
+                .toList();
+    }
+
     /* 차량 검색 (조건 필터 적용) */
     public Page<CarListResponse> searchCars(CarSearchRequest request, Pageable pageable) {
 
@@ -371,6 +407,9 @@ public class CarService {
                 due
         );
     }
-    private record ConsumableRule(String item, long intervalKm) {
+    private record ConsumableRule(String item, long intervalKm) {}
+    /* 차량 상태별 수량 조회 */
+    public CarStatusCountResponse getCarStatusCount() {
+        return carRepository.countCarByStatus();
     }
 }
