@@ -66,5 +66,19 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
                                                         @Param("keyword") String keyword,
                                                         @Param("startDate") LocalDate startDate,
                                                         @Param("endDate") LocalDate endDate);
+    /* 차량 정비 이력 조회 */
+    @Query("""
+            SELECT m
+            FROM Maintenance m
+            JOIN FETCH m.employee e
+            WHERE m.car.id = :cardId
+            AND m.maintenanceDate <= :now
+            ORDER BY m.maintenanceDate DESC
+    """)
+    Page<Maintenance> findMaintenanceHistory(
+            @Param("cardId") Long cardId,
+            @Param("now") LocalDate now,
+            Pageable pageable);
+
 }
 
