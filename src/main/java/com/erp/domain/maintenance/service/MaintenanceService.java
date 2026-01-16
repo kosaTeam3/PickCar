@@ -7,9 +7,7 @@ import com.erp.domain.car.service.CarService;
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.domain.maintenance.dto.request.MaintenanceRequest;
-import com.erp.domain.maintenance.dto.response.MaintenanceDetailResponse;
-import com.erp.domain.maintenance.dto.response.MaintenanceHistoryResponse;
-import com.erp.domain.maintenance.dto.response.MaintenanceListResponse;
+import com.erp.domain.maintenance.dto.response.*;
 import com.erp.domain.maintenance.entity.Maintenance;
 import com.erp.domain.maintenance.entity.MaintenanceStatus;
 import com.erp.domain.maintenance.repository.MaintenanceRepository;
@@ -24,6 +22,11 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.time.temporal.WeekFields;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,6 +123,43 @@ public class MaintenanceService {
         return maintenanceRepository.search(branchId, status, keyword, pageable);
     }
 
+    public MaintenanceStatusGroupResponse getMaintenanceGroupedList(Long branchId, String keyword, MaintenancePeriod period, LocalDate baseDate) {
+        MaintenancePeriod resolvedPeriod = period != null ? period : MaintenancePeriod.MONTH;
+        LocalDate resolvedBaseDate = baseDate != null ? baseDate : LocalDate.now();
+        DateRange range = resolveRange(resolvedPeriod, resolvedBaseDate);
+
+        List<MaintenanceGroupedItemResponse> items = maintenanceRepository.searchByPeriod(
+                branchId,
+                keyword,
+                range.startDate(),
+                range.endDate()
+        );
+
+        Map<MaintenanceStatus, List<MaintenanceGroupedItemResponse>> grouped = items.stream()
+                .collect(Collectors.groupingBy(
+                        MaintenanceGroupedItemResponse::status,
+                        () -> new EnumMap<>(MaintenanceStatus.class),
+                        Collectors.toList()
+                ));
+
+        List<MaintenanceGroupedItemResponse> scheduledList = grouped.getOrDefault(MaintenanceStatus.SCHEDULE, List.of());
+        List<MaintenanceGroupedItemResponse> ongoingList = grouped.getOrDefault(MaintenanceStatus.ONGOING, List.of());
+        List<MaintenanceGroupedItemResponse> completedList = grouped.getOrDefault(MaintenanceStatus.COMPLETED, List.of());
+
+        return new MaintenanceStatusGroupResponse(
+                resolvedPeriod,
+                resolvedBaseDate,
+                range.startDate(),
+                range.endDate(),
+                scheduledList.size(),
+                ongoingList.size(),
+                completedList.size(),
+                grouped.getOrDefault(MaintenanceStatus.SCHEDULE, List.of()),
+                grouped.getOrDefault(MaintenanceStatus.ONGOING, List.of()),
+                grouped.getOrDefault(MaintenanceStatus.COMPLETED, List.of())
+        );
+    }
+
     public MaintenanceDetailResponse getMaintenanceDetail(Long maintenanceId) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new CustomException(404, "해당 정비 정보가 존재하지 않습니다."));
@@ -139,7 +179,7 @@ public class MaintenanceService {
                 parseConsumables(maintenance.getConsumables())
         );
     }
-
+  
     private String resolveConsumables(Car car, MaintenanceRequest request) {
         List<String> requestedItems = request.consumables();
         List<String> dueItems = carService.getDueConsumableItems(car);
@@ -165,7 +205,6 @@ public class MaintenanceService {
             }
             return;
         }
-
         car.setStatus(CarStatus.WAITING);
         car.setLastMaintenanceMileage(car.getMileage());
         car.setMaintenanceDate(maintenance.getMaintenanceDate() != null ? maintenance.getMaintenanceDate() : LocalDate.now());
@@ -184,6 +223,29 @@ public class MaintenanceService {
             return Collections.emptyList();
         }
         return List.of(consumables.split(","));
+      
+    private DateRange resolveRange(MaintenancePeriod period, LocalDate baseDate) {
+        return switch (period) {
+            case YEAR -> new DateRange(
+                    baseDate.withDayOfYear(1),
+                    baseDate.withDayOfYear(baseDate.lengthOfYear())
+            );
+            case MONTH -> new DateRange(
+                    baseDate.withDayOfMonth(1),
+                    baseDate.withDayOfMonth(baseDate.lengthOfMonth())
+            );
+            case WEEK -> {
+                WeekFields weekFields = WeekFields.ISO;
+                LocalDate start = baseDate.with(weekFields.dayOfWeek(), 1);
+                LocalDate end = baseDate.with(weekFields.dayOfWeek(), 7);
+                yield new DateRange(start, end);
+            }
+            case DAY -> new DateRange(baseDate, baseDate);
+        };
+    }
+
+    private record DateRange(LocalDate startDate, LocalDate endDate) {}
+  
     /* 차량 정비 이력 조회 */
     public Page<MaintenanceHistoryResponse> getMaintenanceHistory(Long carId, Pageable pageable) {
 
