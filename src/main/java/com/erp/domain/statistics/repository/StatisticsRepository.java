@@ -25,5 +25,5 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
         """,
             nativeQuery = true
     )
-    List<Object[]> findMonthlyRentCount(@Param("startDate") LocalDateTime startDate);
+    List<StatisticsProjection> findMonthlyRentCount(@Param("startDate") LocalDateTime startDate);
 }

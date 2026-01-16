@@ -26,8 +26,8 @@ public class StatisticsService {
         return rentStatisticsRepository.findMonthlyRentCount(oneYearAgo)
                 .stream()
                 .map(row -> new StatisticsResponse(
-                        (String) row[0],
-                        ((Number) row[1]).longValue()
+                        row.getLabel(),
+                        row.getCount()
                 ))
                 .toList();
 
