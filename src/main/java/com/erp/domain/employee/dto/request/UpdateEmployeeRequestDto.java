@@ -1,4 +1,4 @@
-package com.erp.domain.employee.dto;
+package com.erp.domain.employee.dto.request;
 
 import com.erp.domain.employee.entity.EmployeeAuthority;
 import jakarta.validation.constraints.Email;
