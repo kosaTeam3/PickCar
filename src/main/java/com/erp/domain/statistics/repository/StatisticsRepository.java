@@ -49,4 +49,24 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    /* 주간 대여 건수 조회 */
+    @Query(
+            value = """
+            SELECT
+                DATE_FORMAT(r.start_rent_date_time, '%Y-%u') AS label,
+                COUNT(r.id) AS count
+            FROM rent r
+            WHERE r.start_rent_date_time BETWEEN :startDate AND :endDate
+              AND r.end_rent_date_time IS NOT NULL
+            GROUP BY label
+            ORDER BY label ASC
+        """,
+            nativeQuery = true
+    )
+    List<StatisticsProjection> findWeeklyRentCount(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
 }

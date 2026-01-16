@@ -34,4 +34,13 @@ public class StatisticsController {
     ) {
         return statisticsService.getDailyRentStats(startDate, endDate);
     }
+
+    /* 주간 대여 건수 조회 */
+    @GetMapping("/case/week")
+    public List<StatisticsResponse> getWeeklyCaseStats(
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        return statisticsService.getWeeklyRentStats(startDate, endDate);
+    }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class StatisticsService {
 
-    private final StatisticsRepository rentStatisticsRepository;
+    private final StatisticsRepository statisticsRepository;
 
     /* 월간 대여 건수 통계 */
     public List<StatisticsResponse> getMonthlyRentStats(String startMonth, String endMonth) {
@@ -27,7 +27,7 @@ public class StatisticsService {
         YearMonth end = YearMonth.parse(endMonth);
         LocalDateTime endDate = end.atEndOfMonth().atTime(23, 59, 59);
 
-        return rentStatisticsRepository.findMonthlyRentCount(startDate, endDate)
+        return statisticsRepository.findMonthlyRentCount(startDate, endDate)
                 .stream()
                 .map(row -> new StatisticsResponse(
                         row.getLabel(),
@@ -46,7 +46,24 @@ public class StatisticsService {
         LocalDate end = LocalDate.parse(endDateStr);
         LocalDateTime endDate = end.atTime(23, 59, 59);
 
-        return rentStatisticsRepository.findDailyRentCount(startDate, endDate)
+        return statisticsRepository.findDailyRentCount(startDate, endDate)
+                .stream()
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
+    /* 주간 대여 건수 통계 */
+    public List<StatisticsResponse> getWeeklyRentStats(String startDateStr, String endDateStr) {
+
+        LocalDate start = LocalDate.parse(startDateStr);
+        LocalDateTime startDate = start.atStartOfDay();
+
+        LocalDate end = LocalDate.parse(endDateStr);
+        LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        return statisticsRepository.findWeeklyRentCount(startDate, endDate)
                 .stream()
                 .map(row -> new StatisticsResponse(
                         row.getLabel(),
