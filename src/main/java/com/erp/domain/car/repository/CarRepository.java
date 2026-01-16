@@ -1,5 +1,6 @@
 package com.erp.domain.car.repository;
 
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.entity.FuelType;
@@ -16,14 +17,24 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     int countByBranchIdAndStatus(Long branchId, CarStatus status);
 
     // 특정 지점의 WAITING 상태 차량 중, 예약된 차량들을 제외하고 카운트
-    @Query("SELECT COUNT(c) FROM Car c " +
-            "WHERE c.branch.id = :branchId " +
-            "AND c.status = :status " +
-            "AND c.id NOT IN :rentedCarIds")
-    int countAvailableCarsNotIn(@Param("branchId") Long branchId,
+    @Query("""
+        SELECT COUNT(c) FROM Car c
+        WHERE c.branch.id = :branchId
+        AND c.status = :status
+        AND c.id NOT IN :rentedCarIds""")
+    Integer countAvailableCarsNotIn(@Param("branchId") Long branchId,
                                 @Param("status") CarStatus status,
                                 @Param("rentedCarIds") List<Long> rentedCarIds);
 
+    // 특정 지점의 가용 차량 목록 조회 (예약 차량 제외)
+    @Query("""
+        SELECT c FROM Car c
+        WHERE c.branch.id = :branchId
+        AND c.status = :status
+        AND (:rentedCarIds IS NULL OR c.id NOT IN :rentedCarIds)""")
+    List<Car> findAvailableCars(@Param("branchId") Long branchId,
+                                @Param("status") CarStatus status,
+                                @Param("rentedCarIds") List<Long> rentedCarIds);
 
     /* 차량 검색 */
     @Query("""
@@ -42,4 +53,16 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("fuelType") FuelType fuelType,
             @Param("status") CarStatus status,
             Pageable pageable);
+
+    /* 차량 상태별 수량 조회 */
+    @Query("""
+        SELECT new com.erp.domain.car.dto.response.CarStatusCountResponse(
+            COUNT(c),
+            COUNT(CASE WHEN c.status = 'DRIVING' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'MAINTENANCE' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'WAITING' THEN 1 END)
+        )
+        FROM Car c
+    """)
+    CarStatusCountResponse countCarByStatus();
 }

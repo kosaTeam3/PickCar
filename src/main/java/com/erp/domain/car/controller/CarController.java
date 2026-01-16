@@ -5,6 +5,8 @@ import com.erp.domain.car.dto.request.CarSearchRequest;
 import com.erp.domain.car.dto.request.CarUpdateRequest;
 import com.erp.domain.car.dto.response.CarDetailResponse;
 import com.erp.domain.car.dto.response.CarListResponse;
+import com.erp.domain.car.dto.response.CarMaintenanceAlertResponse;
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,12 @@ public class CarController {
         return ResponseEntity.noContent().build();
     }
 
+    /* 차량 상태별 수량 조회 */
+    @GetMapping("/status")
+    public CarStatusCountResponse getCarStatusCount() {
+        return carService.getCarStatusCount();
+    }
+
     /* 전체 차량 목록 조회 + 조건 검색 통합 */
     @GetMapping
     public Page<CarListResponse> getCarList(
@@ -55,4 +63,9 @@ public class CarController {
         return carService.getCarDetail(carId);
     }
 
+    /* 차량 정비 알림 조회 */
+    @GetMapping("/{carId}/maintenanceAlerts")
+    public CarMaintenanceAlertResponse getMaintenanceAlerts(@PathVariable Long carId) {
+        return carService.getMaintenanceAlerts(carId);
+    }
 }
