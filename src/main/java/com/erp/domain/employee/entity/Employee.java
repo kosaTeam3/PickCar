@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "employee")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -58,25 +59,9 @@ public class Employee extends BaseTimeEntity {
     @Builder.Default
     private Boolean passwordChangeRequired = true;
 
-    public void update(Branch branch,
-                       String name,
-                       String phoneNumber,
-                       String email,
-                       String grade,
-                       EmployeeAuthority authority,
-                       LocalDate quitDate) {
-        if (branch != null) this.branch = branch;
-        if (name != null) this.name = name;
-        if (phoneNumber != null) this.phoneNumber = phoneNumber;
-        if (email != null) this.email = email;
-        if(grade != null) this.grade = grade;
-        if(authority != null) this.authority = authority;
-        if(quitDate != null) this.quitDate = quitDate;
-    }
-
     // Soft Delete
     // 외부에서 퇴사처리하면 오늘로 퇴사날짜를 찍습니다.
-    public void resign(){
+    public void resign() {
         this.quitDate = LocalDate.now();
     }
 }

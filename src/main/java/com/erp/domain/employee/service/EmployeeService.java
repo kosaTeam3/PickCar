@@ -50,7 +50,6 @@ public class EmployeeService {
     }
 
     // 직원 퇴사 (삭제)
-    @Transactional
     public void deleteEmployee(Long employeeId) {
 
         // 조회 (검증)
@@ -63,7 +62,6 @@ public class EmployeeService {
     }
 
     // 직원 정보 수정
-    @Transactional
     public void updateEmployee(Long employeeId, UpdateEmployeeRequestDto request) {
 
         // 직원 조회 (없으면 404)
@@ -71,26 +69,38 @@ public class EmployeeService {
                 .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
 
         // 2. 지점변경이 있을 수 있으니 지점 조회
-        Branch branch = null;
         if (request.branchId() != null) {
             // 지점 ID가 들어온다는 건 지점을 옮기겠다는 것 -> 그 때는 DB 조회
-            branch = branchRepository.findById(request.branchId())
-                    .orElseThrow(() -> new CustomException(404, "해당 지점이 없습니다."));
+            employee.setBranch(branchRepository.findById(request.branchId())
+                    .orElseThrow(() -> new CustomException(404, "해당 지점이 없습니다."))
+            );
         }
 
         // 3. 정보 변경 (Entity의 메서드 호출)
-        // JPA가 변경사항을 감지하는 Dirty Checking
-        // 변경사항에 Null이 포함되더라도 알아서 거름
-        employee.update(
-                branch,
-                request.name(),
-                request.phoneNumber(),
-                request.email(),
-                request.grade(),
-                request.authority(),
-                request.quitDate()
-        );
-        // 트랜잭션이 알아서 Update 쿼리를 날림 (save 필요없음)
+        if (request.name() != null) {
+            employee.setName(request.name());
+        }
+
+        if (request.phoneNumber() != null) {
+            employee.setPhoneNumber(request.phoneNumber());
+        }
+
+        if (request.email() != null) {
+            employee.setEmail(request.email());
+        }
+
+        if (request.grade() != null) {
+            employee.setGrade(request.grade());
+        }
+
+        if (request.authority() != null) {
+            employee.setAuthority(request.authority());
+        }
+
+        if (request.quitDate() != null) {
+            employee.setQuitDate(request.quitDate());
+        }
+        // 트랜잭션이 알아서 Update 쿼리를 날림 (save 필요없음) - Dirty Checking
     }
 
     // 직원 생성
