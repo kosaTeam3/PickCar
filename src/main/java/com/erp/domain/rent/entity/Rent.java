@@ -31,6 +31,10 @@ public class Rent extends BaseTimeEntity {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private RentStatus status;
+
     @Column(name = "car_name", nullable = false)
     private String carName;
 
@@ -40,8 +44,8 @@ public class Rent extends BaseTimeEntity {
     @Column(name = "model", nullable = false)
     private String model;
 
-    @Column(name = "price", nullable = false)
-    private String price;
+    @Column(name = "rental_fee", nullable = false)
+    private Long rentalFee;
 
     @Column(name = "brand", nullable = false)
     private String brand;
