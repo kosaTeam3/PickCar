@@ -40,7 +40,7 @@ public class ClientController {
     public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
         return clientService.getRentHistory(clientId);
     }
-
+    // todo
 //    @GetMapping("/accident/{clientId}")
 //    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
 //        return clientService.getAccidentHistory(clientId);

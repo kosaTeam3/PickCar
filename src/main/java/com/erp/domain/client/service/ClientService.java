@@ -76,6 +76,7 @@ public class ClientService {
                 .toList();
     }
 
+    // todo
     // 회원 사고 기록
 //    public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
 //        if (!clientRepository.existsById(clientId)) {
@@ -105,7 +106,7 @@ public class ClientService {
                 client.getBlacklisted()
         );
     }
-
+    // todo
 //    private ClientAccidentHistoryResponse toAccidentHistory(Accident accident) {
 //        return new ClientAccidentHistoryResponse(
 //                accident.getId(),
