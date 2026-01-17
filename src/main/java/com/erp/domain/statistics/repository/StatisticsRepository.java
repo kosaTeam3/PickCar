@@ -70,12 +70,18 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
     );
 
     /* 인기 차종(모델별) 대여 횟수 통계 */
-    @Query(value = "SELECT r.brand AS brand, r.model AS model, COUNT(r.id) AS count " +
-            "FROM rent r " +
-            "WHERE r.end_rent_date_time IS NOT NULL " + // 반납 완료된 건만
-            "AND r.start_rent_date_time BETWEEN :startDate AND :endDate " +
-            "GROUP BY r.brand, r.model " + // 차종별 그룹핑
-            "ORDER BY count DESC", nativeQuery = true) // 많이 빌린 순서대로
+    @Query(value = """
+            SELECT 
+                r.brand AS brand, 
+                r.model AS model, 
+                COUNT(r.id) AS count
+            FROM rent r
+            WHERE r.end_rent_date_time IS NOT NULL
+            AND r.start_rent_date_time BETWEEN :startDate AND :endDate
+            GROUP BY r.brand, r.model
+            ORDER BY count DESC
+            """,
+            nativeQuery = true)
     List<CarStatisticsProjection> findPopularCarModel(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
