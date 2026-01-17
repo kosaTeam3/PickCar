@@ -1,5 +1,6 @@
 package com.erp.domain.statistics.service;
 
+import com.erp.domain.statistics.dto.CarStatisticsResponse;
 import com.erp.domain.statistics.dto.StatisticsResponse;
 import com.erp.domain.statistics.repository.StatisticsRepository;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,21 @@ public class StatisticsService {
                 .stream()
                 .map(row -> new StatisticsResponse(
                         row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
+    /* 인기 차종(모델별) 대여 횟수 조회 */
+    public List<StatisticsResponse> getPopularCarModelStats(LocalDate srart, LocalDate end) {
+
+        LocalDateTime startDate = start.atStartOfDay();
+        LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        return statisticsRepository.findPopularCarModel(startDate, endDate)
+                .stream()
+                .map(row -> new CarStatisticsResponse(
+                        row.getBrand(),
+                        row.getModel(),
                         row.getCount()))
                 .toList();
     }
