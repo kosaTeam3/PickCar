@@ -3,6 +3,7 @@ package com.erp.domain.statistics.service;
 import com.erp.domain.statistics.dto.CarStatisticsResponse;
 import com.erp.domain.statistics.dto.StatisticsResponse;
 import com.erp.domain.statistics.repository.StatisticsRepository;
+import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +21,14 @@ public class StatisticsService {
     private final StatisticsRepository statisticsRepository;
 
     /* 월간 대여 건수 통계 */
-    public List<StatisticsResponse> getMonthlyRentStats(String startMonth, String endMonth) {
+    public List<StatisticsResponse> getMonthlyRentStats(YearMonth start, YearMonth end) {
 
-        YearMonth start = YearMonth.parse(startMonth);
         LocalDateTime startDate = start.atDay(1).atStartOfDay();
-
-        YearMonth end = YearMonth.parse(endMonth);
         LocalDateTime endDate = end.atEndOfMonth().atTime(23, 59, 59);
+
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(400, "시작 날짜는 종료 날짜보다 빨라야 합니다.");
+        }
 
         return statisticsRepository.findMonthlyRentCount(startDate, endDate)
                 .stream()
@@ -39,13 +41,14 @@ public class StatisticsService {
     }
 
     /* 일간 대여 건수 통계 */
-    public List<StatisticsResponse> getDailyRentStats(String startDateStr, String endDateStr) {
+    public List<StatisticsResponse> getDailyRentStats(LocalDate start, LocalDate end) {
 
-        LocalDate start = LocalDate.parse(startDateStr);
         LocalDateTime startDate = start.atStartOfDay();
-
-        LocalDate end = LocalDate.parse(endDateStr);
         LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(400, "시작 날짜는 종료 날짜보다 빨라야 합니다.");
+        }
 
         return statisticsRepository.findDailyRentCount(startDate, endDate)
                 .stream()
@@ -56,13 +59,14 @@ public class StatisticsService {
     }
 
     /* 주간 대여 건수 통계 */
-    public List<StatisticsResponse> getWeeklyRentStats(String startDateStr, String endDateStr) {
+    public List<StatisticsResponse> getWeeklyRentStats(LocalDate start, LocalDate end) {
 
-        LocalDate start = LocalDate.parse(startDateStr);
         LocalDateTime startDate = start.atStartOfDay();
-
-        LocalDate end = LocalDate.parse(endDateStr);
         LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(400, "시작 날짜는 종료 날짜보다 빨라야 합니다.");
+        }
 
         return statisticsRepository.findWeeklyRentCount(startDate, endDate)
                 .stream()

@@ -1,6 +1,7 @@
 package com.erp.domain.employee.controller;
 
 
+import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
 import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
 import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
@@ -24,12 +25,13 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // 직원 전체 조회(퇴사자 미포함)
+    // 직원 전체 조회(퇴사자 미포함) + 검색
     @GetMapping("/employees")
     public ResponseEntity<Page<EmployeeListResponse>> getEmployees(
+            @ModelAttribute EmployeeSearchRequest request,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(employeeService.getEmployeeList(pageable));
+        return ResponseEntity.ok(employeeService.getEmployeeList(request, pageable));
     }
 
     // 직원 삭제(퇴사) - Soft Delete
