@@ -503,10 +503,7 @@ VALUES ('신규 가입 축하 쿠폰', 10000, '2026-12-31', 'WELCOME2026', NOW()
        ('설문조사 참여 보상', 2000, '2026-03-31', 'SURVEY02', NOW(), NOW()),
        ('서비스 개선 쿠폰', 10000, '2026-12-31', 'VROOM10', NOW(), NOW());
 
-
--- 7. Rent (예약) 데이터 적재 (50건)
--- 주의: car_id(1~110)와 client_id(1~20) 범위 내에서 매핑
--- 6. Rent (렌트) 데이터 적재 - 총 50건
+-- 7. Rent (렌트) 데이터 적재 - 총 50건
 INSERT INTO rent (car_id, client_id, status, rental_fee, start_rent_date_time, end_rent_date_time, created_at,
                   updated_at)
 VALUES

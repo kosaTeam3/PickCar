@@ -249,6 +249,10 @@ public class CarService {
         LocalDateTime startRentDateTime = request.startRentDateTime();
         LocalDateTime endRentDateTime = request.endRentDateTime();
 
+        // 대여 시간 계산: 분 단위 올림을 통해 시간 단위로 환산하며, 비정상적인 분 단위 접근을 방어
+        long minutes = ChronoUnit.MINUTES.between(startRentDateTime, endRentDateTime);
+        long totalHours = (long) Math.ceil(minutes / 60.0);
+
         // 해당 기간에 예약된 차량 ID 조회
         List<Long> rentedCarIds = rentRepository.findRentedCarIds(startRentDateTime, endRentDateTime);
 
@@ -263,7 +267,7 @@ public class CarService {
                         car.getId(),
                         car.getImage(),
                         car.getModel(),
-                        car.getPrice(),
+                        car.calculateRentalFee(totalHours), // 렌트 요금 계산 로직 적용
                         car.getBrand(),
                         car.getYear(),
                         car.getAgeLimit(),
