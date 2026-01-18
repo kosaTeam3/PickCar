@@ -66,15 +66,15 @@ public class ClientService {
     }
 
     // 회원 렌트 기록
-
-    public List<ClientRentHistoryResponse> getRentHistory(Long clientId) {
-        if (!clientRepository.existsById(clientId)) {
-            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
-        }
-        return rentRepository.findRentHistoryByClient(clientId).stream()
-                .map(this::toRentHistory)
-                .toList();
-    }
+    // todo
+//    public List<ClientRentHistoryResponse> getRentHistory(Long clientId) {
+//        if (!clientRepository.existsById(clientId)) {
+//            throw new CustomException(404, "회원 정보를 찾을 수 없습니다.");
+//        }
+//        return rentRepository.findRentHistoryByClient(clientId).stream()
+//                .map(this::toRentHistory)
+//                .toList();
+//    }
 
     // todo
     // 회원 사고 기록
@@ -127,17 +127,17 @@ public class ClientService {
         return clientRepository.findById(clientId)
                 .orElseThrow(() -> new CustomException(404, "회원 정보를 찾을 수 없습니다."));
     }
-
-    private ClientRentHistoryResponse toRentHistory(Rent rent) {
-        return new ClientRentHistoryResponse(
-                rent.getId(),
-                rent.getCarName(),
-                rent.getModel(),
-                rent.getBrand(),
-                rent.getYear(),
-                rent.getPrice(),
-                rent.getStartRentDateTime(),
-                rent.getEndRentDateTime()
-        );
-    }
+    // todo
+//    private ClientRentHistoryResponse toRentHistory(Rent rent) {
+//        return new ClientRentHistoryResponse(
+//                rent.getId(),
+//                rent.getCarName(),
+//                rent.getModel(),
+//                rent.getBrand(),
+//                rent.getYear(),
+//                rent.getRentalFee(),
+//                rent.getStartRentDateTime(),
+//                rent.getEndRentDateTime()
+//        );
+//    }
 }

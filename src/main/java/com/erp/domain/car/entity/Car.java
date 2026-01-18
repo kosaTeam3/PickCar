@@ -59,8 +59,9 @@ public class Car extends BaseTimeEntity {
     @Column(name = "maintenance_date")
     private LocalDate maintenanceDate;
 
+    // 중소형 업체 특성상 일괄 계약이므로 기본값을 지정하거나 상수로 관리
     @Column(name = "insurance_name")
-    private String insuranceName;
+    private String insuranceName = "전국렌터카공제조합";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
