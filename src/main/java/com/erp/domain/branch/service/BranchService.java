@@ -175,7 +175,8 @@ public class BranchService {
                             availableVehicles,
                             branch.getLatitude(),
                             branch.getLongitude(),
-                            branch.getDistance()
+                            branch.getDistance(),
+                            branch.getAddress()
                     );
                 })
                 .toList();
