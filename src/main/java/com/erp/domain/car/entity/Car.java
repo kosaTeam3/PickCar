@@ -60,7 +60,8 @@ public class Car extends BaseTimeEntity {
     private LocalDate maintenanceDate;
 
     // 중소형 업체 특성상 일괄 계약이므로 기본값을 지정하거나 상수로 관리
-    @Column(name = "insurance_name")
+    @Column(name = "insurance_name", columnDefinition = "varchar(255) default '전국렌터카공제조합'")
+    @Builder.Default
     private String insuranceName = "전국렌터카공제조합";
 
     @Enumerated(EnumType.STRING)
