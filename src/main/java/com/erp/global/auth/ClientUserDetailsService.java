@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class ClientUserDetailsService implements UserDetailsService {
     /*
      * UserDetailsService
      * Repository를 이용해 유저를 찾고 만들기
@@ -24,12 +24,18 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // 1. ClientRepository를 이용해  DB에서 유저 찾기
-        return clientRepository.findByEmail(email)
-                .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일을 가진 고객이 없습니다." + email));
+
+        // 2. ClientDetails에 담아서 반환
+        return new ClientDetails(client);
     }
 
     // 2. Client Entity -> UserDetails 변환 메서드
+    // DB 조회 (DB비번 vs 상용자 입력비번 대조 검증)
+    // 인증 완료되면 객체 반환
+    // 한계 : 이 방식은 단일 테이블에 적합, 우리는 Client와 Employee 를 조회하기 때문에
+    // 이거말고 따로 필요 (현재 계층 인증 모호함)
     private UserDetails createUserDetails(Client client) {
         return User.builder()
                 .username(client.getEmail())

@@ -2,9 +2,12 @@ package com.erp.domain.client.service;
 
 import com.erp.domain.client.dto.request.LoginRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
+import com.erp.domain.client.dto.request.ReissueRequestDto;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
 import com.erp.domain.client.repository.ClientRepository;
+import com.erp.global.auth.RefreshToken;
+import com.erp.global.auth.RefreshTokenRepository;
 import com.erp.global.exception.CustomException;
 import com.erp.global.jwt.JwtTokenProvider;
 import com.erp.global.jwt.TokenInfo;
@@ -22,14 +25,15 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ClientService {
 
+
+    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-
     private final ClientRepository clientRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     // 로그인
-    @Transactional(readOnly = true)
+    @Transactional
     public TokenInfo login(LoginRequestDto loginRequestDto) {
         //1. 인증되지 않은 ID/PW 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -38,16 +42,56 @@ public class ClientService {
                         loginRequestDto.password());
 
         // 2. 실제 검증
-        // 여기서 Securityconfig의 Password Encoder 사용
+        // AuthenticationManager가 자동으로 ClientUserDetailsService를 호출하고
+        // 비밀번호까지 비교해서 검증된 객체인 Authentication을 줍니다
+        // 비밀번호가 틀림녀 여기서 예외(AuthenticationException)가 터지고 메서드가 종료됩니다.
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-        // 3. 인증 정보를 가지고 JWT 토큰 생성
+        // 3. JWT 토큰 발급 - 여기까지 오면 로그인이 성공하고 인증된 정보로 토큰을 생성합니다.
+//        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
         TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        return tokenInfo;
 
+
+        refreshTokenRepository.save(RefreshToken.builder()
+                .key(authentication.getName())
+                .value(tokenInfo.refreshToken())
+                .build());
+        return tokenInfo;
+    }
+
+    // 토큰 재발급
+    @Transactional
+    public TokenInfo reissue(ReissueRequestDto requestDto){
+
+        // 1. RefreshToken 유효성 검사 (위조여부)
+        if (!jwtTokenProvider.validateToken(requestDto.refreshToken())){
+            throw new CustomException(401, "유효하지 않은 Refresh Token입니다.");
+        }
+
+        // 2. Access Token에서 UserEmail
+        // 토큰이 만료가 됐더라도 누구인지는 알아야 하기 때문
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestDto.accessToken());
+
+        // 3. Db에서 그 사람의 RefreshToken 꺼내오기
+        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
+                .orElseThrow(() -> new CustomException(400, "로그아웃 된 사용자 입니다.")); // DB에 없으면 로그아웃 된 것
+        // 4. Refresh Token 일지하는 검사
+        if (!refreshToken.getValue().equals(requestDto.refreshToken())){
+            throw new CustomException(400, "토큰 유저의 정보가 일치하지 않습니다.");
+        }
+
+        // 5. 새로운 토큰 생성
+        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+
+        // 6. DB 정보 업데이트 (새로운 Refresh Token으로 교체)
+        RefreshToken newRefreshToken = refreshToken.updateValue(tokenInfo.refreshToken());
+        refreshTokenRepository.save(newRefreshToken);
+
+        return tokenInfo;
     }
 
     // email 중복조회
+    @Transactional
     public void checkEmailDuplicate(String email) {
         if(clientRepository.existsByEmail(email)){
             throw new CustomException(409, "이미 존재하는 이메일입니다.");
@@ -80,7 +124,6 @@ public class ClientService {
                 .gender(gender)  // 주민에서 추출된 성별
                 .residentNumber(dto.residentNumber())
                 .birthday(birthDate)  // 주민에서 추출된 생년월일
-                .blacklisted(false)
                 .licenceArea(dto.licenceArea())
                 .licenceNumber(dto.licenceNumber())
                 .licenceDay(LocalDate.parse(dto.licenceDay()))
