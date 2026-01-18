@@ -1,6 +1,7 @@
 package com.erp.domain.accident.controller;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
+import com.erp.domain.accident.dto.response.AccidentDetailResponse;
 import com.erp.domain.accident.service.AccidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +23,11 @@ public class AccidentController {
         Long id = accidentService.createAccident(carId, request);
 
         return ResponseEntity.created(URI.create("/api/manager/accident/" + id)).build();
+    }
+
+    @GetMapping("/{accidentId}")
+    public ResponseEntity<AccidentDetailResponse> getAccidentDetail(@PathVariable Long accidentId) {
+        AccidentDetailResponse response = accidentService.getAccidentDetail(accidentId);
+        return ResponseEntity.ok(response);
     }
 }
