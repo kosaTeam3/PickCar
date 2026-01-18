@@ -102,6 +102,7 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
     // 토큰 파싱
     private Claims parseClaim(String accessToekn) {
         try {
@@ -109,5 +110,23 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims(); // 만료후에도 꺼내기
         }
+    }
+
+    // 토큰 남은 유효시간 계산
+    public Long getExpireTime(String accessToken) {
+
+        // acessToken 남은 유효시간
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getExpiration();
+
+        // 현재 시간
+        Long now = new Date().getTime();
+
+        // 남은 시간 반환
+        return (expiration.getTime() - now);
     }
 }

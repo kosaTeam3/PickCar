@@ -1,5 +1,6 @@
 package com.erp.global.jwt;
 
+import com.erp.global.auth.LogoutAceessTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private LogoutAceessTokenRepository logoutAceessTokenRepository;
 
     @Override
     public void doFilter(ServletRequest request,
@@ -26,7 +28,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // 1. Request header에서 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null && jwtTokenProvider.validateToken(token)
+                && !logoutAceessTokenRepository.existsById(token)) {
             // 3. 토큰이 유효하면 유저 정보 받아옴
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
@@ -35,7 +38,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         }
         // 5. 다음 필터로 넘기기 (이게 없으면 요청이 여기서 멈춤)
         filterChain.doFilter(request, response);
-
 
     }
 

@@ -6,6 +6,8 @@ import com.erp.domain.client.dto.request.ReissueRequestDto;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
 import com.erp.domain.client.repository.ClientRepository;
+import com.erp.global.auth.LogoutAccessToken;
+import com.erp.global.auth.LogoutAceessTokenRepository;
 import com.erp.global.auth.RefreshToken;
 import com.erp.global.auth.RefreshTokenRepository;
 import com.erp.global.exception.CustomException;
@@ -26,11 +28,34 @@ import java.time.LocalDate;
 public class ClientService {
 
 
+    private final LogoutAceessTokenRepository logoutAceessTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final ClientRepository clientRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+
+    // 로그아웃
+    @Transactional
+    public void logout(String accessToken, String email) {
+
+        // 1. Access Token 남은 시간 계산
+        Long expiration = jwtTokenProvider.getExpireTime(accessToken);
+
+        // 2. 이미 만료된 토큰이 아니라면 블랙리스트에 저장
+        if (expiration > 0) {
+            logoutAceessTokenRepository.save(LogoutAccessToken.builder()
+                    .id(accessToken)
+                    .email(email)
+                    .expiration(expiration)
+                    .build());
+        }
+
+        // 3. RefreshToken 삭제 (이제 재발급 안 됨)
+        refreshTokenRepository.findByKey(email)
+                .ifPresent(refreshTokenRepository::delete);
+    }
 
     // 로그인
     @Transactional
@@ -61,10 +86,10 @@ public class ClientService {
 
     // 토큰 재발급
     @Transactional
-    public TokenInfo reissue(ReissueRequestDto requestDto){
+    public TokenInfo reissue(ReissueRequestDto requestDto) {
 
         // 1. RefreshToken 유효성 검사 (위조여부)
-        if (!jwtTokenProvider.validateToken(requestDto.refreshToken())){
+        if (!jwtTokenProvider.validateToken(requestDto.refreshToken())) {
             throw new CustomException(401, "유효하지 않은 Refresh Token입니다.");
         }
 
@@ -76,7 +101,7 @@ public class ClientService {
         RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
                 .orElseThrow(() -> new CustomException(400, "로그아웃 된 사용자 입니다.")); // DB에 없으면 로그아웃 된 것
         // 4. Refresh Token 일지하는 검사
-        if (!refreshToken.getValue().equals(requestDto.refreshToken())){
+        if (!refreshToken.getValue().equals(requestDto.refreshToken())) {
             throw new CustomException(400, "토큰 유저의 정보가 일치하지 않습니다.");
         }
 
@@ -93,7 +118,7 @@ public class ClientService {
     // email 중복조회
     @Transactional
     public void checkEmailDuplicate(String email) {
-        if(clientRepository.existsByEmail(email)){
+        if (clientRepository.existsByEmail(email)) {
             throw new CustomException(409, "이미 존재하는 이메일입니다.");
         }
     }
