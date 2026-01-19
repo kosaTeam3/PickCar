@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,7 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final ClientUserDetailsService clientUserDetailsService;
-    // private final EmployeeUserDetailsService employeeService; // employee 추가 후 필요
+    // todo  employee 추가 후 필요
+    // private final EmployeeUserDetailsService employeeService;
 
 
     // 비밀번호 암호화 빈 등록
@@ -35,8 +37,7 @@ public class SecurityConfig {
     // -> Spring에게 명시적으로 검증방법이 2개 (client, employee) 있다고 알려주기 -> HttpSecurity
     // 로그인 시 사용자의 인증(Authentication) 담당
     @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
-    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity)
+  public AuthenticationManager authenticationManager(HttpSecurity httpSecurity)
             throws Exception {
         AuthenticationManagerBuilder builder =   // getSharedObject: 스프링 시큐리티가 공유해서 쓰는 객체 보관
                 httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
@@ -54,9 +55,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // JWT 사용시 CSRF 보호 필요없음
-                .formLogin(form -> form.disable())  // Spring 로그인 화면 미사용(Rest API니까)
-                .httpBasic(basic -> basic.disable())  // HTTP basic 인증 비활성
+                .csrf(AbstractHttpConfigurer::disable)  // JWT 사용시 CSRF 보호 필요없음
+                .formLogin(AbstractHttpConfigurer::disable)  // Spring 로그인 화면 미사용(Rest API니까)
+                .httpBasic(AbstractHttpConfigurer::disable)  // HTTP basic 인증 비활성
 
                 .sessionManagement( // session 사용 안 함 (Stateless 설정)
                         session
@@ -87,8 +88,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }
 
 

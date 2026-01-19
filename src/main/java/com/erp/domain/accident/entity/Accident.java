@@ -3,6 +3,7 @@ package com.erp.domain.accident.entity;
 import com.erp.common.entity.BaseTimeEntity;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.client.entity.Client;
+import com.erp.domain.rent.entity.Rent;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,44 +24,32 @@ public class Accident extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
-    private Client client;
+    @JoinColumn(name = "rent_id")
+    private Rent rent;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "accident_status")
-    private AccidentStatus accidentStatus;
+    @Column(name = "status", nullable = false)
+    private AccidentStatus status; // 상태
 
-    @Column(name = "client_name")
-    private String clientName;
+    @Column(name = "description")
+    private String description; // 사고 설명
 
-    @Column(name = "accident_time", nullable = false)
-    private LocalDateTime accidentTime;
+    @Column(name = "location")
+    private String location; // 대략적인 사고 위치
 
-    @Column(name = "accident_detail")
-    private String accidentDetail;
+    @Column(name = "time", nullable = false)
+    private LocalDateTime time; // 사고 시각
 
-    @Column(name = "accident_locate", nullable = false)
-    private String accidentLocate;
+    @Column(name = "part", nullable = false)
+    private String part; // 사고 부위
 
-    @Column(name = "accident_part")
-    private String accidentPart;
+    @Column(name = "repair_cost")
+    private Long repairCost; // 수리비
 
-    @Column(name = "accident_image")
-    private String accidentImage;
-
-    @Column(name = "insurance_info", nullable = false)
-    private String insuranceInfo;
-
-    @Column(name = "brand", nullable = false)
-    private String brand;
-
-    @Column(name = "model", nullable = false)
-    private String model;
-
-    @Column(name = "year", nullable = false)
-    private String year;
+    @Column(name = "client_liability")
+    private Long clientLiability; // 고객 부담금
 }

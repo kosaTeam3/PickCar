@@ -56,4 +56,7 @@ public class Maintenance extends BaseTimeEntity {
 
     @Column(name = "detail")
     private String detail;
+
+    @Column(name = "consumables")
+    private String consumables;
 }

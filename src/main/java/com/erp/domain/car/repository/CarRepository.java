@@ -1,7 +1,68 @@
 package com.erp.domain.car.repository;
 
+import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
+import com.erp.domain.car.entity.FuelType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
+    // 특정 지점의 WAITING 상태 차량 전체 카운트
+    int countByBranchIdAndStatus(Long branchId, CarStatus status);
+
+    // 특정 지점의 WAITING 상태 차량 중, 예약된 차량들을 제외하고 카운트
+    @Query("""
+        SELECT COUNT(c) FROM Car c
+        WHERE c.branch.id = :branchId
+        AND c.status = :status
+        AND c.id NOT IN :rentedCarIds""")
+    Integer countAvailableCarsNotIn(@Param("branchId") Long branchId,
+                                @Param("status") CarStatus status,
+                                @Param("rentedCarIds") List<Long> rentedCarIds);
+
+    // 특정 지점의 가용 차량 목록 조회 (예약 차량 제외)
+    @Query("""
+        SELECT c FROM Car c
+        WHERE c.branch.id = :branchId
+        AND c.status = :status
+        AND (:rentedCarIds IS NULL OR c.id NOT IN :rentedCarIds)""")
+    List<Car> findAvailableCars(@Param("branchId") Long branchId,
+                                @Param("status") CarStatus status,
+                                @Param("rentedCarIds") List<Long> rentedCarIds);
+
+    /* 차량 검색 */
+    @Query("""
+    SELECT c
+    FROM Car c
+    WHERE (:branchId IS NULL OR c.branch.id = :branchId)
+      AND (:brand IS NULL OR c.brand = :brand)
+      AND (:model IS NULL OR c.model LIKE %:model%)
+      AND (:fuelType IS NULL OR c.fuelType = :fuelType)
+      AND (:status IS NULL OR c.status = :status)
+    """)
+    Page<Car> searchCars(
+            @Param("branchId") Long branchId,
+            @Param("brand") String brand,
+            @Param("model") String model,
+            @Param("fuelType") FuelType fuelType,
+            @Param("status") CarStatus status,
+            Pageable pageable);
+
+    /* 차량 상태별 수량 조회 */
+    @Query("""
+        SELECT new com.erp.domain.car.dto.response.CarStatusCountResponse(
+            COUNT(c),
+            COUNT(CASE WHEN c.status = 'DRIVING' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'MAINTENANCE' THEN 1 END),
+            COUNT(CASE WHEN c.status = 'WAITING' THEN 1 END)
+        )
+        FROM Car c
+    """)
+    CarStatusCountResponse countCarByStatus();
 }
