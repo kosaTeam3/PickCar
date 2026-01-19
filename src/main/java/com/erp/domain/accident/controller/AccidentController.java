@@ -23,4 +23,13 @@ public class AccidentController {
 
         return ResponseEntity.created(URI.create("/api/manager/accident/" + id)).build();
     }
+
+    @PatchMapping("/{accidentId}")
+    public ResponseEntity<Void> updateAccident(
+            @PathVariable Long accidentId,
+            @RequestBody AccidentRequest request
+    ) {
+        accidentService.updateAccident(accidentId, request);
+        return ResponseEntity.ok().build();
+    }
 }
