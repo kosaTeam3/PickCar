@@ -2,7 +2,6 @@ package com.erp.domain.accident.service;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.entity.Accident;
-import com.erp.domain.accident.entity.AccidentStatus;
 import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
@@ -50,5 +49,13 @@ public class AccidentService {
         car.setStatus(CarStatus.MAINTENANCE);
 
         return accidentRepository.save(accident).getId();
+    }
+
+    @Transactional
+    public void deleteAccident(Long accidentId) {
+        Accident accident = accidentRepository.findById(accidentId)
+                .orElseThrow(() -> new CustomException(404, "해당 사고 내역을 찾을 수 없습니다."));
+
+        accidentRepository.delete(accident);
     }
 }

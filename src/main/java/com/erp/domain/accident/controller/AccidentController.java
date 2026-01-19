@@ -23,4 +23,11 @@ public class AccidentController {
 
         return ResponseEntity.created(URI.create("/api/manager/accident/" + id)).build();
     }
+
+    @DeleteMapping("/{accidentId}")
+    public ResponseEntity<Void> deleteAccident(@PathVariable Long accidentId) {
+        accidentService.deleteAccident(accidentId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
