@@ -59,16 +59,16 @@ public class JwtTokenProvider {
                 .compact();
 
 
-        // Create Refresh Token
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + refreshExpirationTime))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+//        // Create Refresh Token
+//        String refreshToken = Jwts.builder()
+//                .setExpiration(new Date(now + refreshExpirationTime))
+//                .signWith(key, SignatureAlgorithm.HS256)
+//                .compact();
 
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+//                .refreshToken(refreshToken)
                 .build();
     }
 

@@ -3,7 +3,6 @@ package com.erp.domain.client.controller;
 import com.erp.domain.client.dto.request.EmailCheckRequestDto;
 import com.erp.domain.client.dto.request.LoginRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
-import com.erp.domain.client.dto.request.ReissueRequestDto;
 import com.erp.domain.client.service.ClientService;
 import com.erp.global.jwt.JwtTokenProvider;
 import com.erp.global.jwt.TokenInfo;
@@ -37,11 +36,11 @@ public class ClientController {
         return ResponseEntity.ok().build();
     }
 
-    // 토큰 재발급
-    @PostMapping("/reissue")
-    public ResponseEntity<TokenInfo> reissue(@RequestBody ReissueRequestDto requestDto) {
-        return ResponseEntity.ok(clientService.reissue(requestDto));
-    }
+//    // 토큰 재발급 - refreshToken
+//    @PostMapping("/reissue")
+//    public ResponseEntity<TokenInfo> reissue(@RequestBody ReissueRequestDto requestDto) {
+//        return ResponseEntity.ok(clientService.reissue(requestDto));
+//    }
 
     // 이메일 중복 확인
     @PostMapping("/validation")
