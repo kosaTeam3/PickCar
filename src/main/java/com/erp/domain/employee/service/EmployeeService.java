@@ -3,6 +3,7 @@ package com.erp.domain.employee.service;
 
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
+import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
 import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
 import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
 import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
@@ -33,6 +34,7 @@ public class EmployeeService {
     private static final String SEQUENCE_FORMAT = "%04d";
 
 
+    // 직원 전체조회 + 페이징 + Search
     // 비밀번호 변경 ( 첫 로그인시 강제 변경 포함)
     public void changePassword(Long employeeId, PasswordChangeRequestDto requestDto){
 
@@ -61,8 +63,15 @@ public class EmployeeService {
 
     // 직원 전체조회 + 페이징
     @Transactional(readOnly = true)  // 조회 전용
-    public Page<EmployeeListResponse> getEmployeeList(Pageable pageable) {
-        return employeeRepository.findAllByQuitDateIsNull(pageable)
+    public Page<EmployeeListResponse> getEmployeeList(EmployeeSearchRequest request, Pageable pageable) {
+
+        return employeeRepository.findAllByQuitDateIsNull(
+                        request.name(),
+                        request.email(),
+                        request.call(),
+                        request.grade(),
+                        request.entryDate(),
+                        pageable)
                 .map(entity -> EmployeeListResponse.builder()
                         .employId(entity.getId())
                         .employName(entity.getName())

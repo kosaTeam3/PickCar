@@ -12,18 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/manager/vehicles/maint")
 @RequiredArgsConstructor
-@RequestMapping("/api/manager/vehicles")
 public class MaintenanceManagerController {
 
     private final MaintenanceService maintenanceService;
 
     /* 차량 정비 이력 조회 */
-    @GetMapping("/maint/{carId}")
+    @GetMapping("/{carId}")
     public Page<MaintenanceHistoryResponse> getMaintenanceHistory(
             @PathVariable Long carId,
             @PageableDefault Pageable pageable
     ) {
         return maintenanceService.getMaintenanceHistory(carId, pageable);
     }
+
 }
+
