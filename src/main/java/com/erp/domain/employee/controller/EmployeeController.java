@@ -35,7 +35,7 @@ public class EmployeeController {
             ){
         employeeService.changePassword(employeeId, requestDto);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     // 직원 전체 조회(퇴사자 미포함)

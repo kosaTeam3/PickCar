@@ -40,10 +40,10 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
 
-        // 2. 새 비번 , 확인 비번 일치여부 검증
-        if (!requestDto.newPassword().equals(requestDto.checkPassword())){
-            throw new CustomException(400, "비밀번호가 일치하지 않습니다.");
-        }
+//        // 2. 새 비번 , 확인 비번 일치여부 검증 - 프론트 엔드 역할
+//        if (!requestDto.newPassword().equals(requestDto.checkPassword())){
+//            throw new CustomException(400, "비밀번호가 일치하지 않습니다.");
+//        }
 
         // 3. 기존 비밀번호와 동일한지 검증
         if (passwordEncoder.matches(requestDto.newPassword(), employee.getPassword())){
