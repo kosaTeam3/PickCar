@@ -1,6 +1,6 @@
 package com.erp.global.jwt;
 
-import com.erp.global.auth.LogoutAceessTokenRepository;
+import com.erp.global.auth.LogoutAccessTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private LogoutAceessTokenRepository logoutAceessTokenRepository;
+    private LogoutAccessTokenRepository logoutAceessTokenRepository;
 
     @Override
     public void doFilter(ServletRequest request,

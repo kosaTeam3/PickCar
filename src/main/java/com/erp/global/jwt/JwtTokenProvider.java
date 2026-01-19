@@ -25,6 +25,13 @@ public class JwtTokenProvider {
 
     private final Key key;
 
+    // 토큰 만료시간
+    @Value("${jwt.access_expiration}")
+    private long accessExpirationTime;
+
+    @Value("${jwt.refresh_expiration}")
+    private long refreshExpirationTime;
+
     // 1. 암호화 키 셋팅 : : application.yml`에서 가져온 비밀키 사용
     public JwtTokenProvider(@Value("${jwt.secret_key}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -41,7 +48,7 @@ public class JwtTokenProvider {
         long now = (new Date()).getTime();
 
         // AccessToken 유효기간
-        Date accessTokenExpiration = new Date(now + 1800 * 1000L);
+        Date accessTokenExpiration = new Date(now + accessExpirationTime);
 
         // Create Access Token
         String accessToken = Jwts.builder()
@@ -54,9 +61,10 @@ public class JwtTokenProvider {
 
         // Create Refresh Token
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + (3600 * 1000L) * 2))
+                .setExpiration(new Date(now + refreshExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
@@ -116,12 +124,8 @@ public class JwtTokenProvider {
     public Long getExpireTime(String accessToken) {
 
         // acessToken 남은 유효시간
-        Date expiration = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody()
-                .getExpiration();
+        Claims claims = parseClaim(accessToken);
+        Date expiration = claims.getExpiration();
 
         // 현재 시간
         Long now = new Date().getTime();

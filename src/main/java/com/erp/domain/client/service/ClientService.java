@@ -7,7 +7,7 @@ import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
 import com.erp.domain.client.repository.ClientRepository;
 import com.erp.global.auth.LogoutAccessToken;
-import com.erp.global.auth.LogoutAceessTokenRepository;
+import com.erp.global.auth.LogoutAccessTokenRepository;
 import com.erp.global.auth.RefreshToken;
 import com.erp.global.auth.RefreshTokenRepository;
 import com.erp.global.exception.CustomException;
@@ -28,7 +28,7 @@ import java.time.LocalDate;
 public class ClientService {
 
 
-    private final LogoutAceessTokenRepository logoutAceessTokenRepository;
+    private final LogoutAccessTokenRepository logoutAceessTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
