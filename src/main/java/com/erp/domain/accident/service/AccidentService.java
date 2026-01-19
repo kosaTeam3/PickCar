@@ -3,7 +3,6 @@ package com.erp.domain.accident.service;
 import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
 import com.erp.domain.accident.entity.Accident;
-import com.erp.domain.accident.entity.AccidentStatus;
 import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
@@ -12,11 +11,12 @@ import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,10 +54,9 @@ public class AccidentService {
         return accidentRepository.save(accident).getId();
     }
 
-    public List<AccidentResponse> getAccidents() {
-        return accidentRepository.findAllWithDetails().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<AccidentResponse> getAccidents(Pageable pageable) {
+        return accidentRepository.findAllWithDetails(pageable)
+                .map(this::toResponse);
     }
 
     private AccidentResponse toResponse(Accident accident) {

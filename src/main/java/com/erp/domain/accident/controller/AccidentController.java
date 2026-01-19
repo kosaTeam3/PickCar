@@ -4,11 +4,14 @@ import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
 import com.erp.domain.accident.service.AccidentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/manager/accident")
@@ -27,8 +30,10 @@ public class AccidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AccidentResponse>> getAccidents() {
-        List<AccidentResponse> response = accidentService.getAccidents();
+    public ResponseEntity<Page<AccidentResponse>> getAccidents(
+            @PageableDefault(sort = "time", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<AccidentResponse> response = accidentService.getAccidents(pageable);
 
         return ResponseEntity.ok(response);
     }
