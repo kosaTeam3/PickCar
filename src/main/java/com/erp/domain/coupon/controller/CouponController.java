@@ -1,5 +1,6 @@
 package com.erp.domain.coupon.controller;
 
+import com.erp.domain.coupon.dto.request.CouponIssueRequest;
 import com.erp.domain.coupon.dto.request.CouponSaveRequest;
 import com.erp.domain.coupon.service.CouponService;
 import jakarta.validation.Valid;
@@ -20,6 +21,12 @@ public class CouponController {
     @PostMapping
     public Long createCoupon(@RequestBody @Valid CouponSaveRequest request) {
         return couponService.createCoupon(request);
+    }
+
+    /* [사용자] 쿠폰 발급 */
+    @PostMapping("/issue")
+    public Long issueCoupon(@RequestBody @Valid CouponIssueRequest request) {
+        return couponService.issueCoupon(request.clientId(), request.couponCode());
     }
 
 }
