@@ -12,6 +12,7 @@ import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.domain.rent.repository.RentRepository;
+import com.erp.domain.rent.service.RentalFeeService;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class CarService {
     private final BranchRepository branchRepository;
     private final AlertService alertService;
     private final RentRepository rentRepository;
+    private final RentalFeeService rentalFeeService;
 
     private static final List<ConsumableRule> CONSUMABLE_RULES = List.of(
             new ConsumableRule("엔진오일", 10_000L),
@@ -249,9 +251,7 @@ public class CarService {
         LocalDateTime startRentDateTime = request.startRentDateTime();
         LocalDateTime endRentDateTime = request.endRentDateTime();
 
-        // 대여 시간 계산: 분 단위 올림을 통해 시간 단위로 환산하며, 비정상적인 분 단위 접근을 방어
-        long minutes = ChronoUnit.MINUTES.between(startRentDateTime, endRentDateTime);
-        long totalHours = (long) Math.ceil(minutes / 60.0);
+        long totalHours = rentalFeeService.calculateRentalHours(startRentDateTime, endRentDateTime);
 
         // 해당 기간에 예약된 차량 ID 조회
         List<Long> rentedCarIds = rentRepository.findRentedCarIds(startRentDateTime, endRentDateTime);
@@ -267,7 +267,7 @@ public class CarService {
                         car.getId(),
                         car.getImage(),
                         car.getModel(),
-                        car.calculateRentalFee(totalHours), // 렌트 요금 계산 로직 적용
+                        rentalFeeService.calculateRentalFee(car, totalHours),
                         car.getBrand(),
                         car.getYear(),
                         car.getAgeLimit(),

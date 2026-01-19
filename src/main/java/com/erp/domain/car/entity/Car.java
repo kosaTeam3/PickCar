@@ -84,34 +84,4 @@ public class Car extends BaseTimeEntity {
     @Column(name = "last_maintenance_mileage", nullable = false, columnDefinition = "bigint default 0")
     @Builder.Default
     private Long lastMaintenanceMileage = 0L;
-
-    @Transient
-    private static final int DAILY_CAP_HOUR_THRESHOLD = 10; // 일일 상한 시간 (10시간)
-
-    // 최종 렌트 요금을 계산하는 로직
-    public Long calculateRentalFee(long totalHours) {
-        long days = totalHours / 24;
-        long remainingHours = totalHours % 24;
-        Long dailyCapFee = this.getDailyCapFee(); // 일일 상한 요금(1일당 요금)
-        long totalFee = 0L;
-
-        if (days > 0) {
-            totalFee += days * dailyCapFee;
-        }
-
-        // 24시간 단위로 나누어 떨어지지 않는 남은 시간에 대한 요금 계산
-        long hourlySum = remainingHours * this.price;
-
-        totalFee += Math.min(hourlySum, dailyCapFee);
-
-        return totalFee;
-    }
-
-    public Long getDailyCapFee() { // 일일 상한 요금 계산
-        if (this.price == null) {
-            return 0L;
-        }
-
-        return this.price * DAILY_CAP_HOUR_THRESHOLD;
-    }
 }

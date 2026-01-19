@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +32,7 @@ public class RentService {
     private final CarRepository carRepository;
     private final ClientRepository clientRepository;
     private final CouponRepository couponRepository;
+    private final RentalFeeService rentalFeeService;
 
     public Page<RentHistoryResponse> getRentHistory(Long carId, Pageable pageable) {
 
@@ -65,12 +65,9 @@ public class RentService {
             throw new CustomException(409, "선택하신 시간대에 이미 예약된 차량입니다.");
         }
 
-        // 렌트 요금 계산
-        // 1분이라도 초과되면 1시간으로 올림 처리
-        long minutes = ChronoUnit.MINUTES.between(request.startRentDateTime(), request.endRentDateTime());
-        long totalHours = (long) Math.ceil(minutes / 60.0);
+        long totalHours = rentalFeeService.calculateRentalHours(request.startRentDateTime(), request.endRentDateTime());
 
-        long rentalFee = car.calculateRentalFee(totalHours);
+        long rentalFee = rentalFeeService.calculateRentalFee(car, totalHours);
 
         // 쿠폰 적용
         if (request.couponId() != null) {
