@@ -37,7 +37,7 @@ public class SecurityConfig {
     // -> Spring에게 명시적으로 검증방법이 2개 (client, employee) 있다고 알려주기 -> HttpSecurity
     // 로그인 시 사용자의 인증(Authentication) 담당
     @Bean
-  public AuthenticationManager authenticationManager(HttpSecurity httpSecurity)
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity)
             throws Exception {
         AuthenticationManagerBuilder builder =   // getSharedObject: 스프링 시큐리티가 공유해서 쓰는 객체 보관
                 httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
