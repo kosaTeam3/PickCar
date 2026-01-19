@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     /* 쿠폰 코드로 조회 */
-    Optional<Coupon> findByCode(String couponCode);
+    Optional<Coupon> findAllByCode(String couponCode);
 }
