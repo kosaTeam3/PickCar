@@ -1,6 +1,7 @@
 package com.erp.domain.accident.service;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
+import com.erp.domain.accident.dto.request.AccidentSearchRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
 import com.erp.domain.accident.entity.Accident;
 import com.erp.domain.accident.repository.AccidentRepository;
@@ -54,16 +55,21 @@ public class AccidentService {
         return accidentRepository.save(accident).getId();
     }
 
-    public Page<AccidentResponse> getAccidents(Pageable pageable) {
-        return accidentRepository.findAllWithDetails(pageable)
-                .map(this::toResponse);
+    public Page<AccidentResponse> getAccidents(AccidentSearchRequest searchRequest, Pageable pageable) {
+        return accidentRepository.findAllWithFilters(
+                searchRequest.startAt(),
+                searchRequest.endAt(),
+                searchRequest.vehicleIdNumber(),
+                searchRequest.clientName(),
+                searchRequest.status(),
+                pageable
+        ).map(this::toResponse);
     }
 
     private AccidentResponse toResponse(Accident accident) {
         Long clientId = null;
         String clientName = null;
 
-        // 렌트 된 차량이 아니면 고객 정보는 없음.
         if (accident.getRent() != null && accident.getRent().getClient() != null) {
             clientId = accident.getRent().getClient().getId();
             clientName = accident.getRent().getClient().getName();
@@ -72,8 +78,8 @@ public class AccidentService {
         return new AccidentResponse(
                 accident.getId(),
                 accident.getStatus(),
-                clientId, // nullable
-                clientName, // nullable
+                clientId,
+                clientName,
                 accident.getTime(),
                 accident.getCar().getId(),
                 accident.getCar().getVehicleIdNumber(),

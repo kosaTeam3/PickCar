@@ -1,6 +1,7 @@
 package com.erp.domain.accident.controller;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
+import com.erp.domain.accident.dto.request.AccidentSearchRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
 import com.erp.domain.accident.service.AccidentService;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,10 @@ public class AccidentController {
 
     @GetMapping
     public ResponseEntity<Page<AccidentResponse>> getAccidents(
+            @ModelAttribute AccidentSearchRequest searchRequest,
             @PageableDefault(sort = "time", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<AccidentResponse> response = accidentService.getAccidents(pageable);
+        Page<AccidentResponse> response = accidentService.getAccidents(searchRequest, pageable);
 
         return ResponseEntity.ok(response);
     }
