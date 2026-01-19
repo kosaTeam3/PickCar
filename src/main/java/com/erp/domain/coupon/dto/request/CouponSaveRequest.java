@@ -13,7 +13,7 @@ public record CouponSaveRequest(
         @NotBlank(message = "쿠폰명은 필수 입력 항목입니다.")
         String couponName,
 
-        @NotBlank(message = "할인율은 필수 입력 항목입니다.")
+        @NotNull(message = "할인율은 필수 입력 항목입니다.")
         @Min(value = 100, message = "할인율은 100원 이상이어야 합니다.")
         Integer discount,
 
