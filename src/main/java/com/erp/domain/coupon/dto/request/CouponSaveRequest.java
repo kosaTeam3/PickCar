@@ -13,8 +13,8 @@ public record CouponSaveRequest(
         @NotBlank(message = "쿠폰명은 필수 입력 항목입니다.")
         String couponName,
 
-        @NotNull(message = "할인율은 필수 입력 항목입니다.")
-        @Min(value = 100, message = "할인율은 100원 이상이어야 합니다.")
+        @NotNull(message = "할인금액은 필수 입력 항목입니다.")
+        @Min(value = 1000, message = "할인금액은 1000원 이상이어야 합니다.")
         Integer discount,
 
         @NotNull(message = "유효기간은 필수 입력 항목입니다.")
@@ -23,7 +23,7 @@ public record CouponSaveRequest(
         LocalDate expDate,
         String code,
 
-        @Min(value = 0, message = "최소 구매 금액은 1000원 이상이어야 합니다.")
+        @Min(value = 1000, message = "최소 구매 금액은 1000원 이상이어야 합니다.")
         Integer minPrice
 ) {
 }
