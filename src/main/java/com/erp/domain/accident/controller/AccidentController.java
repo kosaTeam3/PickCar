@@ -3,6 +3,7 @@ package com.erp.domain.accident.controller;
 import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.dto.request.AccidentSearchRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
+import com.erp.domain.accident.dto.response.AccidentDetailResponse;
 import com.erp.domain.accident.service.AccidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,12 @@ public class AccidentController {
     ) {
         Page<AccidentResponse> response = accidentService.getAccidents(searchRequest, pageable);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{accidentId}")
+    public ResponseEntity<AccidentDetailResponse> getAccidentDetail(@PathVariable Long accidentId) {
+        AccidentDetailResponse response = accidentService.getAccidentDetail(accidentId);
         return ResponseEntity.ok(response);
     }
 }

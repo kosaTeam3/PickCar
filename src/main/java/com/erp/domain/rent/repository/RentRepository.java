@@ -46,4 +46,17 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             @Param("carId") Long carId,
             @Param("now") LocalDateTime now,
             Pageable pageable);
+
+    // 요청 기간 내 'WAITING_PAYMENT', 'RESERVED' 상태인 예약이 존재하는지 확인
+    // (겹치는 기간: 요청 시작 < 기존 종료 && 요청 종료 > 기존 시작)
+    @Query("""
+        SELECT COUNT(r) > 0 FROM Rent r
+        WHERE r.car.id = :carId
+        AND r.status IN ('WAITING_PAYMENT', 'RESERVED')
+        AND r.startRentDateTime < :endDateTime
+        AND r.endRentDateTime > :startDateTime
+    """)
+    boolean existsOverlappingRent(@Param("carId") Long carId,
+                                  @Param("startDateTime") LocalDateTime startDateTime,
+                                  @Param("endDateTime") LocalDateTime endDateTime);
 }

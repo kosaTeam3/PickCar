@@ -1,5 +1,6 @@
 package com.erp.domain.statistics.controller;
 
+import com.erp.domain.statistics.dto.CarStatisticsResponse;
 import com.erp.domain.statistics.dto.StatisticsResponse;
 import com.erp.domain.statistics.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
@@ -46,4 +47,14 @@ public class StatisticsController {
     ) {
         return statisticsService.getWeeklyRentStats(startDate, endDate);
     }
+
+    /* 인기 차종(모델별) 대여 횟수 순위 조회 */
+    // todo 인기 차종(모델별) 대여 횟수 통계
+//    @GetMapping("/car")
+//    public List<CarStatisticsResponse> getPopularCarModelStats(
+//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
+//    ) {
+//        return statisticsService.getPopularCarModelStats(startDate, endDate);
+//    }
 }

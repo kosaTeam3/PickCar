@@ -4,6 +4,7 @@ package com.erp.domain.employee.service;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
+import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
 import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
 import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
@@ -34,26 +35,54 @@ public class EmployeeService {
 
 
     // 직원 전체조회 + 페이징 + Search
+    // 비밀번호 변경 ( 첫 로그인시 강제 변경 포함)
+    public void changePassword(Long employeeId, PasswordChangeRequestDto requestDto) {
+
+        // 1. 직원 조회
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new CustomException(404, "해당 직원이 없습니다."));
+
+//        // 2. 새 비번 , 확인 비번 일치여부 검증 - 프론트 엔드 역할
+//        if (!requestDto.newPassword().equals(requestDto.checkPassword())){
+//            throw new CustomException(400, "비밀번호가 일치하지 않습니다.");
+//        }
+
+        // 3. 기존 비밀번호와 동일한지 검증
+        if (passwordEncoder.matches(requestDto.newPassword(), employee.getPassword())) {
+            throw new CustomException(400, "기존 비밀번호와 동일하게 변경할 수 없습니다.");
+        }
+
+        // 4. 비밀번호 암호화 및 변경
+        String encodedPw = passwordEncoder.encode(requestDto.newPassword());
+        employee.setPassword(encodedPw);
+
+        // 5. DB의 join_change_password 컬럼을 0(false)로 변경
+        // 이로서 초기 비밀번호 변경 완료
+        employee.setPasswordChangeRequired(false);
+    }
+
+    // 직원 전체조회 + 페이징
     @Transactional(readOnly = true)  // 조회 전용
     public Page<EmployeeListResponse> getEmployeeList(EmployeeSearchRequest request, Pageable pageable) {
+        if (request.quit() == null || !request.quit()) {
 
-        return employeeRepository.findAllByQuitDateIsNull(
-                        request.name(),
-                        request.email(),
-                        request.call(),
-                        request.grade(),
-                        request.entryDate(),
-                        pageable)
-                .map(entity -> EmployeeListResponse.builder()
-                        .employId(entity.getId())
-                        .employName(entity.getName())
-                        .employCall(entity.getPhoneNumber())
-                        .employGrade(entity.getGrade())
-                        .branchId(entity.getBranch().getId())
-                        .entryDate(entity.getEntryDate())
-                        .quitDate(entity.getQuitDate())
-                        .loginId(entity.getLoginId())
-                        .build());
+            return employeeRepository.findAllByQuitDateIsNull(
+                            request.name(),
+                            request.email(),
+                            request.call(),
+                            request.grade(),
+                            request.entryDate(),
+                            pageable)
+                    .map(this::toListDto);
+        } else
+            return employeeRepository.findAllNotQuit(
+                            request.name(),
+                            request.email(),
+                            request.call(),
+                            request.grade(),
+                            request.entryDate(),
+                            pageable)
+                    .map(this::toListDto);
     }
 
     // 직원 퇴사 (삭제)
@@ -168,5 +197,18 @@ public class EmployeeService {
 
         // %04d : 빈 자리를 0으로 채우는 숫자 포맷
         return prefix + String.format(SEQUENCE_FORMAT, employeeCount);
+    }
+
+    private EmployeeListResponse toListDto(Employee entity) {
+        return EmployeeListResponse.builder()
+                .employId(entity.getId())
+                .employName(entity.getName())
+                .employCall(entity.getPhoneNumber())
+                .employGrade(entity.getGrade())
+                .branchId(entity.getBranch().getId())
+                .entryDate(entity.getEntryDate())
+                .quitDate(entity.getQuitDate())
+                .loginId(entity.getLoginId())
+                .build();
     }
 }

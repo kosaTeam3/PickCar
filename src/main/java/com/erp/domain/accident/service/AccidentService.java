@@ -3,6 +3,7 @@ package com.erp.domain.accident.service;
 import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.dto.request.AccidentSearchRequest;
 import com.erp.domain.accident.dto.response.AccidentResponse;
+import com.erp.domain.accident.dto.response.AccidentDetailResponse;
 import com.erp.domain.accident.entity.Accident;
 import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.car.entity.Car;
@@ -82,6 +83,40 @@ public class AccidentService {
                 clientName,
                 accident.getTime(),
                 accident.getCar().getId(),
+                accident.getCar().getVehicleIdNumber(),
+                accident.getCar().getBrand(),
+                accident.getCar().getModel(),
+                accident.getCar().getYear()
+        );
+    }
+
+    public AccidentDetailResponse getAccidentDetail(Long accidentId) {
+        Accident accident = accidentRepository.findById(accidentId)
+                .orElseThrow(() -> new CustomException(404, "해당 사고 정보를 찾을 수 없습니다."));
+
+        Rent rent = accident.getRent();
+        Long clientId = null;
+        String clientName = null;
+
+        // Rent 정보가 있을 경우에만 고객 정보 추출
+        if (rent != null) {
+            clientId = rent.getClient().getId();
+            clientName = rent.getClient().getName();
+        }
+
+        return new AccidentDetailResponse(
+                accident.getId(),
+                accident.getStatus(),
+                accident.getDescription(),
+                accident.getLocation(),
+                accident.getTime(),
+                accident.getPart(),
+                accident.getRepairCost(),
+                accident.getClientLiability(),
+                clientId,
+                clientName,
+                accident.getCar().getId(),
+                accident.getCar().getInsuranceName(),
                 accident.getCar().getVehicleIdNumber(),
                 accident.getCar().getBrand(),
                 accident.getCar().getModel(),
