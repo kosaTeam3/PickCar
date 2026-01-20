@@ -2,7 +2,6 @@ package com.erp.domain.rent.entity;
 
 import com.erp.common.entity.BaseTimeEntity;
 import com.erp.domain.car.entity.Car;
-import com.erp.domain.car.entity.FuelType;
 import com.erp.domain.client.entity.Client;
 import jakarta.persistence.*;
 import lombok.*;
