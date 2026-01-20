@@ -45,6 +45,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
       AND (:model IS NULL OR c.model LIKE %:model%)
       AND (:fuelType IS NULL OR c.fuelType = :fuelType)
       AND (:status IS NULL OR c.status = :status)
+      AND (:carNumber IS NULL OR c.carNumber LIKE %:carNumber%)
     """)
     Page<Car> searchCars(
             @Param("branchId") Long branchId,
@@ -52,6 +53,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("model") String model,
             @Param("fuelType") FuelType fuelType,
             @Param("status") CarStatus status,
+            @Param("carNumber") String carNumber,
             Pageable pageable);
 
     /* 차량 상태별 수량 조회 */

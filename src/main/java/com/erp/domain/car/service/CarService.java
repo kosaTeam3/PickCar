@@ -288,6 +288,7 @@ public class CarService {
                 request.model(),
                 request.fuelType(),
                 request.status(),
+                request.carNumber(),
                 pageable
         );
 

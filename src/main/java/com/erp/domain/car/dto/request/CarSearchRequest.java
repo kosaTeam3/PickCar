@@ -9,7 +9,8 @@ public record CarSearchRequest (
     String brand,
     String model,
     FuelType fuelType,
-    CarStatus status
+    CarStatus status,
+    String carNumber
 
 ) {
 }
