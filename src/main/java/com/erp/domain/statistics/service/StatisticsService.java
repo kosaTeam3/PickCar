@@ -104,7 +104,9 @@ public class StatisticsService {
 
         return statisticsRepository.findMonthlySales(startDate, endDate)
                 .stream()
-                .map(row -> new StatisticsResponse(row.getLabel(), row.getCount()))
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
                 .toList();
     }
 
@@ -116,7 +118,9 @@ public class StatisticsService {
 
         return statisticsRepository.findWeeklySales(startDate, endDate)
                 .stream()
-                .map(row -> new StatisticsResponse(row.getLabel(), row.getCount()))
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
                 .toList();
     }
 
@@ -128,7 +132,9 @@ public class StatisticsService {
 
         return statisticsRepository.findDailySales(startDate, endDate)
                 .stream()
-                .map(row -> new StatisticsResponse(row.getLabel(), row.getCount()))
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
                 .toList();
     }
 
