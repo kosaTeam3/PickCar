@@ -56,6 +56,34 @@ public class AccidentService {
         return accidentRepository.save(accident).getId();
     }
 
+    @Transactional
+    public void updateAccident(Long accidentId, AccidentRequest request) {
+        Accident accident = accidentRepository.findById(accidentId)
+                .orElseThrow(() -> new CustomException(404, "해당 사고 정보를 찾을 수 없습니다."));
+
+        if (request.status() != null) {
+            accident.setStatus(request.status());
+        }
+        if (request.description() != null) {
+            accident.setDescription(request.description());
+        }
+        if (request.location() != null) {
+            accident.setLocation(request.location());
+        }
+        if (request.time() != null) {
+            accident.setTime(request.time());
+        }
+        if (request.part() != null) {
+            accident.setPart(request.part());
+        }
+        if (request.repairCost() != null) {
+            accident.setRepairCost(request.repairCost());
+        }
+        if (request.clientLiability() != null) {
+            accident.setClientLiability(request.clientLiability());
+        }
+    }
+
     public Page<AccidentResponse> getAccidents(AccidentSearchRequest searchRequest, Pageable pageable) {
         return accidentRepository.findAllWithFilters(
                 searchRequest.startAt(),

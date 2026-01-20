@@ -46,4 +46,13 @@ public class AccidentController {
         AccidentDetailResponse response = accidentService.getAccidentDetail(accidentId);
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{accidentId}")
+    public ResponseEntity<Void> updateAccident(
+            @PathVariable Long accidentId,
+            @RequestBody AccidentRequest request
+    ) {
+        accidentService.updateAccident(accidentId, request);
+        return ResponseEntity.ok().build();
+    }
 }
