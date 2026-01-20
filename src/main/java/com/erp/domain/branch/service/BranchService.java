@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -176,7 +175,8 @@ public class BranchService {
                             availableVehicles,
                             branch.getLatitude(),
                             branch.getLongitude(),
-                            branch.getDistance()
+                            branch.getDistance(),
+                            branch.getAddress()
                     );
                 })
                 .toList();

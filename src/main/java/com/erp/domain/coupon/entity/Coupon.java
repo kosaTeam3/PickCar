@@ -29,7 +29,10 @@ public class Coupon extends BaseTimeEntity {
     @Column(name = "exp_date", nullable = false)
     private LocalDate expDate;
 
-    @Column(name = "code")
+    @Column(name = "code", unique = true)
     private String code;
+
+    @Column(name = "min_price")
+    private Integer minPrice;
 }
 
