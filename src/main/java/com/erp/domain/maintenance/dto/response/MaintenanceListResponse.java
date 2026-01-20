@@ -9,6 +9,9 @@ public record MaintenanceListResponse(
         Long employeeId,
         String employeeName,
         String title,
-        MaintenanceStatus status
+        MaintenanceStatus status,
+        String model,
+        String brand,
+        String vehicleIdNumber
 ) {
 }
