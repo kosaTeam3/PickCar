@@ -1,6 +1,9 @@
 package com.erp.domain.accident.service;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
+import com.erp.domain.accident.dto.request.AccidentSearchRequest;
+import com.erp.domain.accident.dto.response.AccidentResponse;
+import com.erp.domain.accident.dto.response.AccidentDetailResponse;
 import com.erp.domain.accident.entity.Accident;
 import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.car.entity.Car;
@@ -10,6 +13,8 @@ import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +82,73 @@ public class AccidentService {
         if (request.clientLiability() != null) {
             accident.setClientLiability(request.clientLiability());
         }
+    }
+
+    public Page<AccidentResponse> getAccidents(AccidentSearchRequest searchRequest, Pageable pageable) {
+        return accidentRepository.findAllWithFilters(
+                searchRequest.startAt(),
+                searchRequest.endAt(),
+                searchRequest.vehicleIdNumber(),
+                searchRequest.clientName(),
+                searchRequest.status(),
+                pageable
+        ).map(this::toResponse);
+    }
+
+    private AccidentResponse toResponse(Accident accident) {
+        Long clientId = null;
+        String clientName = null;
+
+        if (accident.getRent() != null && accident.getRent().getClient() != null) {
+            clientId = accident.getRent().getClient().getId();
+            clientName = accident.getRent().getClient().getName();
+        }
+
+        return new AccidentResponse(
+                accident.getId(),
+                accident.getStatus(),
+                clientId,
+                clientName,
+                accident.getTime(),
+                accident.getCar().getId(),
+                accident.getCar().getVehicleIdNumber(),
+                accident.getCar().getBrand(),
+                accident.getCar().getModel(),
+                accident.getCar().getYear()
+        );
+    }
+
+    public AccidentDetailResponse getAccidentDetail(Long accidentId) {
+        Accident accident = accidentRepository.findById(accidentId)
+                .orElseThrow(() -> new CustomException(404, "해당 사고 정보를 찾을 수 없습니다."));
+
+        Rent rent = accident.getRent();
+        Long clientId = null;
+        String clientName = null;
+
+        // Rent 정보가 있을 경우에만 고객 정보 추출
+        if (rent != null) {
+            clientId = rent.getClient().getId();
+            clientName = rent.getClient().getName();
+        }
+
+        return new AccidentDetailResponse(
+                accident.getId(),
+                accident.getStatus(),
+                accident.getDescription(),
+                accident.getLocation(),
+                accident.getTime(),
+                accident.getPart(),
+                accident.getRepairCost(),
+                accident.getClientLiability(),
+                clientId,
+                clientName,
+                accident.getCar().getId(),
+                accident.getCar().getInsuranceName(),
+                accident.getCar().getVehicleIdNumber(),
+                accident.getCar().getBrand(),
+                accident.getCar().getModel(),
+                accident.getCar().getYear()
+        );
     }
 }

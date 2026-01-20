@@ -35,6 +35,25 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             Pageable pageable
     );
 
+    @Query("""
+                SELECT e
+                FROM Employee e
+                WHERE  (:name     IS NULL OR e.name   LIKE %:name%)
+                    AND (:email     IS NULL OR e.email       LIKE %:email%)\s
+                    AND (:phone     IS NULL OR e.phoneNumber LIKE %:phone%)\s
+                    AND (:grade     IS NULL OR e.grade       = :grade)\s
+                    AND (:entryDate IS NULL OR e.entryDate   = :entryDate)
+            
+            """)
+    Page<Employee> findAllNotQuit(
+            @Param("name") String name,
+            @Param("email") String email,
+            @Param("phone") String phone,
+            @Param("grade") String grade,
+            @Param("entryDate") LocalDate entryDate,
+            Pageable pageable
+    );
+
     Long countByBranch_Id(Long branchId);
 
     // 이메일 중복검사
