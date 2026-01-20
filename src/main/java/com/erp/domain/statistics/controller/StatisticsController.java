@@ -58,12 +58,21 @@ public class StatisticsController {
         return statisticsService.getPopularCarModelStats(startDate, endDate);
     }
 
-    /* 월간 매출 조회 */
+    /* 월간 매출 통계 조회 */
     @GetMapping("/sales/month")
     public List<StatisticsResponse> getMonthlySalesStats(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth startMonth,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth endMonth
     ) {
         return statisticsService.getMonthlySalesStats(startMonth, endMonth);
+    }
+
+    /* 주간 매출 통계 조회 */
+    @GetMapping("/sales/week")
+    public List<StatisticsResponse> getWeeklySalesStats(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
+    ) {
+        return statisticsService.getWeeklySalesStats(startDate, endDate);
     }
 }

@@ -105,4 +105,19 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
+    /* 주간 매출 통계 */
+    @Query(value = """
+    SELECT 
+        DATE_FORMAT(DATE_SUB(p.paid_at, INTERVAL (WEEKDAY(p.paid_at)) DAY), '%Y-%m-%d') AS label,
+        SUM(p.amount) AS count
+    FROM payment p
+    WHERE p.paid_at BETWEEN :startDate AND :endDate
+      AND p.status = 'PAID'
+    GROUP BY label
+    ORDER BY label ASC
+    """, nativeQuery = true)
+    List<StatisticsProjection> findWeeklySales(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
 }
