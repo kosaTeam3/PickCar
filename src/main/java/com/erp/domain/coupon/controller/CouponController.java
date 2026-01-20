@@ -23,7 +23,7 @@ public class CouponController {
         return couponService.createCoupon(request);
     }
 
-    /* [사용자] 쿠폰 발급 */
+    /* [사용자] 쿠폰 등록 */
     @PostMapping("/issue")
     public Long issueCoupon(@RequestBody @Valid CouponIssueRequest request) {
         return couponService.issueCoupon(request.clientId(), request.code());

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/manager/accident")
+@RequestMapping("/api/manager/accidents")
 @RequiredArgsConstructor
 public class AccidentController {
     private final AccidentService accidentService;
@@ -28,7 +28,7 @@ public class AccidentController {
             ) {
         Long id = accidentService.createAccident(carId, request);
 
-        return ResponseEntity.created(URI.create("/api/manager/accident/" + id)).build();
+        return ResponseEntity.created(URI.create("/api/manager/accidents/" + id)).build();
     }
 
     @GetMapping
