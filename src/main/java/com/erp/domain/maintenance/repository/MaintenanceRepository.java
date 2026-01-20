@@ -23,7 +23,10 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
                 m.employee.id,
                 m.employeeName,
                 m.title,
-                m.status
+                m.status,
+                m.car.model,
+                m.car.model,
+                m.car.vehicleIdNumber
             )
             from Maintenance m
             where (:branchId is null or m.branch.id = :branchId)
