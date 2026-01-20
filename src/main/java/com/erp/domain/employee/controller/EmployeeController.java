@@ -2,6 +2,7 @@ package com.erp.domain.employee.controller;
 
 
 import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
+import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
 import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
 import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
@@ -19,14 +20,28 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/manager")
+@RequestMapping("/api/manager/employees")
 public class EmployeeController {
 
 
     private final EmployeeService employeeService;
 
+    // 직원 비밀번호 변경 API
+    // 나중에 Security 적용 시 @AuthenticationPrincipal로 변경 예정
+    // 이 브랜치에 로그인 로직이 없어 토큰 발급이 안 되기 때문
+    @PatchMapping("/{employeeId}/password")
+    public ResponseEntity<Void> changePassword(
+            @PathVariable Long employeeId,
+            @Valid @RequestBody PasswordChangeRequestDto requestDto
+    ) {
+        employeeService.changePassword(employeeId, requestDto);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
     // 직원 전체 조회(퇴사자 미포함) + 검색
-    @GetMapping("/employees")
+    @GetMapping
     public ResponseEntity<Page<EmployeeListResponse>> getEmployees(
             @ModelAttribute EmployeeSearchRequest request,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
@@ -35,7 +50,7 @@ public class EmployeeController {
     }
 
     // 직원 삭제(퇴사) - Soft Delete
-    @DeleteMapping("/employees/{employeeId}")
+    @DeleteMapping("/{employeeId}")
     public ResponseEntity<Void> deleteEmployee(
             @PathVariable Long employeeId,
             @RequestParam LocalDate date
@@ -46,7 +61,7 @@ public class EmployeeController {
     }
 
     // 직원 수정
-    @PatchMapping("/employees/{employeeId}")
+    @PatchMapping("/{employeeId}")
     public ResponseEntity<Void> updateEmployee(
             @PathVariable Long employeeId,
             @Valid @RequestBody UpdateEmployeeRequestDto requestDto) {
@@ -57,7 +72,7 @@ public class EmployeeController {
     }
 
     // 직원 생성
-    @PostMapping("/employees")
+    @PostMapping
     public ResponseEntity<Long> createEmployee(
             @Valid @RequestBody RegisterEmployeeRequestDto requestDto) {
 
