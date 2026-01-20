@@ -25,7 +25,7 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
                 m.title,
                 m.status,
                 m.car.model,
-                m.car.model,
+                m.car.brand,
                 m.car.vehicleIdNumber
             )
             from Maintenance m
