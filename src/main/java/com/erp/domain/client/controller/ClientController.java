@@ -63,10 +63,4 @@ public class ClientController {
         clientService.registerClient(requestDto);
         return ResponseEntity.noContent().build();
     }
-
-    @DeleteMapping("/black/{clientId}")
-    public ResponseEntity<Void> removeBlacklist(@PathVariable Long clientId) {
-        clientService.removeBlacklist(clientId);
-        return ResponseEntity.noContent().build();
-    }
 }
