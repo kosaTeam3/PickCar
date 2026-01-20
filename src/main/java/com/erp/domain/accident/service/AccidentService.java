@@ -2,7 +2,6 @@ package com.erp.domain.accident.service;
 
 import com.erp.domain.accident.dto.request.AccidentRequest;
 import com.erp.domain.accident.entity.Accident;
-import com.erp.domain.accident.entity.AccidentStatus;
 import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;

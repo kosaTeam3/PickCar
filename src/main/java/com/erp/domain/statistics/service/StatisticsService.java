@@ -77,22 +77,23 @@ public class StatisticsService {
     }
 
     /* 인기 차종(모델별) 대여 횟수 조회 */
-    public List<CarStatisticsResponse> getPopularCarModelStats(LocalDate start, LocalDate end) {
-
-        LocalDateTime startDate = start.atStartOfDay();
-        LocalDateTime endDate = end.atTime(23, 59, 59);
-
-        if (startDate.isAfter(endDate)) {
-            throw new CustomException(400, "시작 날짜는 종료 날짜보다 빨라야 합니다.");
-        }
-
-        return statisticsRepository.findPopularCarModel(startDate, endDate)
-                .stream()
-                .map(row -> new CarStatisticsResponse(
-                        row.getBrand(),
-                        row.getModel(),
-                        row.getCount()))
-                .toList();
-    }
+    // todo 인기 차종(모델별) 대여 횟수 통계
+//    public List<CarStatisticsResponse> getPopularCarModelStats(LocalDate start, LocalDate end) {
+//
+//        LocalDateTime startDate = start.atStartOfDay();
+//        LocalDateTime endDate = end.atTime(23, 59, 59);
+//
+//        if (startDate.isAfter(endDate)) {
+//            throw new CustomException(400, "시작 날짜는 종료 날짜보다 빨라야 합니다.");
+//        }
+//
+//        return statisticsRepository.findPopularCarModel(startDate, endDate)
+//                .stream()
+//                .map(row -> new CarStatisticsResponse(
+//                        row.getBrand(),
+//                        row.getModel(),
+//                        row.getCount()))
+//                .toList();
+//    }
 
 }

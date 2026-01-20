@@ -34,11 +34,11 @@ public class ManagerClientController {
     public ClientDetailResponse getClient(@PathVariable Long clientId) {
         return clientService.getClientDetail(clientId);
     }
-
-    @GetMapping("/rent/{clientId}")
-    public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
-        return clientService.getRentHistory(clientId);
-    }
+    // todo 회원 대여 이력 조회
+//    @GetMapping("/rent/{clientId}")
+//    public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
+//        return clientService.getRentHistory(clientId);
+//    }
     // todo
 //    @GetMapping("/accident/{clientId}")
 //    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {

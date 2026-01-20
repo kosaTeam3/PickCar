@@ -31,40 +31,16 @@ public class Rent extends BaseTimeEntity {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @Column(name = "car_name", nullable = false)
-    private String carName;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private RentStatus status;
 
-    @Column(name = "car_image")
-    private String carImage;
-
-    @Column(name = "model", nullable = false)
-    private String model;
-
-    @Column(name = "price", nullable = false)
-    private String price;
-
-    @Column(name = "brand", nullable = false)
-    private String brand;
-
-    @Column(name = "year", nullable = false)
-    private Integer year;
+    @Column(name = "rental_fee", nullable = false)
+    private Long rentalFee;
 
     @Column(name = "start_rent_date_time")
     private LocalDateTime startRentDateTime;
 
     @Column(name = "end_rent_date_time")
     private LocalDateTime endRentDateTime;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "fuel_type", nullable = false)
-    private FuelType fuelType;
-
-    @Column(name = "age_limit", nullable = false)
-    private String ageLimit;
-
-    @Column(name = "seater", nullable = false)
-    private String seater;
-
-    @Column(name = "color", nullable = false)
-    private String color;
 }
