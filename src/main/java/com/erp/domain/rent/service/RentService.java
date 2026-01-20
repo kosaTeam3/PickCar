@@ -4,8 +4,9 @@ import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
+import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
-import com.erp.domain.coupon.repository.CouponRepository;
+import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
@@ -31,8 +32,8 @@ public class RentService {
     private final RentRepository rentRepository;
     private final CarRepository carRepository;
     private final ClientRepository clientRepository;
-    private final CouponRepository couponRepository;
     private final RentalFeeService rentalFeeService;
+    private final ClientCouponRepository clientCouponRepository;
 
     public Page<RentHistoryResponse> getRentHistory(Long carId, Pageable pageable) {
 
@@ -69,17 +70,28 @@ public class RentService {
 
         long rentalFee = rentalFeeService.calculateRentalFee(car, totalHours);
 
-        // 쿠폰 적용
-        if (request.couponId() != null) {
-            Coupon coupon = couponRepository.findById(request.couponId())
-                    .orElseThrow(() -> new CustomException(404, "쿠폰을 찾을 수 없습니다."));
+        if (request.clientCouponId() != null) {
+            ClientCoupon clientCoupon = clientCouponRepository.findById(request.clientCouponId())
+                    .orElseThrow(() -> new CustomException(404, "보유하신 쿠폰 정보를 찾을 수 없습니다."));
 
-            // 쿠폰 유효성 검증
+            // 소유권 검증 (내 쿠폰이 맞는지)
+            if (!clientCoupon.getClient().getId().equals(clientId)) {
+                throw new CustomException(403, "해당 쿠폰에 대한 권한이 없습니다.");
+            }
+
+            // 사용 여부 검증
+            if (clientCoupon.isUsed()) {
+                throw new CustomException(400, "이미 사용된 쿠폰입니다.");
+            }
+
+            Coupon coupon = clientCoupon.getCoupon();
+
+            // 유효 기간 검증
             if (coupon.getExpDate().isBefore(LocalDate.now())) {
                 throw new CustomException(400, "기한이 만료된 쿠폰입니다.");
             }
 
-            // 정액 할인 적용
+            // 할인 적용
             rentalFee -= coupon.getDiscount();
         }
 
