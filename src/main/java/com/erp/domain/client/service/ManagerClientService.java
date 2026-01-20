@@ -142,11 +142,6 @@ public class ManagerClientService {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new CustomException(404, "해당 고객을 찾을 수 없습니다."));
 
-        boolean isBlack = client.getBlacklisted() != null && client.getBlacklisted();
-        if (!isBlack) {
-            throw new CustomException(400, "이미 블랙리스트 해제 상태인 고객입니다.");
-        }
-
         client.setBlacklisted(false);
         client.setBlacklistInfo(null);
     }
