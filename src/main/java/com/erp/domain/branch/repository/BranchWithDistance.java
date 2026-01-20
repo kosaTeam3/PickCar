@@ -7,4 +7,5 @@ public interface BranchWithDistance {
     Double getLatitude();
     Double getLongitude();
     Double getDistance(); // 유저와의 거리
+    String getAddress(); // 지점 주소
 }

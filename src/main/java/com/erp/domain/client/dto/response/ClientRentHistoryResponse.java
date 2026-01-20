@@ -11,7 +11,7 @@ public record ClientRentHistoryResponse(
         String model,
         String brand,
         Integer year,
-        String price,
+        Long rentalFee, // 렌트 요금
         LocalDateTime startRentDateTime,
         LocalDateTime endRentDateTime
 ) {

@@ -7,7 +7,7 @@ public record AvailableCarResponse(
         Long carId,
         String carImage,
         String model,
-        Long rentalPrice,
+        Long rentalFee, // 총 렌트 요금
         String brand,
         Integer year,
         Integer ageLimit,
