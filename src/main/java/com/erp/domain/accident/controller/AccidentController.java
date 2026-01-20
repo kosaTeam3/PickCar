@@ -55,4 +55,11 @@ public class AccidentController {
         accidentService.updateAccident(accidentId, request);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{accidentId}")
+    public ResponseEntity<Void> deleteAccident(@PathVariable Long accidentId) {
+        accidentService.deleteAccident(accidentId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

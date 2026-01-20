@@ -151,4 +151,12 @@ public class AccidentService {
                 accident.getCar().getYear()
         );
     }
+
+    @Transactional
+    public void deleteAccident(Long accidentId) {
+        Accident accident = accidentRepository.findById(accidentId)
+                .orElseThrow(() -> new CustomException(404, "해당 사고 내역을 찾을 수 없습니다."));
+
+        accidentRepository.delete(accident);
+    }
 }
