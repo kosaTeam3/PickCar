@@ -49,7 +49,6 @@ public class StatisticsController {
     }
 
     /* 인기 차종(모델별) 대여 횟수 순위 조회 */
-    // todo 인기 차종(모델별) 대여 횟수 통계
     @GetMapping("/car")
     public List<CarStatisticsResponse> getPopularCarModelStats(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -74,5 +73,14 @@ public class StatisticsController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
     ) {
         return statisticsService.getWeeklySalesStats(startDate, endDate);
+    }
+
+    /* 일간 매출 통계 조회 */
+    @GetMapping("/sales/day")
+    public List<StatisticsResponse> getDailySalesStats(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
+    ) {
+        return statisticsService.getDailySalesStats(startDate, endDate);
     }
 }
