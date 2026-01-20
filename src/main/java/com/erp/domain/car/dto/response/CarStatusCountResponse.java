@@ -5,9 +5,9 @@ import lombok.Builder;
 @Builder
 public record CarStatusCountResponse(
 
-        long total,
-        long driving,
-        long maintenance,
-        long waiting
+        Long total,
+        Long driving,
+        Long maintenance,
+        Long waiting
 ) {
 }

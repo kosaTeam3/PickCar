@@ -244,6 +244,7 @@ public class CarService {
                 .modelPrice(car.getModelPrice())
                 .seater(car.getSeater())
                 .color(car.getColor().name())
+                .createdAt(car.getCreatedAt().toLocalDate())
                 .build();
     }
 
@@ -287,6 +288,7 @@ public class CarService {
                 request.model(),
                 request.fuelType(),
                 request.status(),
+                request.carNumber(),
                 pageable
         );
 

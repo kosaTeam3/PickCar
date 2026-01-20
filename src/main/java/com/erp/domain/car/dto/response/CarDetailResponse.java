@@ -25,7 +25,8 @@ public record CarDetailResponse(
         Long purchasePrice,
         Long modelPrice,
         Integer seater,
-        String color
+        String color,
+        LocalDate createdAt
 
 ) {
 }
