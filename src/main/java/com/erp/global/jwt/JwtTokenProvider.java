@@ -74,24 +74,13 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)  // Signature
                 .compact();
 
-
-//        // Create Refresh Token
-//        String refreshToken = Jwts.builder()
-//                .setExpiration(new Date(now + refreshExpirationTime))
-//                .signWith(key, SignatureAlgorithm.HS256)
-//                .compact();
-
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
-//                .refreshToken(refreshToken)
                 .build();
     }
 
-    // 3. Token Info 추출 : 토큰 복호화(암호 역으로 풀기) - 누구의 것인지 알아내기
     public Authentication getAuthentication(String accessToken) {
-
-        // 토큰 복호화
         Claims claims = parseClaim(accessToken);
 
         if (claims.get("auth") == null) {
