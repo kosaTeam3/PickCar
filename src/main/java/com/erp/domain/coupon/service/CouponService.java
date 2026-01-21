@@ -46,7 +46,6 @@ public class CouponService {
                 .discount(requestDto.discount())
                 .expDate(requestDto.expDate())
                 .code(couponCode)
-                .minPrice(requestDto.minPrice())
                 .build();
 
         return couponRepository.save(coupon).getId();

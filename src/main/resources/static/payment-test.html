@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 테스트 (PickCar)</title>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+</head>
+<body>
+<h2>결제 테스트</h2>
+<div style="margin-bottom: 10px;">
+    <label>1. 렌트 ID (rentId): </label>
+    <input type="number" id="rentId" placeholder="예: 101">
+</div>
+<div style="margin-bottom: 10px;">
+    <label>2. 주문 번호 (merchantUid): </label>
+    <input type="text" id="merchantUid" placeholder="예: RENT_20260210_101">
+</div>
+<div style="margin-bottom: 10px;">
+    <label>3. 결제 금액 (amount): </label>
+    <input type="number" id="amount" placeholder="예: 360000" value="100">
+</div>
+<button onclick="requestPay()">결제하기</button>
+
+<script>
+    var IMP = window.IMP;
+    // 포트원 관리자 콘솔 -> 결제 연동 -> 식별코드에서 확인한 Store ID 입력
+    IMP.init("imp25155426"); // 고객사 식별 코드
+
+    function requestPay() {
+        const rentId = document.getElementById('rentId').value;
+        const merchantUid = document.getElementById('merchantUid').value;
+        const amount = document.getElementById('amount').value;
+
+        if (!rentId || !merchantUid || !amount) {
+            alert("모든 필드를 입력해야 함.");
+            return;
+        }
+
+        // 포트원 결제창 호출
+        IMP.request_pay({
+            pg: "html5_inicis", // 본인이 설정한 PG사 코드
+            pay_method: "card",
+            merchant_uid: merchantUid,
+            name: "PickCar 렌트 예약",
+            amount: amount,
+            buyer_email: "hwamin1234@pickcar.com",
+            buyer_name: "강화민",
+            buyer_tel: "010-1234-5678"
+        }, function (rsp) {
+            if (rsp.success) {
+                console.log("결제 성공, 서버 검증 시작. imp_uid: " + rsp.imp_uid);
+                // 서버의 결제 내역 저장 API 호출
+                verifyPayment(rentId, rsp.imp_uid, merchantUid);
+            } else {
+                alert("결제 실패: " + rsp.error_msg);
+            }
+        });
+    }
+
+    // 서버 API와 통신하여 결제 검증 및 저장
+    function verifyPayment(rentId, impUid, merchantUid) {
+        fetch('/api/client/payments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rentId: parseInt(rentId),
+                impUid: impUid,           // 포트원 발급 ID
+                merchantUid: merchantUid  // 예약 시 발급받은 주문 번호
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('결제 검증 실패');
+            })
+            .then(data => {
+                // 응답 데이터: paymentId, merchantUid, status, amount
+                alert("결제 및 예약 확정 성공!\n상태: " + data.status + "\n결제 ID: " + data.paymentId);
+                console.log(data);
+            })
+            .catch(error => {
+                alert("서버 검증 중 오류 발생: " + error.message);
+            });
+    }
+</script>
+</body>
+</html>

@@ -5,9 +5,11 @@ import com.erp.domain.accident.repository.AccidentRepository;
 import com.erp.domain.client.dto.request.AddClientBlacklist;
 import com.erp.domain.client.dto.response.ClientAccidentHistoryResponse;
 import com.erp.domain.client.dto.response.ClientDetailResponse;
+import com.erp.domain.client.dto.response.ClientRentHistoryResponse;
 import com.erp.domain.client.dto.response.ClientSummaryResponse;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
+import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.AllArgsConstructor;
@@ -135,5 +137,14 @@ public class ManagerClientService {
                 rent.getStartRentDateTime(),
                 rent.getEndRentDateTime()
         );
+    }
+
+    @Transactional
+    public void removeBlacklist(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new CustomException(404, "해당 고객을 찾을 수 없습니다."));
+
+        client.setBlacklisted(false);
+        client.setBlacklistInfo(null);
     }
 }

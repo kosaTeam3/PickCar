@@ -1,5 +1,6 @@
 package com.erp.global.jwt;
 
+import com.erp.domain.client.entity.Client;
 import com.erp.domain.employee.entity.Employee;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -39,6 +40,21 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Client Login
+    public TokenInfo generateClientToken(Client client){
+        String accessToken = Jwts.builder()
+                .claim("id",client.getId())
+                .claim("authority","CLIENT")
+                .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+        return TokenInfo.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .build();
+    }
+
+    //  Employee Login
     public TokenInfo generateToken(Employee employee) {
         String accessToken = Jwts.builder()
                 .claim("id", employee.getId())
@@ -80,6 +96,8 @@ public class JwtTokenProvider {
                 .build();
     }
 
+
+    // 3. Token Info 추출 : 토큰 복호화(암호 역으로 풀기) - 누구의 것인지 알아내기
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaim(accessToken);
 
