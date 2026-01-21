@@ -72,6 +72,8 @@ public class CouponService {
                 status = CouponStatus.ACTIVE;
             }
 
+            long usedCount = clientCouponRepository.countByCouponIdAndIsUsedTrue(coupon.getId());
+
             return new AdminCouponResponse(
                     coupon.getId(),
                     coupon.getCouponName(),
@@ -79,6 +81,7 @@ public class CouponService {
                     coupon.getDiscount(),
                     coupon.getMaxQuantity(),
                     coupon.getIssuedQuantity(),
+                    usedCount,
                     coupon.getStartDate(),
                     coupon.getEndDate(),
                     coupon.getExpDate(),

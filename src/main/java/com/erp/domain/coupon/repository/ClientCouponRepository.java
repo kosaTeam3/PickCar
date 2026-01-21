@@ -12,4 +12,7 @@ public interface ClientCouponRepository extends JpaRepository<ClientCoupon, Long
 
     /* 중복 발급 확인 메서드 */
     boolean existsByClientIdAndCouponId(Long clientId, Long couponId);
+
+    /* 쿠폰 사용 현황 조회 */
+    long countByCouponIdAndIsUsedTrue(Long couponId);
 }

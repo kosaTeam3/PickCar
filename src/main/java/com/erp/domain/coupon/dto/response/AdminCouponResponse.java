@@ -11,6 +11,7 @@ public record AdminCouponResponse(
         Integer discount,
         Integer maxQuantity,
         Integer issuedQuantity,
+        Long usedQuantity,
         LocalDate startDate,
         LocalDate endDate,
         LocalDate expDate,
