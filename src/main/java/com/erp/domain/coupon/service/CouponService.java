@@ -123,6 +123,33 @@ public class CouponService {
         return clientCouponRepository.save(clientCoupon).getId();
     }
 
+    /* [사용자] 내 쿠폰 목록 조회 */
+    public List<ClientCouponResponse> getClientCoupons(Long clientId) {
+        LocalDate now = LocalDate.now();
+
+        return clientCouponRepository.findByClientId(clientId).stream()
+                .map(clientCoupon -> {
+                    Coupon coupon = clientCoupon.getCoupon();
+
+                    String status = "ACTIVE"; // 기본은 사용 가능
+                    if (clientCoupon.isUsed()) {
+                        status = "USED";      // 사용 완료
+                    } else if (now.isAfter(coupon.getExpDate())) {
+                        status = "EXPIRED";   // 기간 만료
+                    }
+
+                    return new ClientCouponResponse(
+                            clientCoupon.getId(),
+                            coupon.getCouponName(),
+                            coupon.getDiscount(),
+                            coupon.getExpDate(),
+                            coupon.getCode(),
+                            status
+                    );
+                })
+                .toList();
+    }
+
     /* 랜덤 코드 생성 */
     private String generateRandomCode() {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();

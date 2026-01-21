@@ -29,7 +29,7 @@ public class Coupon extends BaseTimeEntity {
     @Column(name = "code", unique = true, nullable = false)
     private String code;
 
-    @Column(name = "max_quanatity", nullable = false)
+    @Column(name = "max_quantity", nullable = false)
     private Integer maxQuantity;
 
     @Column(name = "issued_quantity", nullable = false)

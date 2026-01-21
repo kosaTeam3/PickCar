@@ -13,27 +13,21 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/coupons")
+@RequestMapping("/api/client/coupons")
 public class CouponController {
 
     private final CouponService couponService;
-
-    /* [관리자] 쿠폰 생성 */
-    @PostMapping
-    public Long createCoupon(@RequestBody @Valid CouponSaveRequest request) {
-        return couponService.createCoupon(request);
-    }
-
-    /* [관리자] 쿠폰 전체 목록 조회 */
-    @GetMapping
-    public List<AdminCouponResponse> getAllCoupons() {
-        return couponService.getAdminCoupons();
-    }
 
     /* [사용자] 쿠폰 발급 */
     @PostMapping("/issue")
     public Long issueCoupon(@RequestBody @Valid CouponIssueRequest request) {
         return couponService.issueCoupon(request.clientId(), request.code());
+    }
+
+    /* [사용자] 내 쿠폰 목록 조회 */
+    @GetMapping("/my")
+    public List<ClientCouponResponse> getMyCoupons(@RequestParam Long clientId) {
+        return couponService.getClientCoupons(clientId);
     }
 
 }
