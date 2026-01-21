@@ -5,16 +5,10 @@ import com.erp.domain.client.dto.request.RegisterClientRequestDto;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
 import com.erp.domain.client.repository.ClientRepository;
-import com.erp.global.auth.LogoutAccessToken;
-import com.erp.global.auth.LogoutAccessTokenRepository;
-import com.erp.global.auth.RefreshTokenRepository;
 import com.erp.global.exception.CustomException;
 import com.erp.global.jwt.JwtTokenProvider;
 import com.erp.global.jwt.TokenInfo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,40 +19,18 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ClientService {
 
-
-    private final LogoutAccessTokenRepository logoutAceessTokenRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final ClientRepository clientRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-
-    // 로그아웃
-    @Transactional
-    public void logout(String accessToken, String email) {
-
-        // 1. Access Token 남은 시간 계산
-        Long expiration = jwtTokenProvider.getExpireTime(accessToken);
-
-        // 2. 이미 만료된 토큰이 아니라면 블랙리스트에 저장
-        if (expiration > 0) {
-            logoutAceessTokenRepository.save(LogoutAccessToken.builder()
-                    .id(accessToken)
-                    .email(email)
-                    .expiration(expiration)
-                    .build());
-        }
-    }
-
     // 로그인
     @Transactional
-    public TokenInfo login (LoginRequestDto dto ) {
+    public TokenInfo login(LoginRequestDto dto) {
         Client client =
                 clientRepository.findByEmail(dto.email()).orElseThrow(
                         () -> new CustomException(401, "사용자를 찾을 수 없습니다.")
                 );
-        if (passwordEncoder.matches(dto.password(),client.getPassword())){
+        if (passwordEncoder.matches(dto.password(), client.getPassword())) {
             throw new CustomException(401, "사용자를 찾을 수 없습니다.");
         }
         return jwtTokenProvider.generateClientToken(client);
@@ -83,11 +55,9 @@ public class ClientService {
         String encodedPassword = passwordEncoder.encode(dto.password());
 
         // 3. 주민으로 생년월일, 성별 변환
-
         String residentNumber = dto.residentNumber();  // 주민번호 가져오기
         LocalDate birthDate = getBirthDateFromRegiNum(residentNumber);
         Gender gender = getGenderFromResiNum(dto.residentNumber());
-
 
         // 4. Entity 변환 및 저장
         Client client = Client.builder()
@@ -107,7 +77,6 @@ public class ClientService {
 
     // 성별 추출
     private Gender getGenderFromResiNum(String residentNumber) {
-
         char genderCode = residentNumber.charAt(7);
         // 남자는 홀수 , 여자는 짝수
         if (genderCode == '1' ||
