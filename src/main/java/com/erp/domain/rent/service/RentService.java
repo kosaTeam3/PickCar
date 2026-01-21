@@ -70,6 +70,8 @@ public class RentService {
 
         long rentalFee = rentalFeeService.calculateRentalFee(car, totalHours);
 
+        Long appliedClientCouponId = null;
+
         if (request.clientCouponId() != null) {
             ClientCoupon clientCoupon = clientCouponRepository.findById(request.clientCouponId())
                     .orElseThrow(() -> new CustomException(404, "보유하신 쿠폰 정보를 찾을 수 없습니다."));
@@ -93,6 +95,9 @@ public class RentService {
 
             // 할인 적용
             rentalFee -= coupon.getDiscount();
+
+            // 적용된 ClientCoupon ID 저장 준비
+            appliedClientCouponId = clientCoupon.getId();
         }
 
         if (rentalFee < 0) rentalFee = 0;
@@ -105,6 +110,7 @@ public class RentService {
                 .endRentDateTime(request.endRentDateTime())
                 .rentalFee(rentalFee)
                 .status(RentStatus.WAITING_PAYMENT)
+                .clientCouponId(appliedClientCouponId)
                 .build();
 
         Rent savedRent = rentRepository.save(rent);

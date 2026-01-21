@@ -298,7 +298,15 @@ VALUES (2, 'KMHCT41CDPA001001', '아반떼', 10000, '현대', 2023, 21, 'GASOLIN
        (2, 'KNAGD41LDPA001019', 'K5', 13000, '기아', 2023, 21, 'DIESEL', '12호1019', 47000, 'WAITING', 29000000, 32000000,
         5, 'WHITE', NOW(), NOW()),
        (2, 'KNAGD41LDPA001020', 'K5', 13000, '기아', 2023, 21, 'DIESEL', '12호1020', 61000, 'MAINTENANCE', 29000000,
-        32000000, 5, 'GRAY', NOW(), NOW());
+        32000000, 5, 'GRAY', NOW(), NOW()),
+       (2, 'KNAGD41LDPA001021', '셀토스', 100, '기아', 2023, 21, 'GASOLINE', '12호1021', 71000, 'WAITING', 25000000,
+        25000000, 5, 'WHITE', NOW(), NOW()),
+       (2, 'KNAGD41LDPA001022', '코나', 100, '현대', 2023, 21, 'GASOLINE', '12호1022', 75000, 'WAITING', 28000000,
+        28000000, 5, 'WHITE', NOW(), NOW()),
+       (2, 'KNAGD41LDPA001023', '투싼', 100, '현대', 2024, 21, 'GASOLINE', '12호1023', 21000, 'WAITING', 35000000,
+        35000000, 5, 'GRAY', NOW(), NOW()),
+       (2, 'KNAGD41LDPA001024', '스포티지', 100, '기아', 2025, 21, 'GASOLINE', '12호1024', 1000, 'WAITING', 36000000,
+        36000000, 5, 'WHITE', NOW(), NOW());;
 
 -- 왕십리지점(3): 15대
 INSERT INTO car (branch_id, vehicle_id_number, model, price, brand, year, age_limit, fuel_type, car_number, mileage,
