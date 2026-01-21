@@ -76,6 +76,7 @@ public class CouponService {
             throw new CustomException(400, "이미 발급된 쿠폰입니다.");
         }
 
+        // 발급 수량 증가
         coupon.setIssuedQuantity(coupon.getIssuedQuantity() + 1);
 
         ClientCoupon clientCoupon = ClientCoupon.builder()

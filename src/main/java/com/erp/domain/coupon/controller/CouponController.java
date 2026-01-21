@@ -17,7 +17,7 @@ public class CouponController {
 
     private final CouponService couponService;
 
-    /* [관리자] 쿠폰 생성 API */
+    /* [관리자] 쿠폰 생성 */
     @PostMapping
     public Long createCoupon(@RequestBody @Valid CouponSaveRequest request) {
         return couponService.createCoupon(request);
@@ -27,12 +27,6 @@ public class CouponController {
     @PostMapping("/issue")
     public Long issueCoupon(@RequestBody @Valid CouponIssueRequest request) {
         return couponService.issueCoupon(request.clientId(), request.code());
-    }
-
-    /* 내 쿠폰 목록 조회 */
-    @GetMapping("/my/{clientId}")
-    public List<ClientCouponResponse> getMyCoupons(@PathVariable Long clientId) {
-        return couponService.getMyCoupons(clientId);
     }
 
 }
