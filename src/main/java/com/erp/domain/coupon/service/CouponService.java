@@ -32,28 +32,24 @@ public class CouponService {
     public Long createCoupon(CouponSaveRequest requestDto) {
 
         String couponCode = requestDto.code();
-
         if (couponCode == null || couponCode.isBlank()) {
             couponCode = generateRandomCode();
-        } else {
-            if (couponRepository.findAllByCode(couponCode).isPresent()) {
-                throw new CustomException(400, "이미 존재하는 쿠폰 코드입니다.");
-            }
+        } else if (couponRepository.findAllByCode(couponCode).isPresent()) {
+            throw new CustomException(400, "이미 존재하는 쿠폰 코드입니다.");
         }
 
         Coupon coupon = Coupon.builder()
                 .couponName(requestDto.couponName())
                 .discount(requestDto.discount())
-                .expDate(requestDto.expDate())
                 .code(couponCode)
-                .minPrice(requestDto.minPrice())
+                .maxQuantity(requestDto.maxQuantity())
+                .issuedQuantity(0)
+                .startDate(requestDto.startDate())
+                .endDate(requestDto.endDate())
+                .expDate(requestDto.expDate())
                 .build();
 
         return couponRepository.save(coupon).getId();
-    }
-
-    private String generateRandomCode() {
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
     /* [사용자] 쿠폰 발급 */
@@ -66,9 +62,21 @@ public class CouponService {
         Coupon coupon = couponRepository.findAllByCode(couponCode)
                 .orElseThrow(() -> new CustomException(404, "유효하지 않은 쿠폰 코드입니다."));
 
-        if (coupon.getExpDate().isBefore(LocalDate.now())) {
-            throw new CustomException(400, "만료된 쿠폰입니다.");
+        LocalDate now = LocalDate.now();
+        if (now.isBefore(coupon.getStartDate()) || now.isAfter(coupon.getEndDate())) {
+            throw new CustomException(400, "지금은 쿠폰 발급 기간이 아닙니다. (발급 기간: "
+                    + coupon.getStartDate() + " ~ " + coupon.getEndDate() + ")");
         }
+
+        if (coupon.getMaxQuantity() <= coupon.getIssuedQuantity()) {
+            throw new CustomException(400, "준비된 쿠폰 수량이 모두 소진되었습니다.");
+        }
+
+        if (clientCouponRepository.existsByClientIdAndCouponId(clientId, coupon.getId())) {
+            throw new CustomException(400, "이미 발급된 쿠폰입니다.");
+        }
+
+        coupon.setIssuedQuantity(coupon.getIssuedQuantity() + 1);
 
         ClientCoupon clientCoupon = ClientCoupon.builder()
                 .client(client)
@@ -79,30 +87,9 @@ public class CouponService {
         return clientCouponRepository.save(clientCoupon).getId();
     }
 
-    /* 내 쿠폰 목록 조회 */
-    public List<ClientCouponResponse> getMyCoupons(Long clientId) {
-
-        List<ClientCoupon> myCoupons = clientCouponRepository.findByClientId(clientId);
-
-        return myCoupons.stream().map(clientCoupon -> {
-
-            CouponStatus status = CouponStatus.AVAILABLE;
-
-            if (clientCoupon.isUsed()) {
-                status = CouponStatus.USED;
-            } else if (clientCoupon.getCoupon().getExpDate().isBefore(LocalDate.now())) {
-                status = CouponStatus.EXPIRED;
-            }
-
-            return new ClientCouponResponse(
-                    clientCoupon.getId(),
-                    clientCoupon.getCoupon().getCouponName(),
-                    clientCoupon.getCoupon().getDiscount(),
-                    clientCoupon.getCoupon().getExpDate(),
-                    clientCoupon.getCoupon().getCode(),
-                    status
-            );
-        }).toList();
+    /* 랜덤 코드 생성 */
+    private String generateRandomCode() {
+        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
 }
