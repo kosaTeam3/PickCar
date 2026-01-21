@@ -27,7 +27,7 @@ public class Payment extends BaseTimeEntity {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @Column(name = "imp_uid", nullable = false)
+    @Column(name = "imp_uid", nullable = false, unique = true)
     private String impUid; // 포트원 결제 고유 번호
 
     @Column(name = "merchant_uid", nullable = false)

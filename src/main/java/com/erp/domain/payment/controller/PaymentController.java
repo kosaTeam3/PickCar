@@ -3,6 +3,7 @@ package com.erp.domain.payment.controller;
 import com.erp.domain.payment.dto.request.PaymentSaveRequest;
 import com.erp.domain.payment.dto.response.PaymentSaveResponse;
 import com.erp.domain.payment.service.PaymentService;
+import com.erp.domain.payment.service.PortOnePaymentInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,10 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<PaymentSaveResponse> savePayment(@RequestBody PaymentSaveRequest request) {
-        PaymentSaveResponse response = paymentService.savePayment(request);
+        PortOnePaymentInfo paymentInfo = paymentService.getPortOnePaymentInfo(request.impUid());
+        // Transactional 비관적 락 적용
+        PaymentSaveResponse response = paymentService.savePayment(request, paymentInfo);
+
         return ResponseEntity.ok(response);
     }
 }
