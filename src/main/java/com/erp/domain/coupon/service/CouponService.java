@@ -3,6 +3,7 @@ package com.erp.domain.coupon.service;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
 import com.erp.domain.coupon.dto.request.CouponSaveRequest;
+import com.erp.domain.coupon.dto.response.AdminCouponResponse;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
 import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
@@ -50,6 +51,40 @@ public class CouponService {
                 .build();
 
         return couponRepository.save(coupon).getId();
+    }
+
+    /* [관리자] 쿠폰 전체 목록 조회 */
+    public List<AdminCouponResponse> getAdminCoupons() {
+
+        LocalDate now = LocalDate.now();
+
+        return couponRepository.findAllByOrderByIdDesc().stream().map(coupon -> {
+            CouponStatus status;
+            if (now.isBefore(coupon.getStartDate())) {
+                status = CouponStatus.READY;
+            } else if (now.isAfter(coupon.getEndDate())) {
+                status = CouponStatus.FINISHED;
+            } else if (now.isAfter(coupon.getExpDate())) {
+                status = CouponStatus.EXPIRED;
+            } else if (coupon.getMaxQuantity() != 0 && coupon.getIssuedQuantity() >= coupon.getMaxQuantity()) {
+                status = CouponStatus.EXHAUSTED;
+            } else {
+                status = CouponStatus.ACTIVE;
+            }
+
+            return new AdminCouponResponse(
+                    coupon.getId(),
+                    coupon.getCouponName(),
+                    coupon.getCode(),
+                    coupon.getDiscount(),
+                    coupon.getMaxQuantity(),
+                    coupon.getIssuedQuantity(),
+                    coupon.getStartDate(),
+                    coupon.getEndDate(),
+                    coupon.getExpDate(),
+                    status
+            );
+        }).toList();
     }
 
     /* [사용자] 쿠폰 발급 */
