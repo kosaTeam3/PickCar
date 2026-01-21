@@ -9,11 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AccidentRepository extends JpaRepository<Accident, Long> {
-    // todo
-//    @Query("SELECT a FROM Accident a WHERE a.client.id = :clientId")
-//    List<Accident> findByClientId(Long clientId);
+
+    @Query("""
+            SELECT a
+            FROM Accident a
+            JOIN FETCH a.car c
+            JOIN FETCH a.rent r
+            JOIN FETCH r.client cl
+            WHERE cl.id = :clientId
+            ORDER BY a.time DESC
+            """)
+    List<Accident> findByClientId(@Param("clientId") Long clientId);
 
     @Query(value = """
             SELECT a
