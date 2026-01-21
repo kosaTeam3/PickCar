@@ -1,6 +1,7 @@
 package com.erp.domain.client.controller;
 
 import com.erp.domain.client.dto.request.AddClientBlacklist;
+import com.erp.domain.client.dto.response.ClientAccidentHistoryResponse;
 import com.erp.domain.client.dto.response.ClientDetailResponse;
 import com.erp.domain.client.dto.response.ClientSummaryResponse;
 import com.erp.domain.client.service.ManagerClientService;
@@ -33,16 +34,18 @@ public class ManagerClientController {
     public ClientDetailResponse getClient(@PathVariable Long clientId) {
         return clientService.getClientDetail(clientId);
     }
-    // todo 회원 대여 이력 조회
-//    @GetMapping("/rent/{clientId}")
-//    public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
-//        return clientService.getRentHistory(clientId);
-//    }
-    // todo
-//    @GetMapping("/accident/{clientId}")
-//    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
-//        return clientService.getAccidentHistory(clientId);
-//    }
+
+    // 렌트 이력 조회
+    @GetMapping("/rent/{clientId}")
+    public List<ClientRentHistoryResponse> getRentHistory(@PathVariable Long clientId) {
+        return clientService.getRentHistory(clientId);
+    }
+
+    // 사고 이력 조회
+    @GetMapping("/accident/{clientId}")
+    public List<ClientAccidentHistoryResponse> getAccidentHistory(@PathVariable Long clientId) {
+        return clientService.getAccidentHistory(clientId);
+    }
 
     @PostMapping("/black/{clientId}")
     public ResponseEntity<Void> addBlacklist(@PathVariable Long clientId, @Valid @RequestBody AddClientBlacklist dto) {
