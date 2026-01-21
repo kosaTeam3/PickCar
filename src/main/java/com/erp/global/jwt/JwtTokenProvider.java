@@ -1,5 +1,6 @@
 package com.erp.global.jwt;
 
+import com.erp.domain.employee.entity.Employee;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -36,6 +37,21 @@ public class JwtTokenProvider {
     public JwtTokenProvider(@Value("${jwt.secret_key}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public TokenInfo generateToken(Employee employee) {
+        String accessToken = Jwts.builder()
+                .claim("id", employee.getId())
+                .claim("isFirstLogin", employee.getPasswordChangeRequired())
+                .claim("authority", employee.getAuthority())
+                .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenInfo.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .build();
     }
 
     // 2. Create Token  : 유저 정보 받고  AccessToken, RefreshToken 만들기
