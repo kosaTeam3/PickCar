@@ -8,6 +8,6 @@ public record RentCreateRequest(
         @NotNull Long carId,
         @NotNull LocalDateTime startRentDateTime,
         @NotNull LocalDateTime endRentDateTime,
-        Long couponId // Nullable
+        Long clientCouponId // Nullable
 ) {
 }
