@@ -138,4 +138,13 @@ public class ManagerClientService {
                 rent.getEndRentDateTime()
         );
     }
+
+    @Transactional
+    public void removeBlacklist(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new CustomException(404, "해당 고객을 찾을 수 없습니다."));
+
+        client.setBlacklisted(false);
+        client.setBlacklistInfo(null);
+    }
 }
