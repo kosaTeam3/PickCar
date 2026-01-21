@@ -57,30 +57,43 @@ public class ClientService {
 
     // 로그인
     @Transactional
-    public TokenInfo login(LoginRequestDto loginRequestDto) {
-        //1. 인증되지 않은 ID/PW 객체 생성
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        loginRequestDto.email(),
-                        loginRequestDto.password());
-
-        // 2. 실제 검증
-        // AuthenticationManager가 자동으로 ClientUserDetailsService를 호출하고
-        // 비밀번호까지 비교해서 검증된 객체인 Authentication을 줍니다
-        // 비밀번호가 틀림녀 여기서 예외(AuthenticationException)가 터지고 메서드가 종료됩니다.
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-        // 3. JWT 토큰 발급 - 여기까지 오면 로그인이 성공하고 인증된 정보로 토큰을 생성합니다.
-//        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-
-//        리프레시 토큰 DB 저장 로직 (프론트엔드 도입 후 필요)
-//        refreshTokenRepository.save(RefreshToken.builder()
-//                .key(authentication.getName())
-//                .value(tokenInfo.refreshToken())
-//                .build());
-        return tokenInfo;
+    public TokenInfo login (LoginRequestDto dto ) {
+        Client client =
+                clientRepository.findByEmail(dto.email()).orElseThrow(
+                        () -> new CustomException(401, "사용자를 찾을 수 없습니다.")
+                );
+        if (passwordEncoder.matches(dto.password(),client.getPassword())){
+            throw new CustomException(401, "사용자를 찾을 수 없습니다.");
+        }
+        return jwtTokenProvider.generateClientToken(client);
     }
+
+//    // 로그인
+//    @Transactional
+//    public TokenInfo login(LoginRequestDto loginRequestDto) {
+//        //1. 인증되지 않은 ID/PW 객체 생성
+//        UsernamePasswordAuthenticationToken authenticationToken =
+//                new UsernamePasswordAuthenticationToken(
+//                        loginRequestDto.email(),
+//                        loginRequestDto.password());
+//
+//        // 2. 실제 검증
+//        // AuthenticationManager가 자동으로 ClientUserDetailsService를 호출하고
+//        // 비밀번호까지 비교해서 검증된 객체인 Authentication을 줍니다
+//        // 비밀번호가 틀림녀 여기서 예외(AuthenticationException)가 터지고 메서드가 종료됩니다.
+//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//
+//        // 3. JWT 토큰 발급 - 여기까지 오면 로그인이 성공하고 인증된 정보로 토큰을 생성합니다.
+////        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+//        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+//
+////        리프레시 토큰 DB 저장 로직 (프론트엔드 도입 후 필요)
+////        refreshTokenRepository.save(RefreshToken.builder()
+////                .key(authentication.getName())
+////                .value(tokenInfo.refreshToken())
+////                .build());
+//        return tokenInfo;
+//    }
 
 //    // 토큰 재발급  - refresh Token 비활성
 //    @Transactional
