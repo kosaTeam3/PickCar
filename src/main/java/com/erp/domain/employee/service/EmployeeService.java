@@ -221,7 +221,6 @@ public class EmployeeService {
         if (!passwordEncoder.matches(dto.password(), employee.getPassword())) {
             throw new CustomException(401, "사용자를 찾을 수 없습니다");
         }
-
         return jwtTokenProvider.generateToken(employee);
     }
 }
