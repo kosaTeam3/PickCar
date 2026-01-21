@@ -2,6 +2,7 @@ package com.erp.global.jwt;
 
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.employee.entity.Employee;
+import com.sun.security.auth.UserPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,8 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -41,10 +40,10 @@ public class JwtTokenProvider {
     }
 
     // Client Login
-    public TokenInfo generateClientToken(Client client){
+    public TokenInfo generateClientToken(Client client) {
         String accessToken = Jwts.builder()
-                .claim("id",client.getId())
-                .claim("authority","CLIENT")
+                .claim("id", client.getId())
+                .claim("authority", "CLIENT")
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -70,50 +69,23 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    // 2. Create Token  : 유저 정보 받고  AccessToken, RefreshToken 만들기
-    public TokenInfo generateToken(Authentication authentication) {
-        // 권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-
-        // AccessToken 유효기간
-        Date accessTokenExpiration = new Date(now + accessExpirationTime);
-
-        // Create Access Token
-        String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())  // Payload에 유저네임(email) 저장
-                .claim("auth", authorities)  // Payload claim에 권한 정보
-                .setExpiration(accessTokenExpiration)  //만료시간 설정
-                .signWith(key, SignatureAlgorithm.HS256)  // Signature
-                .compact();
-
-        return TokenInfo.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .build();
-    }
-
-
-    // 3. Token Info 추출 : 토큰 복호화(암호 역으로 풀기) - 누구의 것인지 알아내기
+    // Token Info 추출 : 토큰 복호화(암호 역으로 풀기) - 누구의 것인지 알아내기
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaim(accessToken);
 
-        if (claims.get("auth") == null) {
+        if (claims.get("authority") == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
         // 권한 정보 획득
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("auth").toString().split(","))
+                Arrays.stream(claims.get("authority").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
         // UserDetails 객체 만들어서 Authenticaiton 리턴
         // UserDetails : interface, User : UserDetails를 구현한 class
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserPrincipal principal = new UserPrincipal(claims.get("id").toString());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
@@ -141,19 +113,5 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims(); // 만료후에도 꺼내기
         }
-    }
-
-    // 토큰 남은 유효시간 계산
-    public Long getExpireTime(String accessToken) {
-
-        // acessToken 남은 유효시간
-        Claims claims = parseClaim(accessToken);
-        Date expiration = claims.getExpiration();
-
-        // 현재 시간
-        Long now = new Date().getTime();
-
-        // 남은 시간 반환
-        return (expiration.getTime() - now);
     }
 }
