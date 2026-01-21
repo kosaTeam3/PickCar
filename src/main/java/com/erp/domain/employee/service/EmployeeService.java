@@ -224,12 +224,3 @@ public class EmployeeService {
         return jwtTokenProvider.generateToken(employee);
     }
 }
-
-
-
-
-
-
-
-
-
