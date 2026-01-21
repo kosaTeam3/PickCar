@@ -71,7 +71,8 @@ public class SecurityConfig {
                                         "/api/client/login",      // 로그인
                                         "/api/client/register",   // 회원가입
                                         "/api/client/reissue",    // 토큰 재발급
-                                        "/api/client/validation"  // 이메일 중복 체크
+                                        "/api/client/validation",  // 이메일 중복 체크
+                                        "/payment-test.html" // 결제 테스트
                                 ).permitAll()
                                 // 관리자 페이지는 나중에 권한 처리 (일단 인증된 사람들만)
 //                                .requestMatchers("/api/manager/**").hasRole("employee")

@@ -3,14 +3,13 @@ package com.erp.domain.employee.service;
 
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
-import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
-import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
-import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
-import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.*;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.global.exception.CustomException;
+import com.erp.global.jwt.JwtTokenProvider;
+import com.erp.global.jwt.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +26,7 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final BranchRepository branchRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     private static final String COMPANY_PREFIX = "PC";
@@ -210,5 +210,17 @@ public class EmployeeService {
                 .quitDate(entity.getQuitDate())
                 .loginId(entity.getLoginId())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public TokenInfo login(EmployeeLoginRequestDto dto) {
+        Employee employee = employeeRepository.findByLoginId(dto.loginId()).orElseThrow(
+                () -> new CustomException(401, "사용자를 찾을 수 없습니다")
+        );
+
+        if (!passwordEncoder.matches(dto.password(), employee.getPassword())) {
+            throw new CustomException(401, "사용자를 찾을 수 없습니다");
+        }
+        return jwtTokenProvider.generateToken(employee);
     }
 }

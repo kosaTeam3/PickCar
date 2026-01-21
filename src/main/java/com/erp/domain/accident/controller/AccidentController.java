@@ -28,7 +28,7 @@ public class AccidentController {
             ) {
         Long id = accidentService.createAccident(carId, request);
 
-        return ResponseEntity.created(URI.create("/api/manager/accident/" + id)).build();
+        return ResponseEntity.created(URI.create("/api/manager/accidents/" + id)).build();
     }
 
     @GetMapping

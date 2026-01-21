@@ -42,4 +42,8 @@ public class Rent extends BaseTimeEntity {
 
     @Column(name = "end_rent_date_time")
     private LocalDateTime endRentDateTime;
+
+    // 사용한 고객 쿠폰 ID (쿠폰 안 쓴 경우 NULL)
+    @Column(name = "client_coupon_id")
+    private Long clientCouponId;
 }

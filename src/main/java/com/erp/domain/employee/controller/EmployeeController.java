@@ -1,12 +1,10 @@
 package com.erp.domain.employee.controller;
 
 
-import com.erp.domain.employee.dto.request.EmployeeSearchRequest;
-import com.erp.domain.employee.dto.request.PasswordChangeRequestDto;
-import com.erp.domain.employee.dto.request.RegisterEmployeeRequestDto;
-import com.erp.domain.employee.dto.request.UpdateEmployeeRequestDto;
+import com.erp.domain.employee.dto.request.*;
 import com.erp.domain.employee.dto.response.EmployeeListResponse;
 import com.erp.domain.employee.service.EmployeeService;
+import com.erp.global.jwt.TokenInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +18,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/manager/employees")
+@RequestMapping("/api/manager")
 public class EmployeeController {
 
 
@@ -29,7 +27,7 @@ public class EmployeeController {
     // 직원 비밀번호 변경 API
     // 나중에 Security 적용 시 @AuthenticationPrincipal로 변경 예정
     // 이 브랜치에 로그인 로직이 없어 토큰 발급이 안 되기 때문
-    @PatchMapping("/{employeeId}/password")
+    @PatchMapping("/employees/{employeeId}/password")
     public ResponseEntity<Void> changePassword(
             @PathVariable Long employeeId,
             @Valid @RequestBody PasswordChangeRequestDto requestDto
@@ -41,7 +39,7 @@ public class EmployeeController {
 
 
     // 직원 전체 조회(퇴사자 미포함) + 검색
-    @GetMapping
+    @GetMapping("/employees")
     public ResponseEntity<Page<EmployeeListResponse>> getEmployees(
             @ModelAttribute EmployeeSearchRequest request,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
@@ -50,7 +48,7 @@ public class EmployeeController {
     }
 
     // 직원 삭제(퇴사) - Soft Delete
-    @DeleteMapping("/{employeeId}")
+    @DeleteMapping("/employees/{employeeId}")
     public ResponseEntity<Void> deleteEmployee(
             @PathVariable Long employeeId,
             @RequestParam LocalDate date
@@ -61,7 +59,7 @@ public class EmployeeController {
     }
 
     // 직원 수정
-    @PatchMapping("/{employeeId}")
+    @PatchMapping("/employees/{employeeId}")
     public ResponseEntity<Void> updateEmployee(
             @PathVariable Long employeeId,
             @Valid @RequestBody UpdateEmployeeRequestDto requestDto) {
@@ -72,11 +70,16 @@ public class EmployeeController {
     }
 
     // 직원 생성
-    @PostMapping
+    @PostMapping("/employees")
     public ResponseEntity<Long> createEmployee(
             @Valid @RequestBody RegisterEmployeeRequestDto requestDto) {
 
         long newEmployeeId = employeeService.createEmployee(requestDto);
         return ResponseEntity.ok(newEmployeeId);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenInfo> login(@RequestBody EmployeeLoginRequestDto dto) {
+        return ResponseEntity.ok().body(employeeService.login(dto));
     }
 }

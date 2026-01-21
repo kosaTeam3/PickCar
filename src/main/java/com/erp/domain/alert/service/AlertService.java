@@ -26,6 +26,7 @@ public class AlertService {
     private final AlertRepository alertRepository;
     private final EmployeeRepository employeeRepository;
 
+    /* 정기 점검 알림 */
     public void createRegularInspectionAlerts(Car car) {
         if (car.getCreatedAt() == null || car.getBranch() == null) {
             return;
@@ -37,6 +38,7 @@ public class AlertService {
         createAlertsForBranch(car.getBranch(), message, inspectionDate);
     }
 
+    /* 소모품 교체 알림 */
     public void createConsumableAlerts(Car car, List<String> items) {
         if (items.isEmpty() || car.getBranch() == null) {
             return;
@@ -49,6 +51,7 @@ public class AlertService {
         }
     }
 
+    /* 지점별 알림 배포 */
     private void createAlertsForBranch(Branch branch, String message, LocalDate date) {
         List<Employee> employees = employeeRepository.findByBranchId(branch.getId());
         for (Employee employee : employees) {
