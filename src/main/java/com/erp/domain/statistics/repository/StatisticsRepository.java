@@ -13,8 +13,7 @@ import java.util.List;
 public interface StatisticsRepository extends JpaRepository<Rent, Long> {
 
     /* 월간 대여 건수 조회 */
-    @Query(
-            value = """
+    @Query(value = """
             SELECT
                 DATE_FORMAT(r.start_rent_date_time, '%Y-%m') AS label,
                 COUNT(r.id) AS count
@@ -24,16 +23,14 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             GROUP BY label
             ORDER BY label ASC
         """,
-            nativeQuery = true
-    )
+            nativeQuery = true)
     List<StatisticsProjection> findMonthlyRentCount(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
 
     /* 일간 대여 건수 조회 */
-    @Query(
-            value = """
+    @Query(value = """
             SELECT
                 DATE_FORMAT(r.start_rent_date_time, '%Y-%m-%d') AS label,
                 COUNT(r.id) AS count
@@ -43,16 +40,14 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             GROUP BY label
             ORDER BY label ASC
         """,
-            nativeQuery = true
-    )
+            nativeQuery = true)
     List<StatisticsProjection> findDailyRentCount(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
 
     /* 주간 대여 건수 조회 */
-    @Query(
-            value = """
+    @Query(value = """
             SELECT
                 DATE_FORMAT(r.start_rent_date_time, '%Y-%u') AS label,
                 COUNT(r.id) AS count
@@ -62,8 +57,7 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             GROUP BY label
             ORDER BY label ASC
         """,
-            nativeQuery = true
-    )
+            nativeQuery = true)
     List<StatisticsProjection> findWeeklyRentCount(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
@@ -87,5 +81,56 @@ public interface StatisticsRepository extends JpaRepository<Rent, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    /* 월간 매출 통계 */
+    @Query(value = """
+        SELECT 
+            DATE_FORMAT(p.paid_at, '%Y-%m') As label,
+            SUM(p.amount) AS count
+        FROM payment p
+        WHERE p.paid_at BETWEEN :startDate AND :endDate
+            AND p.status = 'PAID'
+        GROUP BY label
+        ORDER BY label ASC 
+    """,
+        nativeQuery = true)
+    List<StatisticsProjection> findMonthlySales(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    /* 주간 매출 통계 */
+    @Query(value = """
+    SELECT 
+        DATE_FORMAT(DATE_SUB(p.paid_at, INTERVAL (WEEKDAY(p.paid_at)) DAY), '%Y-%m-%d') AS label,
+        SUM(p.amount) AS count
+    FROM payment p
+    WHERE p.paid_at BETWEEN :startDate AND :endDate
+      AND p.status = 'PAID'
+    GROUP BY label
+    ORDER BY label ASC
+    """,
+        nativeQuery = true)
+    List<StatisticsProjection> findWeeklySales(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    /* 일간 매출 통계 */
+    @Query(value = """
+    SELECT 
+        DATE_FORMAT(p.paid_at, '%Y-%m-%d') AS label,
+        SUM(p.amount) AS count
+    FROM payment p
+    WHERE p.paid_at BETWEEN :startDate AND :endDate
+      AND p.status = 'PAID'
+    GROUP BY label
+    ORDER BY label ASC
+    """,
+        nativeQuery = true)
+    List<StatisticsProjection> findDailySales(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
 
 }

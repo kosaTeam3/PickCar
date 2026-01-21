@@ -96,4 +96,46 @@ public class StatisticsService {
                 .toList();
     }
 
+    /* 월간 매출 통계 */
+    public List<StatisticsResponse> getMonthlySalesStats(YearMonth start, YearMonth end) {
+
+        LocalDateTime startDate = start.atDay(1).atStartOfDay();
+        LocalDateTime endDate = end.atEndOfMonth().atTime(23, 59, 59);
+
+        return statisticsRepository.findMonthlySales(startDate, endDate)
+                .stream()
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
+    /* 주간 매출 통계 */
+    public List<StatisticsResponse> getWeeklySalesStats(LocalDate start, LocalDate end) {
+
+        LocalDateTime startDate = start.atStartOfDay();
+        LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        return statisticsRepository.findWeeklySales(startDate, endDate)
+                .stream()
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
+    /* 일간 매출 통계 */
+    public List<StatisticsResponse> getDailySalesStats(LocalDate start, LocalDate end) {
+
+        LocalDateTime startDate = start.atStartOfDay();
+        LocalDateTime endDate = end.atTime(23, 59, 59);
+
+        return statisticsRepository.findDailySales(startDate, endDate)
+                .stream()
+                .map(row -> new StatisticsResponse(
+                        row.getLabel(),
+                        row.getCount()))
+                .toList();
+    }
+
 }
