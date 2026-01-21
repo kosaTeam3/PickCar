@@ -1,7 +1,9 @@
 package com.erp;
 
 import com.erp.global.dto.ErrorResponse;
+import com.sun.security.auth.UserPrincipal;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +15,12 @@ import java.util.List;
  */
 @RestController("/")
 public class SampleController {
+
+    //요청정보를 가져올때 사용합니다.
+    @GetMapping("/getRequestUserId")
+    public String test(@AuthenticationPrincipal UserPrincipal user){
+        return user.getName();
+    }
 
     //데이터가 존재할경우 견본입니다
     @GetMapping("/data")
