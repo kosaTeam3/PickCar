@@ -43,7 +43,7 @@ public class JwtTokenProvider {
     public TokenInfo generateClientToken(Client client) {
         String accessToken = Jwts.builder()
                 .claim("id", client.getId())
-                .claim("authority", "CLIENT")
+                .claim("authority", "ROLE_CLIENT")
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -58,7 +58,7 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .claim("id", employee.getId())
                 .claim("isFirstLogin", employee.getPasswordChangeRequired())
-                .claim("authority", employee.getAuthority())
+                .claim("authority", "ROLE_" + employee.getAuthority())
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -107,9 +107,9 @@ public class JwtTokenProvider {
     }
 
     // 토큰 파싱
-    private Claims parseClaim(String accessToekn) {
+    private Claims parseClaim(String accessToken) {
         try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToekn).getBody();
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims(); // 만료후에도 꺼내기
         }
