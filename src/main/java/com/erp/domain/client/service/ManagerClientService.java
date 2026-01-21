@@ -73,7 +73,6 @@ public class ManagerClientService {
                 .toList();
     }
 
-    // todo
     // 회원 사고 기록
     public List<ClientAccidentHistoryResponse> getAccidentHistory(Long clientId) {
         if (!clientRepository.existsById(clientId)) {

@@ -31,8 +31,5 @@ public class Coupon extends BaseTimeEntity {
 
     @Column(name = "code", unique = true)
     private String code;
-
-    @Column(name = "min_price")
-    private Integer minPrice;
 }
 

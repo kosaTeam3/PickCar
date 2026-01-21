@@ -21,9 +21,6 @@ public record CouponSaveRequest(
         @Future(message = "유효기간은 현재 날짜 이후여야 합니다.")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate expDate,
-        String code,
-
-        @Min(value = 1000, message = "최소 구매 금액은 1000원 이상이어야 합니다.")
-        Integer minPrice
+        String code
 ) {
 }
