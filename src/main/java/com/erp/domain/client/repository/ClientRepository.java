@@ -23,6 +23,4 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     // 이메일 중복 확인
     boolean existsByEmail(String email);
-
-    Optional<Client> findById(Long id);
 }

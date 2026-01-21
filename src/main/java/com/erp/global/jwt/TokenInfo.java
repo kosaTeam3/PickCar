@@ -10,5 +10,4 @@ public record TokenInfo(
         String refreshToken
 
 ) {
-
 }
