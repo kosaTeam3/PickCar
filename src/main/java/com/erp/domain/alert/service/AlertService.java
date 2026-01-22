@@ -9,6 +9,8 @@ import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,8 +80,8 @@ public class AlertService {
     }
 
     @Transactional(readOnly = true)
-    public List<AlertListResponse> getAlerts(Long employeeId) {
-        return alertRepository.findByEmployeeIdOrderByCreatedAtDesc(employeeId).stream()
+    public Page<AlertListResponse> getAlerts(Long employeeId, Pageable pageable) {
+        return alertRepository.findAllByEmployeeId(employeeId, pageable)
                 .map(alert -> new AlertListResponse(
                         alert.getId(),
                         alert.getType(),
@@ -87,8 +89,7 @@ public class AlertService {
                         alert.getDate(),
                         alert.isRead(),
                         alert.getCreatedAt()
-                ))
-                .toList();
+                ));
     }
 
     public void markAlertRead(Long alertId) {

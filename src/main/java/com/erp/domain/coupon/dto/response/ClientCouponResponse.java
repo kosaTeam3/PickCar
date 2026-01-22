@@ -11,6 +11,6 @@ public record ClientCouponResponse(
         Integer discount,
         LocalDate expDate,
         String code,
-        String status
+        CouponStatus status
 ) {
 }

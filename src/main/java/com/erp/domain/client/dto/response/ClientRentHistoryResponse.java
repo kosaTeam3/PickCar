@@ -1,5 +1,6 @@
 package com.erp.domain.client.dto.response;
 
+import com.erp.domain.rent.entity.RentStatus;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,8 @@ public record ClientRentHistoryResponse(
         String model,
         String brand,
         Integer year,
-        Long rentalFee, // 렌트 요금
+        RentStatus status,
+        Long rentalFee,
         LocalDateTime startRentDateTime,
         LocalDateTime endRentDateTime
 ) {
