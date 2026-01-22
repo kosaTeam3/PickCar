@@ -133,6 +133,7 @@ public class ManagerClientService {
                 rent.getCar().getModel(),
                 rent.getCar().getBrand(),
                 rent.getCar().getYear(),
+                rent.getStatus(),
                 rent.getRentalFee(),
                 rent.getStartRentDateTime(),
                 rent.getEndRentDateTime()
