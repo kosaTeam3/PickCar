@@ -1,6 +1,7 @@
 package com.erp.domain.rent.service;
 
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
@@ -8,8 +9,10 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.request.RentReturnRequest;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
+import com.erp.domain.rent.dto.response.RentReturnResponse;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
 import com.erp.domain.rent.repository.RentRepository;
@@ -126,6 +129,37 @@ public class RentService {
                 .buyerName(client.getName())
                 .buyerEmail(client.getEmail())
                 .buyerPhone(client.getPhoneNumber())
+                .build();
+    }
+
+    @Transactional
+    public RentReturnResponse returnRent(Long clientId, RentReturnRequest request) {
+        // 예약 조회
+        Rent rent = rentRepository.findById(request.rentId())
+                .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
+
+        // 권한 검증 (내 예약이 맞는지)
+        if (!rent.getClient().getId().equals(clientId)) {
+            throw new CustomException(403, "해당 예약에 대한 권한이 없습니다.");
+        }
+
+        // 상태 검증 (이미 반납되었거나 취소된 예약인지)
+        if (rent.getStatus() != RentStatus.RESERVED) {
+            throw new CustomException(400, "반납 가능한 상태가 아닙니다. (현재 상태: " + rent.getStatus() + ")");
+        }
+
+        // Rent 상태 변경 (RESERVED -> COMPLETED)
+        rent.setStatus(RentStatus.COMPLETED);
+
+        // Car 상태 변경 (DRIVING -> WAITING)
+        Car car = rent.getCar();
+        car.setStatus(CarStatus.WAITING);
+
+        return RentReturnResponse.builder()
+                .rentId(rent.getId())
+                .rentStatus(rent.getStatus())
+                .returnDateTime(LocalDateTime.now())
+                .message("차량 반납이 완료되었습니다.")
                 .build();
     }
 }
