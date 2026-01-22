@@ -2,11 +2,15 @@ package com.erp.domain.alert.controller;
 
 import com.erp.domain.alert.dto.response.AlertListResponse;
 import com.erp.domain.alert.service.AlertService;
+import com.sun.security.auth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/manager/alerts")
@@ -17,10 +21,12 @@ public class AlertController {
 
     /* 알림 생성 */
     @GetMapping
-    public ResponseEntity<List<AlertListResponse>> getAlerts(
-            @RequestParam Long employeeId
+    public ResponseEntity<Page<AlertListResponse>> getAlerts(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(alertService.getAlerts(employeeId));
+        Long userId = Long.parseLong(user.getName());
+        return ResponseEntity.ok(alertService.getAlerts(userId, pageable));
     }
 
     /* 알림 상태 변경 */
