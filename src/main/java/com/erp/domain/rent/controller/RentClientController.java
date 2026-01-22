@@ -30,11 +30,10 @@ public class RentClientController {
     }
 
     @GetMapping
-    public ResponseEntity<CurrentRentResponse> getCurrentRent() {
-        // Long clientId = Long.parseLong(userDetails.getUsername());
-        Long clientId = 1L; // DB에 있는 테스트용 고객 ID, 로그인 구현 후 주석 복원 필요
+    public ResponseEntity<CurrentRentResponse> getCurrentRent(@AuthenticationPrincipal UserPrincipal user) {
+        Long userId = Long.parseLong(user.getName());
 
-        CurrentRentResponse response = rentService.findCurrentRent(clientId);
+        CurrentRentResponse response = rentService.findCurrentRent(userId);
 
         return ResponseEntity.ok(response);
     }
