@@ -9,7 +9,6 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
-import com.erp.domain.rent.dto.request.RentReturnRequest;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
 import com.erp.domain.rent.dto.response.RentReturnResponse;
@@ -133,15 +132,10 @@ public class RentService {
     }
 
     @Transactional
-    public RentReturnResponse returnRent(Long userId, RentReturnRequest request) {
+    public RentReturnResponse returnRental(Long rentId) {
         // 예약 조회
-        Rent rent = rentRepository.findById(request.rentId())
+        Rent rent = rentRepository.findById(rentId)
                 .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
-
-        // 권한 검증 (내 예약이 맞는지)
-        if (!rent.getClient().getId().equals(userId)) {
-            throw new CustomException(403, "해당 예약에 대한 권한이 없습니다.");
-        }
 
         // 상태 검증 (이미 반납되었거나 취소된 예약인지)
         if (rent.getStatus() != RentStatus.RESERVED) {
