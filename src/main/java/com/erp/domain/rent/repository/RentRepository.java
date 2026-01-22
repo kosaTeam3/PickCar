@@ -2,6 +2,7 @@ package com.erp.domain.rent.repository;
 
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.rent.entity.Rent;
+import com.erp.domain.rent.entity.RentStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,4 +73,19 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM Rent r WHERE r.id = :id")
     Optional<Rent> findByIdWithLock(@Param("id") Long id);
+
+    // 고객의 현재 렌트중인(RESERVED 상태 + 현재 시간이 대여 기간에 포함됨) 차량 정보 조회
+    @Query("""
+            SELECT r
+            FROM Rent r
+            JOIN FETCH r.car c
+            JOIN FETCH c.branch b
+            WHERE r.client.id = :clientId
+            AND :now BETWEEN r.startRentDateTime AND r.endRentDateTime
+            AND r.status = :status
+            """)
+    Optional<Rent> findCurrentRentByClient(
+            @Param("clientId") Long clientId,
+            @Param("now") LocalDateTime now,
+            @Param("status") RentStatus status);
 }

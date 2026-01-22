@@ -1,15 +1,13 @@
 package com.erp.domain.rent.controller;
 
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.response.CurrentRentResponse;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.service.RentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client/rental")
@@ -26,6 +24,16 @@ public class RentClientController {
         Long clientId = 1L; // DB에 있는 테스트용 고객 ID, 로그인 구현 후 주석 복원 필요
 
         RentCreateResponse response = rentService.createRent(request, clientId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<CurrentRentResponse> getCurrentRent() {
+        // Long clientId = Long.parseLong(userDetails.getUsername());
+        Long clientId = 1L; // DB에 있는 테스트용 고객 ID, 로그인 구현 후 주석 복원 필요
+
+        CurrentRentResponse response = rentService.findCurrentRent(clientId);
 
         return ResponseEntity.ok(response);
     }
