@@ -59,19 +59,21 @@ public class CouponService {
         LocalDate now = LocalDate.now();
 
         return couponRepository.findAllByOrderByIdDesc().stream().map(coupon -> {
+            // 관리자용 상태 동적 계산 (우선순위 : 기간 전 -> 종료 -> 만료 -> 소진 -> 정상)
             CouponStatus status;
             if (now.isBefore(coupon.getStartDate())) {
-                status = CouponStatus.READY;
+                status = CouponStatus.READY;         // 발급 시작 전
             } else if (now.isAfter(coupon.getEndDate())) {
-                status = CouponStatus.FINISHED;
+                status = CouponStatus.FINISHED;     // 발급 기간 종료
             } else if (now.isAfter(coupon.getExpDate())) {
-                status = CouponStatus.EXPIRED;
+                status = CouponStatus.EXPIRED;      // 사용 기한 만료
             } else if (coupon.getMaxQuantity() != 0 && coupon.getIssuedQuantity() >= coupon.getMaxQuantity()) {
-                status = CouponStatus.EXHAUSTED;
+                status = CouponStatus.EXHAUSTED;    // 수량 소진
             } else {
-                status = CouponStatus.ACTIVE;
+                status = CouponStatus.ACTIVE;       // 발급 중
             }
 
+            // 실사용 횟수 조회
             long usedCount = clientCouponRepository.countByCouponIdAndIsUsedTrue(coupon.getId());
 
             return new AdminCouponResponse(
@@ -100,12 +102,14 @@ public class CouponService {
         Coupon coupon = couponRepository.findAllByCode(couponCode)
                 .orElseThrow(() -> new CustomException(404, "유효하지 않은 쿠폰 코드입니다."));
 
+        // 발급 유효성 검증 (기간 -> 수량 -> 중복 여부 순서)
         LocalDate now = LocalDate.now();
         if (now.isBefore(coupon.getStartDate()) || now.isAfter(coupon.getEndDate())) {
             throw new CustomException(400, "지금은 쿠폰 발급 기간이 아닙니다. (발급 기간: "
                     + coupon.getStartDate() + " ~ " + coupon.getEndDate() + ")");
         }
 
+        // 수량 제한 확인 (0이면 무제한이므로 체크 안함, maxQuantity가 0이 아닐때만 체크)
         if (coupon.getMaxQuantity() <= coupon.getIssuedQuantity()) {
             throw new CustomException(400, "준비된 쿠폰 수량이 모두 소진되었습니다.");
         }
@@ -153,7 +157,7 @@ public class CouponService {
                 .toList();
     }
 
-    /* 랜덤 코드 생성 */
+    /* 랜덤 코드 생성 (8자리 대문자) */
     private String generateRandomCode() {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/manager/coupons") // 👈 관리자 전용 경로!
+@RequestMapping("/api/manager/coupons")
 public class ManagerCouponController {
 
     private final CouponService couponService;

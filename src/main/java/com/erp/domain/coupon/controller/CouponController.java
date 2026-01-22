@@ -1,8 +1,6 @@
 package com.erp.domain.coupon.controller;
 
 import com.erp.domain.coupon.dto.request.CouponIssueRequest;
-import com.erp.domain.coupon.dto.request.CouponSaveRequest;
-import com.erp.domain.coupon.dto.response.AdminCouponResponse;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
 import com.erp.domain.coupon.service.CouponService;
 import jakarta.validation.Valid;
@@ -25,8 +23,8 @@ public class CouponController {
     }
 
     /* [사용자] 내 쿠폰 목록 조회 */
-    @GetMapping("/my")
-    public List<ClientCouponResponse> getMyCoupons(@RequestParam Long clientId) {
+    @GetMapping("/{clientId}")
+    public List<ClientCouponResponse> getMyCoupons(@PathVariable Long clientId) {
         return couponService.getClientCoupons(clientId);
     }
 
