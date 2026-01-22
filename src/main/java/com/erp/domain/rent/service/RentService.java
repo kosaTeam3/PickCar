@@ -50,12 +50,12 @@ public class RentService {
     }
 
     @Transactional
-    public RentCreateResponse createRent(RentCreateRequest request, Long clientId) {
+    public RentCreateResponse createRent(RentCreateRequest request, Long userId) {
         // 차량 및 고객 조회
         Car car = carRepository.findById(request.carId())
                 .orElseThrow(() -> new CustomException(404, "차량을 찾을 수 없습니다."));
 
-        Client client = clientRepository.findById(clientId)
+        Client client = clientRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(404, "고객을 찾을 수 없습니다."));
 
         // 해당 기간에 이미 예약이 있는지 확인. 1차 검증
@@ -78,7 +78,7 @@ public class RentService {
                     .orElseThrow(() -> new CustomException(404, "보유하신 쿠폰 정보를 찾을 수 없습니다."));
 
             // 소유권 검증 (내 쿠폰이 맞는지)
-            if (!clientCoupon.getClient().getId().equals(clientId)) {
+            if (!clientCoupon.getClient().getId().equals(userId)) {
                 throw new CustomException(403, "해당 쿠폰에 대한 권한이 없습니다.");
             }
 
