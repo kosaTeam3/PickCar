@@ -130,9 +130,9 @@ public class RentService {
                 .build();
     }
 
-    public CurrentRentResponse findCurrentRent(Long clientId) {
+    public CurrentRentResponse findCurrentRent(Long userId) {
         // 현재 시간 기준, 예약 확정(RESERVED) 상태인 렌트 정보 조회
-        Rent rent = rentRepository.findCurrentRentByClient(clientId, LocalDateTime.now(), RentStatus.RESERVED)
+        Rent rent = rentRepository.findCurrentRentByClient(userId, LocalDateTime.now(), RentStatus.RESERVED)
                 .orElseThrow(() -> new CustomException(400, "현재 렌트중인 차량이 없습니다."));
 
         return CurrentRentResponse.builder()
