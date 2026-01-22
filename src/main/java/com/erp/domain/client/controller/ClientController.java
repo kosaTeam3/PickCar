@@ -9,8 +9,10 @@ import com.erp.global.jwt.TokenInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/client")
@@ -18,29 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
 
     private final ClientService clientService;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    // 로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
-
-        // "Bearer " 문자열 떼기 (공백까지 7)
-        String token = accessToken.substring(7);
-
-        //  토큰에서 사용자 이메일 추출 (누구껀지 알아야 리프레시 토큰을 지움)
-        Authentication auth = jwtTokenProvider.getAuthentication(token);
-
-        //  토큰과 이메일을 서비스로 넘겨서 처리
-        clientService.logout(token, auth.getName());
-
-        return ResponseEntity.ok().build();
-    }
-
-//    // 토큰 재발급 - refreshToken
-//    @PostMapping("/reissue")
-//    public ResponseEntity<TokenInfo> reissue(@RequestBody ReissueRequestDto requestDto) {
-//        return ResponseEntity.ok(clientService.reissue(requestDto));
-//    }
 
     // 이메일 중복 확인
     @PostMapping("/validation")
