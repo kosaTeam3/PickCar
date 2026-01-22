@@ -1,11 +1,13 @@
 package com.erp.domain.payment.service;
 
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.payment.dto.request.PaymentSaveRequest;
 import com.erp.domain.payment.dto.response.PaymentSaveResponse;
 import com.erp.domain.payment.entity.Payment;
 import com.erp.domain.payment.entity.PaymentStatus;
 import com.erp.domain.payment.repository.PaymentRepository;
+import com.erp.domain.rent.dto.response.RentCancelResponse;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
 import com.erp.domain.rent.repository.RentRepository;
@@ -169,6 +171,64 @@ public class PaymentService {  // 결제 내역 저장 및 검증
         } catch (Exception e) {
             log.error("PortOne Token Error", e);
             throw new CustomException(500, "결제 시스템 연동 중 오류가 발생했습니다.");
+        }
+    }
+
+    @Transactional
+    public RentCancelResponse cancelPayment(Long rentId, String reason, Long userId) {
+        // 관련 렌트 및 결제 정보 조회
+        Rent rent = rentRepository.findById(rentId)
+                .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
+
+        // 권한 및 상태 검증
+        if (!rent.getClient().getId().equals(userId)) {
+            throw new CustomException(403, "취소 권한이 없습니다.");
+        }
+        if (rent.getStatus() != RentStatus.RESERVED) {
+            throw new CustomException(400, "취소 가능한 예약 상태가 아닙니다.");
+        }
+
+        Payment payment = paymentRepository.findByRentId(rent.getId())
+                .orElseThrow(() -> new CustomException(404, "결제 내역을 찾을 수 없습니다."));
+
+        // 포트원 API 호출 (AccessToken 발급 및 취소 요청 로직 포함)
+        String accessToken = getPortOneAccessToken();
+        cancelPortOnePayment(accessToken, payment.getMerchantUid(), reason);
+
+        // DB 상태 업데이트
+        payment.setStatus(PaymentStatus.CANCELLED);
+        rent.setStatus(RentStatus.CANCELLED);
+        rent.getCar().setStatus(CarStatus.WAITING);
+
+        return RentCancelResponse.builder()
+                .merchantUid(payment.getMerchantUid())
+                .cancelAmount(payment.getAmount())
+                .cancelledAt(LocalDateTime.now())
+                .status("CANCELLED")
+                .build();
+    }
+
+    // 포트원 취소 요청 API 호출
+    private void cancelPortOnePayment(String accessToken, String merchantUid, String reason) {
+        try {
+            String response = restClient.post()
+                    .uri("https://api.iamport.kr/payments/cancel")
+                    .header("Authorization", accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("merchant_uid", merchantUid, "reason", reason))
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode root = objectMapper.readTree(response);
+            if (root.get("code").asInt() != 0) {
+                log.error("포트원 취소 실패 응답: {}", response);
+                throw new CustomException(400, "포트원 결제 취소 실패: " + root.get("message").asText());
+            }
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("PortOne Cancel Communication Error", e);
+            throw new CustomException(500, "결제 취소 통신 중 오류가 발생했습니다.");
         }
     }
 }

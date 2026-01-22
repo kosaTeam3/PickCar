@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record CurrentRentResponse(
+        Long rentId,            // 예약 ID
         Long carId,             // 차량 ID
         String carImage,        // 사진
         String carModel,        // 차모델

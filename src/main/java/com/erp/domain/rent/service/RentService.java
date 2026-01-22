@@ -136,6 +136,7 @@ public class RentService {
                 .orElseThrow(() -> new CustomException(400, "현재 렌트중인 차량이 없습니다."));
 
         return CurrentRentResponse.builder()
+                .rentId(rent.getId())
                 .carId(rent.getCar().getId())
                 .carImage(rent.getCar().getImage())
                 .carModel(rent.getCar().getModel())
