@@ -133,13 +133,13 @@ public class RentService {
     }
 
     @Transactional
-    public RentReturnResponse returnRent(Long clientId, RentReturnRequest request) {
+    public RentReturnResponse returnRent(Long userId, RentReturnRequest request) {
         // 예약 조회
         Rent rent = rentRepository.findById(request.rentId())
                 .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
 
         // 권한 검증 (내 예약이 맞는지)
-        if (!rent.getClient().getId().equals(clientId)) {
+        if (!rent.getClient().getId().equals(userId)) {
             throw new CustomException(403, "해당 예약에 대한 권한이 없습니다.");
         }
 

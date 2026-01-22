@@ -35,9 +35,9 @@ public class RentManagerController {
             @Valid @RequestBody RentReturnRequest request,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        Long clientId = Long.parseLong(user.getName());
+        Long userId = Long.parseLong(user.getName());
 
-        RentReturnResponse response = rentService.returnRent(clientId, request);
+        RentReturnResponse response = rentService.returnRent(userId, request);
 
         return ResponseEntity.ok(response);
     }
