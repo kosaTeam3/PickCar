@@ -1,9 +1,7 @@
 package com.erp.domain.rent.controller;
 
 import com.erp.domain.rent.dto.request.RentCreateRequest;
-import com.erp.domain.rent.dto.request.RentReturnRequest;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
-import com.erp.domain.rent.dto.response.RentReturnResponse;
 import com.erp.domain.rent.service.RentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,19 +29,5 @@ public class RentClientController {
 
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/return")
-    public ResponseEntity<RentReturnResponse> returnRent(
-            @Valid @RequestBody RentReturnRequest request
-            // @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        // Long clientId = Long.parseLong(userDetails.getUsername());
-        Long clientId = 1L; // 테스트용 고정 ID
-
-        RentReturnResponse response = rentService.returnRent(clientId, request);
-
-        return ResponseEntity.ok(response);
-    }
-
 
 }
