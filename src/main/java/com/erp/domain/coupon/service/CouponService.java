@@ -12,6 +12,9 @@ import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.coupon.repository.CouponRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,11 +57,13 @@ public class CouponService {
     }
 
     /* [관리자] 쿠폰 전체 목록 조회 */
-    public List<AdminCouponResponse> getAdminCoupons() {
+    public Page<AdminCouponResponse> getAdminCoupons(Pageable pageable) {
 
         LocalDate now = LocalDate.now();
 
-        return couponRepository.findAllByOrderByIdDesc().stream().map(coupon -> {
+        Page<Coupon> couponPage = couponRepository.findAll(pageable);
+
+        return couponPage.map(coupon -> {
             // 관리자용 상태 동적 계산 (우선순위 : 기간 전 -> 종료 -> 만료 -> 소진 -> 정상)
             CouponStatus status;
             if (now.isBefore(coupon.getStartDate())) {
@@ -89,7 +94,7 @@ public class CouponService {
                     coupon.getExpDate(),
                     status
             );
-        }).toList();
+        });
     }
 
     /* [사용자] 쿠폰 발급 */
