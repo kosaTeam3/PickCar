@@ -5,6 +5,7 @@ import com.erp.domain.client.repository.ClientRepository;
 import com.erp.domain.coupon.dto.request.CouponSaveRequest;
 import com.erp.domain.coupon.dto.response.AdminCouponResponse;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
+import com.erp.domain.coupon.dto.response.IssuedClientCouponResponse;
 import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.entity.CouponStatus;
@@ -95,6 +96,20 @@ public class CouponService {
                     status
             );
         });
+    }
+
+    /* [관리자] 특정 쿠폰 발급 유저 목록 조회 */
+    public Page<IssuedClientCouponResponse> getIssuedClients(Long couponId, Pageable pageable) {
+
+        return clientCouponRepository.findByCouponId(couponId, pageable)
+                .map(clientCoupon -> new IssuedClientCouponResponse(
+                        clientCoupon.getClient().getName(),
+                        clientCoupon.getClient().getEmail(),
+                        clientCoupon.getClient().getPhoneNumber(),
+                        clientCoupon.getCreatedAt(),
+                        clientCoupon.getUsedAt(),
+                        clientCoupon.isUsed()
+                ));
     }
 
     /* [사용자] 쿠폰 발급 */

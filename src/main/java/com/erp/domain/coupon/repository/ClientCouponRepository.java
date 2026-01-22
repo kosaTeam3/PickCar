@@ -1,6 +1,8 @@
 package com.erp.domain.coupon.repository;
 
 import com.erp.domain.coupon.entity.ClientCoupon;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +26,7 @@ public interface ClientCouponRepository extends JpaRepository<ClientCoupon, Long
     @Modifying(clearAutomatically = true)
     @Query("UPDATE ClientCoupon c SET c.isUsed = true, c.usedAt = :usedAt WHERE c.id = :id AND c.isUsed = false")
     int updateStatusToUsed(@Param("id") Long id, @Param("usedAt") LocalDateTime usedAt);
+
+    /* 특정 쿠폰 발급 내역 조회 */
+    Page<ClientCoupon> findByCouponId(Long couponId, Pageable pageable);
 }
