@@ -8,6 +8,7 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.response.CurrentRentResponse;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
 import com.erp.domain.rent.entity.Rent;
@@ -126,6 +127,25 @@ public class RentService {
                 .buyerName(client.getName())
                 .buyerEmail(client.getEmail())
                 .buyerPhone(client.getPhoneNumber())
+                .build();
+    }
+
+    public CurrentRentResponse findCurrentRent(Long clientId) {
+        // 현재 시간 기준, 예약 확정(RESERVED) 상태인 렌트 정보 조회
+        Rent rent = rentRepository.findCurrentRentByClient(clientId, LocalDateTime.now(), RentStatus.RESERVED)
+                .orElseThrow(() -> new CustomException(400, "현재 렌트중인 차량이 없습니다."));
+
+        return CurrentRentResponse.builder()
+                .carId(rent.getCar().getId())
+                .carImage(rent.getCar().getImage())
+                .carModel(rent.getCar().getModel())
+                .rentalFee(rent.getRentalFee())
+                .carBrand(rent.getCar().getBrand())
+                .carYear(rent.getCar().getYear())
+                .startRentDateTime(rent.getStartRentDateTime())
+                .endRentDateTime(rent.getEndRentDateTime())
+                .branchName(rent.getCar().getBranch().getName())
+                .branchAddress(rent.getCar().getBranch().getAddress())
                 .build();
     }
 }

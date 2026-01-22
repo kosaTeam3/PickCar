@@ -1,15 +1,15 @@
 package com.erp.domain.client.controller;
 
-import com.erp.domain.client.dto.request.EmailCheckRequestDto;
-import com.erp.domain.client.dto.request.LoginRequestDto;
-import com.erp.domain.client.dto.request.RegisterClientRequestDto;
+import com.erp.domain.client.dto.request.*;
+import com.erp.domain.client.dto.response.MypageResponse;
 import com.erp.domain.client.service.ClientService;
-import com.erp.global.jwt.JwtTokenProvider;
 import com.erp.global.jwt.TokenInfo;
+import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,29 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
 
     private final ClientService clientService;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    // 로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
-
-        // "Bearer " 문자열 떼기 (공백까지 7)
-        String token = accessToken.substring(7);
-
-        //  토큰에서 사용자 이메일 추출 (누구껀지 알아야 리프레시 토큰을 지움)
-        Authentication auth = jwtTokenProvider.getAuthentication(token);
-
-        //  토큰과 이메일을 서비스로 넘겨서 처리
-        clientService.logout(token, auth.getName());
-
-        return ResponseEntity.ok().build();
-    }
-
-//    // 토큰 재발급 - refreshToken
-//    @PostMapping("/reissue")
-//    public ResponseEntity<TokenInfo> reissue(@RequestBody ReissueRequestDto requestDto) {
-//        return ResponseEntity.ok(clientService.reissue(requestDto));
-//    }
 
     // 이메일 중복 확인
     @PostMapping("/validation")
@@ -61,6 +38,34 @@ public class ClientController {
     public ResponseEntity<Void> registerClient(@Valid @RequestBody RegisterClientRequestDto requestDto) {
 
         clientService.registerClient(requestDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 내정보 조회
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/mypage")
+    public ResponseEntity<MypageResponse> getMypage(
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        return ResponseEntity.ok(clientService.getMypage(Long.parseLong(user.getName())));
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PatchMapping("/mypage")
+    public ResponseEntity<Void> updateMypage(
+            @AuthenticationPrincipal UserPrincipal user,
+            MypageUpdateRequestDto dto
+    ) {
+        clientService.updateMypage(Long.parseLong(user.getName()), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal UserPrincipal user, ChangePasswordRequestDto dto
+    ) {
+        clientService.changePassword(Long.parseLong(user.getName()), dto);
         return ResponseEntity.noContent().build();
     }
 }
