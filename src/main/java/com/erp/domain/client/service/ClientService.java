@@ -30,7 +30,7 @@ public class ClientService {
                 clientRepository.findByEmail(dto.email()).orElseThrow(
                         () -> new CustomException(401, "사용자를 찾을 수 없습니다.")
                 );
-        if (passwordEncoder.matches(dto.password(), client.getPassword())) {
+        if (!passwordEncoder.matches(dto.password(), client.getPassword())) {
             throw new CustomException(401, "사용자를 찾을 수 없습니다.");
         }
         return jwtTokenProvider.generateClientToken(client);
