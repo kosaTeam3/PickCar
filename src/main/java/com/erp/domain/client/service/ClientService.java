@@ -1,7 +1,10 @@
 package com.erp.domain.client.service;
 
+import com.erp.domain.client.dto.request.ChangePasswordRequestDto;
 import com.erp.domain.client.dto.request.LoginRequestDto;
+import com.erp.domain.client.dto.request.MypageUpdateRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
+import com.erp.domain.client.dto.response.MypageResponse;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
 import com.erp.domain.client.repository.ClientRepository;
@@ -118,5 +121,49 @@ public class ClientService {
             year += 2000;
         }
         return LocalDate.of(year, month, day);
+    }
+
+    public MypageResponse getMypage(Long userId) {
+        Client client = clientRepository.findById(userId).orElseThrow(
+                () -> new CustomException(404, "유저 정보가 정확하지 않습니다")
+        );
+
+
+        return MypageResponse.builder()
+                .email(client.getEmail())
+                .name(client.getName())
+                .phoneNumber(client.getPhoneNumber())
+                .licenceArea(client.getLicenceArea())
+                .licenceDay(client.getLicenceDay())
+                .licenceNumber(client.getLicenceNumber())
+                .build();
+    }
+
+    @Transactional
+    public void updateMypage(Long userId, MypageUpdateRequestDto dto) {
+        Client client = clientRepository.findById(userId).orElseThrow(
+                () -> new CustomException(404, "유저 정보가 정확하지 않습니다")
+        );
+
+        if (dto.email() != null) {
+
+            client.setEmail(dto.email());
+        }
+
+        if (dto.licenceDay() != null) {
+            client.setLicenceDay(dto.licenceDay());
+        }
+    }
+
+    public void changePassword(Long userId, ChangePasswordRequestDto dto) {
+        Client client = clientRepository.findById(userId).orElseThrow(
+                () -> new CustomException(404, "유저 정보가 정확하지 않습니다")
+        );
+
+        if (passwordEncoder.matches(dto.password(), client.getPassword())) {
+            throw new CustomException(400, "기존 비밀번호와 동일하게 변경할 수 없습니다.");
+        }
+
+        client.setPassword(passwordEncoder.encode(dto.password()));
     }
 }

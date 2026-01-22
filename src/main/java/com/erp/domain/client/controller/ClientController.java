@@ -1,18 +1,16 @@
 package com.erp.domain.client.controller;
 
-import com.erp.domain.client.dto.request.EmailCheckRequestDto;
-import com.erp.domain.client.dto.request.LoginRequestDto;
-import com.erp.domain.client.dto.request.RegisterClientRequestDto;
+import com.erp.domain.client.dto.request.*;
+import com.erp.domain.client.dto.response.MypageResponse;
 import com.erp.domain.client.service.ClientService;
-import com.erp.global.jwt.JwtTokenProvider;
 import com.erp.global.jwt.TokenInfo;
+import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client")
@@ -40,6 +38,34 @@ public class ClientController {
     public ResponseEntity<Void> registerClient(@Valid @RequestBody RegisterClientRequestDto requestDto) {
 
         clientService.registerClient(requestDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 내정보 조회
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/mypage")
+    public ResponseEntity<MypageResponse> getMypage(
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        return ResponseEntity.ok(clientService.getMypage(Long.parseLong(user.getName())));
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PatchMapping("/mypage")
+    public ResponseEntity<Void> updateMypage(
+            @AuthenticationPrincipal UserPrincipal user,
+            MypageUpdateRequestDto dto
+    ) {
+        clientService.updateMypage(Long.parseLong(user.getName()), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal UserPrincipal user, ChangePasswordRequestDto dto
+    ) {
+        clientService.changePassword(Long.parseLong(user.getName()), dto);
         return ResponseEntity.noContent().build();
     }
 }
