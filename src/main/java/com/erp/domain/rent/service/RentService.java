@@ -139,6 +139,7 @@ public class RentService {
                 .carId(rent.getCar().getId())
                 .carImage(rent.getCar().getImage())
                 .carModel(rent.getCar().getModel())
+                .rentId(rent.getId())
                 .rentalFee(rent.getRentalFee())
                 .carBrand(rent.getCar().getBrand())
                 .carYear(rent.getCar().getYear())

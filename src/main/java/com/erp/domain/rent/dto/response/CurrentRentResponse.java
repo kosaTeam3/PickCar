@@ -9,6 +9,7 @@ public record CurrentRentResponse(
         Long carId,             // 차량 ID
         String carImage,        // 사진
         String carModel,        // 차모델
+        Long rentId,            // 렌트 ID
         Long rentalFee,         // 최종 대여 금액(쿠폰 적용)
         String carBrand,        // 제조사
         Integer carYear,        // 제조년도
