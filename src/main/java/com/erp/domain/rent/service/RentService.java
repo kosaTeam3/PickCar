@@ -1,6 +1,7 @@
 package com.erp.domain.rent.service;
 
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.repository.ClientRepository;
@@ -11,6 +12,7 @@ import com.erp.domain.rent.dto.request.RentCreateRequest;
 import com.erp.domain.rent.dto.response.CurrentRentResponse;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
+import com.erp.domain.rent.dto.response.RentReturnResponse;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
 import com.erp.domain.rent.repository.RentRepository;
@@ -148,6 +150,32 @@ public class RentService {
                 .endRentDateTime(rent.getEndRentDateTime())
                 .branchName(rent.getCar().getBranch().getName())
                 .branchAddress(rent.getCar().getBranch().getAddress())
+                .build();
+    }
+
+    @Transactional
+    public RentReturnResponse returnRental(Long rentId) {
+        // 예약 조회
+        Rent rent = rentRepository.findById(rentId)
+                .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
+
+        // 상태 검증 (이미 반납되었거나 취소된 예약인지)
+        if (rent.getStatus() != RentStatus.RESERVED) {
+            throw new CustomException(400, "반납 가능한 상태가 아닙니다. (현재 상태: " + rent.getStatus() + ")");
+        }
+
+        // Rent 상태 변경 (RESERVED -> COMPLETED)
+        rent.setStatus(RentStatus.COMPLETED);
+
+        // Car 상태 변경 (DRIVING -> WAITING)
+        Car car = rent.getCar();
+        car.setStatus(CarStatus.WAITING);
+
+        return RentReturnResponse.builder()
+                .rentId(rent.getId())
+                .rentStatus(rent.getStatus())
+                .returnDateTime(LocalDateTime.now())
+                .message("차량 반납이 완료되었습니다.")
                 .build();
     }
 }

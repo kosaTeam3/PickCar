@@ -3,7 +3,6 @@ package com.erp;
 import com.erp.global.dto.ErrorResponse;
 import com.sun.security.auth.UserPrincipal;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,7 +1,5 @@
 package com.erp.domain.coupon.dto.response;
 
-import com.erp.domain.coupon.entity.CouponStatus;
-
 import java.time.LocalDate;
 
 public record ClientCouponResponse(
