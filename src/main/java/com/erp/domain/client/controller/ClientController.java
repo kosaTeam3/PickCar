@@ -1,6 +1,7 @@
 package com.erp.domain.client.controller;
 
 import com.erp.domain.client.dto.request.*;
+import com.erp.domain.client.dto.response.ClientInfoResponse;
 import com.erp.domain.client.dto.response.MypageResponse;
 import com.erp.domain.client.service.ClientService;
 import com.erp.global.jwt.TokenInfo;
@@ -14,10 +15,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client")
+@PreAuthorize("hasAnyRole('CLIENT')")
 @RequiredArgsConstructor
 public class ClientController {
 
     private final ClientService clientService;
+
+    @GetMapping
+    public ResponseEntity<ClientInfoResponse> getInfo(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(clientService.getInfo(Long.parseLong(user.getName())));
+    }
 
     // 이메일 중복 확인
     @PostMapping("/validation")
@@ -42,7 +49,6 @@ public class ClientController {
     }
 
     // 내정보 조회
-    @PreAuthorize("hasAnyRole('CLIENT')")
     @GetMapping("/mypage")
     public ResponseEntity<MypageResponse> getMypage(
             @AuthenticationPrincipal UserPrincipal user
@@ -50,7 +56,6 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getMypage(Long.parseLong(user.getName())));
     }
 
-    @PreAuthorize("hasAnyRole('CLIENT')")
     @PatchMapping("/mypage")
     public ResponseEntity<Void> updateMypage(
             @AuthenticationPrincipal UserPrincipal user,
@@ -60,7 +65,7 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyRole('CLIENT')")
+
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal UserPrincipal user, ChangePasswordRequestDto dto
