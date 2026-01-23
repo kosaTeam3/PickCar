@@ -12,7 +12,7 @@ import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +64,7 @@ public class RentClientController {
 
     @GetMapping("/history")
     public ResponseEntity<Page<RentHistListResponse>> getRentHistories(
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageRequest,
             @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(rentService.getRentHistories(Long.parseLong(user.getName()), pageRequest));
     }

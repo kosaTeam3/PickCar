@@ -16,7 +16,6 @@ import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,7 +202,8 @@ public class RentService {
         rent.getCar().setStatus(CarStatus.DRIVING);
     }
 
-    public Page<RentHistListResponse> getRentHistories(Long userId, PageRequest pageRequest) {
+    public Page<RentHistListResponse>
+    getRentHistories(Long userId, Pageable pageRequest) {
         return rentRepository.findRentHistories(userId, pageRequest)
                 .map(data -> RentHistListResponse.builder()
                         .carId(data.getCarId())
