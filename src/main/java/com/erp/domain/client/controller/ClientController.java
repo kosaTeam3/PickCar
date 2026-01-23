@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client")
-@PreAuthorize("hasAnyRole('CLIENT')")
 @RequiredArgsConstructor
 public class ClientController {
 
     private final ClientService clientService;
 
+    @PreAuthorize("hasAnyRole('CLIENT')")
     @GetMapping
     public ResponseEntity<ClientInfoResponse> getInfo(@AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(clientService.getInfo(Long.parseLong(user.getName())));
@@ -50,6 +50,7 @@ public class ClientController {
 
     // 내정보 조회
     @GetMapping("/mypage")
+    @PreAuthorize("hasAnyRole('CLIENT')")
     public ResponseEntity<MypageResponse> getMypage(
             @AuthenticationPrincipal UserPrincipal user
     ) {
@@ -57,6 +58,7 @@ public class ClientController {
     }
 
     @PatchMapping("/mypage")
+    @PreAuthorize("hasAnyRole('CLIENT')")
     public ResponseEntity<Void> updateMypage(
             @AuthenticationPrincipal UserPrincipal user,
             MypageUpdateRequestDto dto
@@ -67,6 +69,7 @@ public class ClientController {
 
 
     @PatchMapping("/password")
+    @PreAuthorize("hasAnyRole('CLIENT')")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal UserPrincipal user, ChangePasswordRequestDto dto
     ) {
