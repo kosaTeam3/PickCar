@@ -3,12 +3,12 @@ package com.erp.domain.coupon.controller;
 import com.erp.domain.coupon.dto.request.CouponIssueRequest;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
 import com.erp.domain.coupon.service.CouponService;
+import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @RestController
