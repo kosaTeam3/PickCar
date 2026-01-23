@@ -6,16 +6,23 @@ import com.erp.domain.rent.dto.request.RentCreateRequest;
 import com.erp.domain.rent.dto.response.CurrentRentResponse;
 import com.erp.domain.rent.dto.response.RentCancelResponse;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
+import com.erp.domain.rent.dto.response.RentHistListResponse;
 import com.erp.domain.rent.service.RentService;
 import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client/rentals")
+@PreAuthorize("hasAnyRole('CLIENT')")
 @RequiredArgsConstructor
 public class RentClientController {
     private final RentService rentService;
@@ -25,7 +32,7 @@ public class RentClientController {
     public ResponseEntity<RentCreateResponse> createRent(
             @Valid @RequestBody RentCreateRequest request,
             @AuthenticationPrincipal UserPrincipal user
-            ) {
+    ) {
         Long userId = Long.parseLong(user.getName());
 
         RentCreateResponse response = rentService.createRent(request, userId);
@@ -53,5 +60,12 @@ public class RentClientController {
         RentCancelResponse response = paymentService.cancelPayment(rentId, request.reason(), userId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<Page<RentHistListResponse>> getRentHistories(
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+            @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(rentService.getRentHistories(Long.parseLong(user.getName()), pageRequest));
     }
 }

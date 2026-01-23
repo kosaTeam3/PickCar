@@ -88,4 +88,22 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             @Param("clientId") Long clientId,
             @Param("now") LocalDateTime now,
             @Param("status") RentStatus status);
+
+    @Query("""
+                select
+                    c.id as carId,
+                    c.image as stringImage,
+                    c.model as model,
+                    c.brand as brand,
+                    c.year as year,
+                    r.status as status,
+                    b.id as branchId,
+                    r.startRentDateTime as startRentDateTime,
+                    r.endRentDateTime as endRentDateTime
+                from Rent r
+                join r.car c
+                join c.branch b
+                where r.client.id = :clientId
+            """)
+    Page<RentHistoriesProjection> findRentHistories(@Param("clientId") Long clientId, Pageable pageable);
 }
