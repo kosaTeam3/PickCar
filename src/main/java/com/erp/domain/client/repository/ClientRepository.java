@@ -17,13 +17,11 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "c.name LIKE %:keyword% OR " +
             "c.email LIKE %:keyword% OR " +
             "c.phoneNumber LIKE %:keyword%")
-    List<Client> searchClient(@Param("keyword") String keyword);
+    Page<Client> searchClient(@Param("keyword") String keyword, Pageable pageRequest);
 
     // 로그인
     Optional<Client> findByEmail(String email);
 
     // 이메일 중복 확인
     boolean existsByEmail(String email);
-
-    Page<Client> searchClient(@Param("keyword") String keyword, Pageable pageRequest);
 }
