@@ -13,7 +13,8 @@ import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.repository.RentRepository;
 import com.erp.global.exception.CustomException;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,20 +32,16 @@ public class ManagerClientService {
     private final RentRepository rentRepository;
 
     // 회원목록 조회
-    public List<ClientSummaryResponse> getClients() {
-        return clientRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
-                .stream()
-                .map(this::toSummary)
-                .toList();
+    public Page<ClientSummaryResponse> getClients(Pageable pageRequest) {
+        return clientRepository.findAll(pageRequest)
+                .map(this::toSummary);
     }
 
     // 회원 검색
-    public List<ClientSummaryResponse> searchClients(String keyword) {
+    public Page<ClientSummaryResponse> searchClients(String keyword, Pageable pageRequest) {
         return clientRepository
-                .searchClient(keyword)
-                .stream()
-                .map(this::toSummary)
-                .toList();
+                .searchClient(keyword, pageRequest)
+                .map(this::toSummary);
     }
 
     // 회원 상세정보

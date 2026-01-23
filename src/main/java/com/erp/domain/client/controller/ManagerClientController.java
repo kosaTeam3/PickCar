@@ -8,6 +8,10 @@ import com.erp.domain.client.dto.response.ClientSummaryResponse;
 import com.erp.domain.client.service.ManagerClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +26,16 @@ public class ManagerClientController {
 
 
     @GetMapping(params = "keyword")
-    public List<ClientSummaryResponse> searchClients(@RequestParam String keyword) {
-        return clientService.searchClients(keyword);
+    public ResponseEntity<Page<ClientSummaryResponse>> searchClients(
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageRequest,
+            @RequestParam String keyword
+    ) {
+        return ResponseEntity.ok(clientService.searchClients(keyword, pageRequest));
     }
 
     @GetMapping
-    public List<ClientSummaryResponse> getClients() {
-        return clientService.getClients();
+    public ResponseEntity<Page<ClientSummaryResponse>> getClients(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageRequest) {
+        return ResponseEntity.ok(clientService.getClients(pageRequest));
     }
 
     @GetMapping("/{clientId}")
