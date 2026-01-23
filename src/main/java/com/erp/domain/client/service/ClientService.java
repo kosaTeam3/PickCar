@@ -4,6 +4,7 @@ import com.erp.domain.client.dto.request.ChangePasswordRequestDto;
 import com.erp.domain.client.dto.request.LoginRequestDto;
 import com.erp.domain.client.dto.request.MypageUpdateRequestDto;
 import com.erp.domain.client.dto.request.RegisterClientRequestDto;
+import com.erp.domain.client.dto.response.ClientInfoResponse;
 import com.erp.domain.client.dto.response.MypageResponse;
 import com.erp.domain.client.entity.Client;
 import com.erp.domain.client.entity.Gender;
@@ -165,5 +166,14 @@ public class ClientService {
         }
 
         client.setPassword(passwordEncoder.encode(dto.password()));
+    }
+
+    public ClientInfoResponse getInfo(Long userId) {
+        Client client = clientRepository.findById(userId).orElseThrow(
+                () -> new CustomException(404, "유저 정보가 정확하지 않습니다")
+        );
+        return ClientInfoResponse.builder()
+                .name(client.getName())
+                .build();
     }
 }
