@@ -178,4 +178,30 @@ public class RentService {
                 .message("차량 반납이 완료되었습니다.")
                 .build();
     }
+
+    // 예약 시간 전 대여 가능 버퍼 시간
+    private static final long PICKUP_BUFFER_MINUTES = 15;
+
+    @Transactional
+    public void startRental(Long rentId) {
+        Rent rent = rentRepository.findById(rentId)
+                .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
+
+        // RESERVED 상태인지 확인
+        if (rent.getStatus() != RentStatus.RESERVED) {
+            throw new CustomException(400, "대여 시작이 가능한 상태가 아닙니다.");
+        }
+
+
+        // // 현재 시각과 예약 시작 시각 비교 (버퍼 적용)
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime earliestAvailableTime = rent.getStartRentDateTime().minusMinutes(PICKUP_BUFFER_MINUTES);
+
+        if (now.isBefore(earliestAvailableTime)) {
+            throw new CustomException(400, "아직 대여 인도 가능 시간이 아닙니다. 예약 시간 15분 전부터 처리가 가능합니다.");
+        }
+
+        // 차량 상태를 운행 중(DRIVING)으로 변경
+        rent.getCar().setStatus(CarStatus.DRIVING);
+    }
 }

@@ -15,11 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class RentStatusController {
     private final RentService rentService;
 
-        @PatchMapping("/{rentId}/return")
-    public ResponseEntity<RentReturnResponse> returnRental(
-            @PathVariable Long rentId) {
+    // 차량 반납 처리
+    @PatchMapping("/{rentId}/return")
+    public ResponseEntity<RentReturnResponse> returnRental(@PathVariable Long rentId) {
         RentReturnResponse response = rentService.returnRental(rentId);
 
         return ResponseEntity.ok(response);
     }
+
+    // 차량 대여 시작 처리
+    @PatchMapping("/{rentId}/pickup")
+    public ResponseEntity<Void> pickupRental(@PathVariable Long rentId) {
+        rentService.startRental(rentId);
+
+        return ResponseEntity.ok().build();
+    }
+
 }
