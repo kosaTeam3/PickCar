@@ -1,7 +1,9 @@
 package com.erp;
 
 import com.erp.global.dto.ErrorResponse;
+import com.sun.security.auth.UserPrincipal;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +15,14 @@ import java.util.List;
  */
 @RestController("/")
 public class SampleController {
+
+    // 특정 권한을 가진 사람만 허용합니다.
+//    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')") // 권한이 없는 경우 404 예외를 발생시킵니다
+    @GetMapping("/getRequestUserId")
+    // 요청한 사용자 정보를 가져올때 견본입니다.
+    public String test(@AuthenticationPrincipal UserPrincipal user){
+        return user.getName();
+    }
 
     //데이터가 존재할경우 견본입니다
     @GetMapping("/data")

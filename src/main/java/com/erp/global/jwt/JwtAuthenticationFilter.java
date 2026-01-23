@@ -1,6 +1,5 @@
 package com.erp.global.jwt;
 
-import com.erp.global.auth.LogoutAccessTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -18,7 +17,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private LogoutAccessTokenRepository logoutAceessTokenRepository;
 
     @Override
     public void doFilter(ServletRequest request,
@@ -28,17 +26,14 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // 1. Request header에서 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)
-                && !logoutAceessTokenRepository.existsById(token)) {
-            // 3. 토큰이 유효하면 유저 정보 받아옴
+        if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
             // 4. SecurityContextHolder에 저장 -> 이제부터 스프링은 이 유저를 "로그인 된 사람"으로 취급
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        // 5. 다음 필터로 넘기기 (이게 없으면 요청이 여기서 멈춤)
-        filterChain.doFilter(request, response);
 
+        filterChain.doFilter(request, response);
     }
 
     // header에서 "Bearer " 문자열 떼고 토큰만 가져오기

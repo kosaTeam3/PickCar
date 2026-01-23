@@ -9,6 +9,7 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.response.CurrentRentResponse;
 import com.erp.domain.rent.dto.response.RentCreateResponse;
 import com.erp.domain.rent.dto.response.RentHistoryResponse;
 import com.erp.domain.rent.dto.response.RentReturnResponse;
@@ -51,12 +52,12 @@ public class RentService {
     }
 
     @Transactional
-    public RentCreateResponse createRent(RentCreateRequest request, Long clientId) {
+    public RentCreateResponse createRent(RentCreateRequest request, Long userId) {
         // 차량 및 고객 조회
         Car car = carRepository.findById(request.carId())
                 .orElseThrow(() -> new CustomException(404, "차량을 찾을 수 없습니다."));
 
-        Client client = clientRepository.findById(clientId)
+        Client client = clientRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(404, "고객을 찾을 수 없습니다."));
 
         // 해당 기간에 이미 예약이 있는지 확인. 1차 검증
@@ -79,7 +80,7 @@ public class RentService {
                     .orElseThrow(() -> new CustomException(404, "보유하신 쿠폰 정보를 찾을 수 없습니다."));
 
             // 소유권 검증 (내 쿠폰이 맞는지)
-            if (!clientCoupon.getClient().getId().equals(clientId)) {
+            if (!clientCoupon.getClient().getId().equals(userId)) {
                 throw new CustomException(403, "해당 쿠폰에 대한 권한이 없습니다.");
             }
 
@@ -128,6 +129,27 @@ public class RentService {
                 .buyerName(client.getName())
                 .buyerEmail(client.getEmail())
                 .buyerPhone(client.getPhoneNumber())
+                .build();
+    }
+
+    public CurrentRentResponse findCurrentRent(Long userId) {
+        // 현재 시간 기준, 예약 확정(RESERVED) 상태인 렌트 정보 조회
+        Rent rent = rentRepository.findCurrentRentByClient(userId, LocalDateTime.now(), RentStatus.RESERVED)
+                .orElseThrow(() -> new CustomException(400, "현재 렌트중인 차량이 없습니다."));
+
+        return CurrentRentResponse.builder()
+                .rentId(rent.getId())
+                .carId(rent.getCar().getId())
+                .carImage(rent.getCar().getImage())
+                .carModel(rent.getCar().getModel())
+                .rentId(rent.getId())
+                .rentalFee(rent.getRentalFee())
+                .carBrand(rent.getCar().getBrand())
+                .carYear(rent.getCar().getYear())
+                .startRentDateTime(rent.getStartRentDateTime())
+                .endRentDateTime(rent.getEndRentDateTime())
+                .branchName(rent.getCar().getBranch().getName())
+                .branchAddress(rent.getCar().getBranch().getAddress())
                 .build();
     }
 
