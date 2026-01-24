@@ -9,6 +9,7 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.request.RentManagerSearchRequest;
 import com.erp.domain.rent.dto.response.*;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
@@ -227,5 +228,40 @@ public class RentService {
                         .endRentDateTime(data.getEndRentDateTime())
                         .build());
 
+    }
+
+    public Page<RentManagerListResponse> getManagerRentals(RentManagerSearchRequest request, Pageable pageable) {
+        String status = request.status();
+        CarStatus targetCarStatus;
+
+        // status 파라미터 유효성 검증 및 변환
+        if ("pickup-waiting".equals(status)) {
+            targetCarStatus = CarStatus.WAITING; // 인도 대기
+        } else if ("return-waiting".equals(status)) {
+            targetCarStatus = CarStatus.DRIVING; // 인수 대기
+        } else {
+            throw new CustomException(400, "잘못된 조회 상태 값입니다. (pickup-waiting 또는 return-waiting 만 가능)");
+        }
+
+        Page<Rent> rents = rentRepository.findManagerRentals(
+                RentStatus.RESERVED,
+                targetCarStatus,
+                request.branchId(),
+                request.carNumber(),
+                request.clientName(),
+                pageable
+        );
+
+        return rents.map(rent -> RentManagerListResponse.builder()
+                .rentId(rent.getId())
+                .carId(rent.getCar().getId())
+                .carNumber(rent.getCar().getCarNumber())
+                .model(rent.getCar().getModel())
+                .clientName(rent.getClient().getName())
+                .clientPhone(rent.getClient().getPhoneNumber())
+                .carStatus(rent.getCar().getStatus())
+                .startRentDateTime(rent.getStartRentDateTime())
+                .endRentDateTime(rent.getEndRentDateTime())
+                .build());
     }
 }
