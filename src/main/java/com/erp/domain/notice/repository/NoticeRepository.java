@@ -1,6 +1,6 @@
 package com.erp.domain.notice.repository;
 
-import com.erp.domain.notice.dto.NoticeSummaryResponse;
+import com.erp.domain.notice.dto.response.NoticeSummaryDto;
 import com.erp.domain.notice.entity.Notice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Query("""
-                select new com.erp.domain.notice.dto.NoticeSummaryResponse(
+                select new com.erp.domain.notice.dto.NoticeSummaryDto(
                     n.id, n.employeeName, n.title, n.summary, n.active, n.pinned,
                     n.startDate, n.endDate, n.createdAt
                 )
@@ -23,7 +23,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
                         or (:writer is not null and n.employeeName like concat('%', :writer, '%'))
                       )
             """)
-    Page<NoticeSummaryResponse> searchSummaries(
+    Page<NoticeSummaryDto> searchSummaries(
             @Param("title") String title,
             @Param("writer") String writer,
             @Param("active") Boolean active,

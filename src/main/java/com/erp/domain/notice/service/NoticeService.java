@@ -2,15 +2,17 @@ package com.erp.domain.notice.service;
 
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
-import com.erp.domain.notice.dto.NoticeSummaryResponse;
 import com.erp.domain.notice.dto.request.NoticeCreateDto;
 import com.erp.domain.notice.dto.request.NoticeSearchDto;
 import com.erp.domain.notice.dto.request.NoticeUpdateDto;
+import com.erp.domain.notice.dto.response.NoticeDetailDto;
+import com.erp.domain.notice.dto.response.NoticeSummaryDto;
 import com.erp.domain.notice.entity.Notice;
 import com.erp.domain.notice.repository.NoticeRepository;
 import com.erp.global.exception.CustomException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -100,7 +102,25 @@ public class NoticeService {
         }
     }
 
-    public Page<NoticeSummaryResponse> getNotices(NoticeSearchDto search, Pageable pageable) {
+    public Page<NoticeSummaryDto> searchNotices(NoticeSearchDto search, Pageable pageable) {
         return noticeRepository.searchSummaries(search.title(), search.writer(), search.active(), pageable);
+    }
+
+    public @Nullable NoticeDetailDto getNotice(Long id) {
+        Notice notice = noticeRepository.findById(id).orElseThrow(
+                () -> new CustomException(404, "공지사항을 찾을 수 없습니다.")
+        );
+
+        return NoticeDetailDto.builder()
+                .id(notice.getId())
+                .employeeId(notice.getEmployee().getId())
+                .employeeName(notice.getEmployeeName())
+                .title(notice.getTitle())
+                .content(notice.getContent())
+                .active(notice.getActive())
+                .pinned(notice.getPinned())
+                .startDate(notice.getStartDate())
+                .endDate(notice.getEndDate())
+                .build();
     }
 }

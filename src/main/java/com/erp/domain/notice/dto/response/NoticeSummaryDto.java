@@ -1,9 +1,9 @@
-package com.erp.domain.notice.dto;
+package com.erp.domain.notice.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record NoticeSummaryResponse(
+public record NoticeSummaryDto(
         Long id,
         String employeeName,
         String title,

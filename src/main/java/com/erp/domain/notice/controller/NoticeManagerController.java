@@ -1,6 +1,7 @@
 package com.erp.domain.notice.controller;
 
-import com.erp.domain.notice.dto.NoticeSummaryResponse;
+import com.erp.domain.notice.dto.response.NoticeDetailDto;
+import com.erp.domain.notice.dto.response.NoticeSummaryDto;
 import com.erp.domain.notice.dto.request.NoticeCreateDto;
 import com.erp.domain.notice.dto.request.NoticeSearchDto;
 import com.erp.domain.notice.dto.request.NoticeUpdateDto;
@@ -52,13 +53,18 @@ public class NoticeManagerController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<NoticeDetailDto> getNotice(@PathVariable Long noticeId){
+        return ResponseEntity.ok(noticeService.getNotice(noticeId));
+    }
+
     @GetMapping
-    public ResponseEntity<Page<NoticeSummaryResponse>> getNotices(
+    public ResponseEntity<Page<NoticeSummaryDto>> searchNotices(
             @ModelAttribute NoticeSearchDto search,
             @PageableDefault(size = 20, sort = {"pinned", "createdAt"},
                     direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
-        return ResponseEntity.ok(noticeService.getNotices(search, pageable));
+        return ResponseEntity.ok(noticeService.searchNotices(search, pageable));
     }
 }
