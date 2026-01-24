@@ -38,4 +38,8 @@ public class NoticeService {
     private String toSummary(String content) {
         return content.substring(0, Math.min(content.length(), 90));
     }
+
+    public void deleteNotice(Long noticeId) {
+        noticeRepository.deleteById(noticeId);
+    }
 }

@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
 @RequestMapping("/api/manager/notices")
@@ -26,6 +24,12 @@ public class NoticeManagerController {
     ) {
         noticeService.createNotice(Long.parseLong(user.getName()), request);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{noticeId}")
+    public ResponseEntity<Void> deleteNotice(@PathVariable Long noticeId) {
+        noticeService.deleteNotice(noticeId);
         return ResponseEntity.noContent().build();
     }
 }
