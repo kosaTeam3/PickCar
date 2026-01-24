@@ -81,12 +81,10 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             JOIN FETCH r.car c
             JOIN FETCH c.branch b
             WHERE r.client.id = :clientId
-            AND :now BETWEEN r.startRentDateTime AND r.endRentDateTime
             AND r.status = :status
             """)
     Optional<Rent> findCurrentRentByClient(
             @Param("clientId") Long clientId,
-            @Param("now") LocalDateTime now,
             @Param("status") RentStatus status);
 
     @Query("""
