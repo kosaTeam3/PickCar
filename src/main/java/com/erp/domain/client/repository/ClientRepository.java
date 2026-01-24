@@ -23,4 +23,10 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     // 이메일 중복 확인
     boolean existsByEmail(String email);
+
+    // 휴대폰 번호 중복 확인
+    boolean existsByPhoneNumber(String phoneNumber);
+
+    // 면허증 번호 중복 확인
+    boolean existsByLicenceNumber(String licenceNumber);
 }
