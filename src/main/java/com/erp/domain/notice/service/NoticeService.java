@@ -2,14 +2,20 @@ package com.erp.domain.notice.service;
 
 import com.erp.domain.employee.entity.Employee;
 import com.erp.domain.employee.repository.EmployeeRepository;
+import com.erp.domain.notice.dto.NoticeSummaryResponse;
 import com.erp.domain.notice.dto.request.NoticeCreateDto;
+import com.erp.domain.notice.dto.request.NoticeSearchDto;
 import com.erp.domain.notice.dto.request.NoticeUpdateDto;
 import com.erp.domain.notice.entity.Notice;
 import com.erp.domain.notice.repository.NoticeRepository;
 import com.erp.global.exception.CustomException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class NoticeService {
 
@@ -92,5 +98,9 @@ public class NoticeService {
         if (request.endDate() != null) {
             notice.setEndDate(request.endDate());
         }
+    }
+
+    public Page<NoticeSummaryResponse> getNotices(NoticeSearchDto search, Pageable pageable) {
+        return noticeRepository.searchSummaries(search.title(), search.writer(), search.active(), pageable);
     }
 }
