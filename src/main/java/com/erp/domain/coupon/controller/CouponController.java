@@ -2,6 +2,7 @@ package com.erp.domain.coupon.controller;
 
 import com.erp.domain.coupon.dto.request.CouponIssueRequest;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
+import com.erp.domain.coupon.dto.response.EventCouponResponse;
 import com.erp.domain.coupon.service.CouponService;
 import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
@@ -37,6 +38,12 @@ public class CouponController {
         Long clientId = Long.parseLong(user.getName());
 
         return couponService.getClientCoupons(clientId);
+    }
+
+    /* [사용자] 랜딩 페이지 이벤트 배너용 쿠폰 목록 */
+    @GetMapping("/event")
+    public List<EventCouponResponse> getEventCoupons() {
+        return couponService.getActiveCoupons();
     }
 
 }

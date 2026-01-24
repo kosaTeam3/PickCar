@@ -5,6 +5,7 @@ import com.erp.domain.client.repository.ClientRepository;
 import com.erp.domain.coupon.dto.request.CouponSaveRequest;
 import com.erp.domain.coupon.dto.response.AdminCouponResponse;
 import com.erp.domain.coupon.dto.response.ClientCouponResponse;
+import com.erp.domain.coupon.dto.response.EventCouponResponse;
 import com.erp.domain.coupon.dto.response.IssuedClientCouponResponse;
 import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
@@ -173,6 +174,25 @@ public class CouponService {
                             status
                     );
                 })
+                .toList();
+    }
+
+    /* 이벤트 배너용 쿠폰 목록 조회 */
+    public List<EventCouponResponse> getActiveCoupons() {
+        LocalDate today = LocalDate.now();
+
+        List<Coupon> activeCoupons = couponRepository.findActiveCoupons(today);
+
+        return activeCoupons.stream()
+                .map(coupon -> new EventCouponResponse(
+                        coupon.getId(),
+                        coupon.getCode(),
+                        coupon.getCouponName(),
+                        coupon.getMaxQuantity() - coupon.getIssuedQuantity(),
+                        coupon.getStartDate(),
+                        coupon.getEndDate(),
+                        coupon.getExpDate()
+                ))
                 .toList();
     }
 
