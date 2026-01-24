@@ -9,10 +9,7 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
-import com.erp.domain.rent.dto.response.CurrentRentResponse;
-import com.erp.domain.rent.dto.response.RentCreateResponse;
-import com.erp.domain.rent.dto.response.RentHistoryResponse;
-import com.erp.domain.rent.dto.response.RentReturnResponse;
+import com.erp.domain.rent.dto.response.*;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
 import com.erp.domain.rent.repository.RentRepository;
@@ -203,5 +200,22 @@ public class RentService {
 
         // 차량 상태를 운행 중(DRIVING)으로 변경
         rent.getCar().setStatus(CarStatus.DRIVING);
+    }
+
+    public Page<RentHistListResponse>
+    getRentHistories(Long userId, Pageable pageRequest) {
+        return rentRepository.findRentHistories(userId, pageRequest)
+                .map(data -> RentHistListResponse.builder()
+                        .carId(data.getCarId())
+                        .stringImage(data.getStringImage())
+                        .model(data.getModel())
+                        .brand(data.getBrand())
+                        .year(data.getYear())
+                        .status(data.getStatus())
+                        .branchId(data.getBranchId())
+                        .startRentDateTime(data.getStartRentDateTime())
+                        .endRentDateTime(data.getEndRentDateTime())
+                        .build());
+
     }
 }
