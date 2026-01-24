@@ -1,5 +1,6 @@
 package com.erp.domain.rent.controller;
 
+import com.erp.domain.rent.dto.request.RentManagerSearchRequest;
 import com.erp.domain.rent.dto.response.RentManagerListResponse;
 import com.erp.domain.rent.dto.response.RentReturnResponse;
 import com.erp.domain.rent.service.RentService;
@@ -34,13 +35,10 @@ public class RentStatusController {
 
     @GetMapping
     public ResponseEntity<Page<RentManagerListResponse>> getRentals(
-            @RequestParam String status,
-            @RequestParam(required = false) Long branchId,
-            @RequestParam(required = false) String carNumber,
-            @RequestParam(required = false) String clientName,
+            @ModelAttribute RentManagerSearchRequest request,
             @PageableDefault Pageable pageable
     ) {
-        Page<RentManagerListResponse> response = rentService.getManagerRentals(status, branchId, carNumber, clientName, pageable);
+        Page<RentManagerListResponse> response = rentService.getManagerRentals(request, pageable);
         return ResponseEntity.ok(response);
     }
 

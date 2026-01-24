@@ -9,6 +9,7 @@ import com.erp.domain.coupon.entity.ClientCoupon;
 import com.erp.domain.coupon.entity.Coupon;
 import com.erp.domain.coupon.repository.ClientCouponRepository;
 import com.erp.domain.rent.dto.request.RentCreateRequest;
+import com.erp.domain.rent.dto.request.RentManagerSearchRequest;
 import com.erp.domain.rent.dto.response.*;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
@@ -219,13 +220,8 @@ public class RentService {
 
     }
 
-    public Page<RentManagerListResponse> getManagerRentals(
-            String status,
-            Long branchId,
-            String carNumber,
-            String clientName,
-            Pageable pageable
-    ) {
+    public Page<RentManagerListResponse> getManagerRentals(RentManagerSearchRequest request, Pageable pageable) {
+        String status = request.status();
         CarStatus targetCarStatus;
 
         // status 파라미터 유효성 검증 및 변환
@@ -237,16 +233,12 @@ public class RentService {
             throw new CustomException(400, "잘못된 조회 상태 값입니다. (pickup-waiting 또는 return-waiting 만 가능)");
         }
 
-        if (branchId != null && branchId == 1L) {
-            throw new CustomException(400, "본사 데이터는 조회할 수 없습니다.");
-        }
-
         Page<Rent> rents = rentRepository.findManagerRentals(
                 RentStatus.RESERVED,
                 targetCarStatus,
-                branchId,
-                carNumber,
-                clientName,
+                request.branchId(),
+                request.carNumber(),
+                request.clientName(),
                 pageable
         );
 

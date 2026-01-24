@@ -114,7 +114,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
         JOIN FETCH r.client cl
         WHERE r.status = :rentStatus
         AND c.status = :carStatus
-        AND b.id <> 1
+        AND b.name <> '본사'
         AND (:branchId IS NULL OR b.id = :branchId)
         AND (:carNumber IS NULL OR c.carNumber LIKE %:carNumber%)
         AND (:clientName IS NULL OR cl.name LIKE %:clientName%)
