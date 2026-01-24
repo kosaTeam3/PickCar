@@ -1,6 +1,7 @@
 package com.erp.domain.notice.controller;
 
 import com.erp.domain.notice.dto.request.NoticeCreateDto;
+import com.erp.domain.notice.dto.request.NoticeUpdateDto;
 import com.erp.domain.notice.service.NoticeService;
 import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
@@ -26,6 +27,18 @@ public class NoticeManagerController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{noticeId}")
+    public ResponseEntity<Void> updateNotice(
+            @AuthenticationPrincipal UserPrincipal user,
+            @RequestBody NoticeUpdateDto request,
+            @PathVariable Long noticeId
+    ) {
+        noticeService.updateNotice(Long.parseLong(user.getName()), request, noticeId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<Void> deleteNotice(@PathVariable Long noticeId) {
