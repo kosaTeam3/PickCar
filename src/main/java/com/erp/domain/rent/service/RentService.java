@@ -35,6 +35,10 @@ public class RentService {
     private final RentalFeeService rentalFeeService;
     private final ClientCouponRepository clientCouponRepository;
 
+    // 최대 대여 기간을 상수로 정의 (14일 * 24시간 = 336시간)
+    private static final int MAX_RENTAL_DAYS = 14;
+    private static final int HOURS_IN_A_DAY = 24;
+
     public Page<RentHistoryResponse> getRentHistory(Long carId, Pageable pageable) {
 
         Page<Rent> rents = rentRepository.findRentHistoryByCarId(carId, LocalDateTime.now(), pageable);
@@ -57,6 +61,14 @@ public class RentService {
         Client client = clientRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(404, "고객을 찾을 수 없습니다."));
 
+        // 대여 기간 계산
+        long totalHours = rentalFeeService.calculateRentalHours(request.startRentDateTime(), request.endRentDateTime());
+
+        // 대여 기간이 14일을 초과하는지 검증
+        if (totalHours > (long) MAX_RENTAL_DAYS * HOURS_IN_A_DAY) {
+            throw new CustomException(400, "대여 기간은 최대 14일을 초과할 수 없습니다.");
+        }
+
         // 해당 기간에 이미 예약이 있는지 확인. 1차 검증
         boolean isOverlapped = rentRepository.existsOverlappingRent(
                 request.carId(), request.startRentDateTime(), request.endRentDateTime()
@@ -65,8 +77,6 @@ public class RentService {
         if (isOverlapped) {
             throw new CustomException(409, "선택하신 시간대에 이미 예약된 차량입니다.");
         }
-
-        long totalHours = rentalFeeService.calculateRentalHours(request.startRentDateTime(), request.endRentDateTime());
 
         long rentalFee = rentalFeeService.calculateRentalFee(car, totalHours);
 
