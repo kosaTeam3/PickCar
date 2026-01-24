@@ -59,6 +59,7 @@ public class JwtTokenProvider {
                 .claim("id", employee.getId())
                 .claim("isFirstLogin", employee.getPasswordChangeRequired())
                 .claim("authority", "ROLE_" + employee.getAuthority())
+                .claim("branchId", employee.getBranch().getId())
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
