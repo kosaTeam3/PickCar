@@ -51,19 +51,31 @@ public class ClientService {
     // 회원가입
     @Transactional
     public void registerClient(RegisterClientRequestDto dto) {
-        // 1. 중복 검사
+
+        // 1. 이메일 중복 검사
         if (clientRepository.existsByEmail(dto.email())) {
-            throw new CustomException(404, "이미 존재하는 이메일입니다.");
+            throw new CustomException(409, "이미 존재하는 이메일입니다.");
         }
-        // 2. 비밀번호 BCrypt 암호화
+
+        // 2. 휴대폰 번호 중복 검사
+        if (clientRepository.existsByPhoneNumber(dto.phoneNumber())) {
+            throw new CustomException(409, "이미 존재하는 휴대폰 번호입니다.");
+        }
+
+        // 3. 면허증 번호 중복 검사.
+        if (clientRepository.existsByLicenceNumber(dto.licenceNumber())) {
+            throw new CustomException(409, "이미 존재하는 면허증 번호입니다.");
+        }
+
+        // 4. 비밀번호 BCrypt 암호화
         String encodedPassword = passwordEncoder.encode(dto.password());
 
-        // 3. 주민으로 생년월일, 성별 변환
+        // 5. 주민으로 생년월일, 성별 변환
         String residentNumber = dto.residentNumber();  // 주민번호 가져오기
         LocalDate birthDate = getBirthDateFromRegiNum(residentNumber);
         Gender gender = getGenderFromResiNum(dto.residentNumber());
 
-        // 4. Entity 변환 및 저장
+        // 6. Entity 변환 및 저장
         Client client = Client.builder()
                 .email(dto.email())
                 .password(encodedPassword)
