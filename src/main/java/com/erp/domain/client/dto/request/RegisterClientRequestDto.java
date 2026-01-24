@@ -3,7 +3,6 @@ package com.erp.domain.client.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
@@ -32,8 +31,8 @@ public record RegisterClientRequestDto(
         String residentNumber,
 
         @NotBlank(message = "면허증 번호")
-        @Size(min = 12, max = 12)
-        @Pattern(regexp = "^[0-9]{12}")
+        @Pattern(regexp = "^\\d{2}-\\d{2}-\\d{6}-\\d{2}$",
+                message = "면허증 번호 형식이 올바르지 않습니다. (예: 11-22-333333-44)\"")
         String licenceNumber,
 
         @NotBlank(message = "면허 발급처")

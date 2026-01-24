@@ -2,6 +2,7 @@ package com.erp.global.exception;
 
 import com.erp.global.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,5 +18,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> customException(CustomException e) {
         return ResponseEntity.status(e.getStatusCode())
                 .body(new ErrorResponse(e.getStatusCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(new ErrorResponse(400, e.getMessage()));
     }
 }
