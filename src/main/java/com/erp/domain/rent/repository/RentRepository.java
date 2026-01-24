@@ -1,6 +1,7 @@
 package com.erp.domain.rent.repository;
 
 import com.erp.domain.car.entity.Car;
+import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.rent.entity.Rent;
 import com.erp.domain.rent.entity.RentStatus;
 import jakarta.persistence.LockModeType;
@@ -104,4 +105,27 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
                 where r.client.id = :clientId
             """)
     Page<RentHistoriesProjection> findRentHistories(@Param("clientId") Long clientId, Pageable pageable);
+
+    @Query("""
+        SELECT r
+        FROM Rent r
+        JOIN FETCH r.car c
+        JOIN FETCH c.branch b
+        JOIN FETCH r.client cl
+        WHERE r.status = :rentStatus
+        AND c.status = :carStatus
+        AND b.id <> 1
+        AND (:branchId IS NULL OR b.id = :branchId)
+        AND (:carNumber IS NULL OR c.carNumber LIKE %:carNumber%)
+        AND (:clientName IS NULL OR cl.name LIKE %:clientName%)
+        ORDER BY r.startRentDateTime ASC
+        """)
+    Page<Rent> findManagerRentals(
+            @Param("rentStatus") RentStatus rentStatus,
+            @Param("carStatus") CarStatus carStatus,
+            @Param("branchId") Long branchId,
+            @Param("carNumber") String carNumber,
+            @Param("clientName") String clientName,
+            Pageable pageable
+    );
 }

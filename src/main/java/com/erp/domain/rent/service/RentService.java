@@ -218,4 +218,48 @@ public class RentService {
                         .build());
 
     }
+
+    public Page<RentManagerListResponse> getManagerRentals(
+            String status,
+            Long branchId,
+            String carNumber,
+            String clientName,
+            Pageable pageable
+    ) {
+        CarStatus targetCarStatus;
+
+        // status 파라미터 유효성 검증 및 변환
+        if ("pickup-waiting".equals(status)) {
+            targetCarStatus = CarStatus.WAITING; // 인도 대기
+        } else if ("return-waiting".equals(status)) {
+            targetCarStatus = CarStatus.DRIVING; // 인수 대기
+        } else {
+            throw new CustomException(400, "잘못된 조회 상태 값입니다. (pickup-waiting 또는 return-waiting 만 가능)");
+        }
+
+        if (branchId != null && branchId == 1L) {
+            throw new CustomException(400, "본사 데이터는 조회할 수 없습니다.");
+        }
+
+        Page<Rent> rents = rentRepository.findManagerRentals(
+                RentStatus.RESERVED,
+                targetCarStatus,
+                branchId,
+                carNumber,
+                clientName,
+                pageable
+        );
+
+        return rents.map(rent -> RentManagerListResponse.builder()
+                .rentId(rent.getId())
+                .carId(rent.getCar().getId())
+                .carNumber(rent.getCar().getCarNumber())
+                .model(rent.getCar().getModel())
+                .clientName(rent.getClient().getName())
+                .clientPhone(rent.getClient().getPhoneNumber())
+                .carStatus(rent.getCar().getStatus())
+                .startRentDateTime(rent.getStartRentDateTime())
+                .endRentDateTime(rent.getEndRentDateTime())
+                .build());
+    }
 }
