@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -81,18 +80,8 @@ public class RentService {
             throw new CustomException(400, "대여 기간은 최대 14일을 초과할 수 없습니다.");
         }
 
-        // 내 기존 결제 대기 내역(WAITING_PAYMENT)이 있다면 삭제 (재결제 시도 허용)
-        List<Rent> myWaitingRents = rentRepository.findMyWaitingRents(
-                request.carId(),
-                client.getId(),
-                request.startRentDateTime(),
-                request.endRentDateTime()
-        );
-
-        if (!myWaitingRents.isEmpty()) {
-            rentRepository.deleteAll(myWaitingRents);
-            rentRepository.flush(); // 즉시 삭제 반영
-        }
+        rentRepository.deleteAllWaitingRentsByClientId(userId);
+        rentRepository.flush();
 
         // 해당 기간에 이미 예약이 있는지 확인. 1차 검증
         boolean isOverlapped = rentRepository.existsOverlappingRent(

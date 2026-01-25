@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,21 +72,14 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
                                   @Param("startDateTime") LocalDateTime startDateTime,
                                   @Param("endDateTime") LocalDateTime endDateTime);
 
-    // 내 결제 대기 내역 조회 (시간 겹침 확인)
+    @Modifying
+    @Transactional
     @Query("""
-            SELECT r FROM Rent r
-            WHERE r.car.id = :carId
-            AND r.client.id = :clientId
-            AND r.status = com.erp.domain.rent.entity.RentStatus.WAITING_PAYMENT
-            AND r.startRentDateTime < :endDateTime
-            AND r.endRentDateTime > :startDateTime
+                DELETE FROM Rent r
+                WHERE r.client.id = :clientId
+                AND r.status = com.erp.domain.rent.entity.RentStatus.WAITING_PAYMENT
             """)
-    List<Rent> findMyWaitingRents(
-            @Param("carId") Long carId,
-            @Param("clientId") Long clientId,
-            @Param("startDateTime") LocalDateTime startDateTime,
-            @Param("endDateTime") LocalDateTime endDateTime
-    );
+    void deleteAllWaitingRentsByClientId(@Param("clientId") Long clientId);
 
     // 비관적 락을 사용하여 예약을 조회
     @Lock(LockModeType.PESSIMISTIC_WRITE)
