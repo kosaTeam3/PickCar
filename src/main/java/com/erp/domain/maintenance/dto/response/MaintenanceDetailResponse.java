@@ -12,6 +12,8 @@ public record MaintenanceDetailResponse(
         Long employeeId,
         String employeeName,
         String vehicleIdNumber,
+        String brand,
+        String model,
         String title,
         LocalDate maintenanceDate,
         Long cost,
