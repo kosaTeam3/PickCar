@@ -70,6 +70,22 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
                                   @Param("startDateTime") LocalDateTime startDateTime,
                                   @Param("endDateTime") LocalDateTime endDateTime);
 
+    // 내 결제 대기 내역 조회 (시간 겹침 확인)
+    @Query("""
+            SELECT r FROM Rent r
+            WHERE r.car.id = :carId
+            AND r.client.id = :clientId
+            AND r.status = com.erp.domain.rent.entity.RentStatus.WAITING_PAYMENT
+            AND r.startRentDateTime < :endDateTime
+            AND r.endRentDateTime > :startDateTime
+            """)
+    List<Rent> findMyWaitingRents(
+            @Param("carId") Long carId,
+            @Param("clientId") Long clientId,
+            @Param("startDateTime") LocalDateTime startDateTime,
+            @Param("endDateTime") LocalDateTime endDateTime
+    );
+
     // 비관적 락을 사용하여 예약을 조회
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM Rent r WHERE r.id = :id")
