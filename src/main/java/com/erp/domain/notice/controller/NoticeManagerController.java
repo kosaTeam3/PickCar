@@ -1,10 +1,10 @@
 package com.erp.domain.notice.controller;
 
-import com.erp.domain.notice.dto.response.NoticeDetailDto;
-import com.erp.domain.notice.dto.response.NoticeSummaryDto;
 import com.erp.domain.notice.dto.request.NoticeCreateDto;
 import com.erp.domain.notice.dto.request.NoticeSearchDto;
 import com.erp.domain.notice.dto.request.NoticeUpdateDto;
+import com.erp.domain.notice.dto.response.NoticeDetailDto;
+import com.erp.domain.notice.dto.response.NoticeSummaryDto;
 import com.erp.domain.notice.service.NoticeService;
 import com.sun.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
@@ -54,14 +54,14 @@ public class NoticeManagerController {
     }
 
     @GetMapping("/{noticeId}")
-    public ResponseEntity<NoticeDetailDto> getNotice(@PathVariable Long noticeId){
+    public ResponseEntity<NoticeDetailDto> getNotice(@PathVariable Long noticeId) {
         return ResponseEntity.ok(noticeService.getNotice(noticeId));
     }
 
     @GetMapping
     public ResponseEntity<Page<NoticeSummaryDto>> searchNotices(
             @ModelAttribute NoticeSearchDto search,
-            @PageableDefault(size = 20, sort = {"pinned", "createdAt"},
+            @PageableDefault(size = 20, sort = "id",
                     direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
