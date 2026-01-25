@@ -29,4 +29,23 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
             @Param("active") Boolean active,
             Pageable pageable
     );
+
+    @Query("""
+                select new com.erp.domain.notice.dto.response.NoticeSummaryDto(
+                    n.id, n.employeeName, n.title, n.summary, n.active, n.pinned,
+                    n.startDate, n.endDate, n.createdAt
+                )
+                from Notice n
+                where
+                    (:keyword is null or :keyword = '' or n.title like concat('%', :keyword, '%'))
+                    and (
+                        n.endDate is null
+                        or n.active = true
+                        or (n.startDate is not null and (n.endDate is null or n.endDate >= current_date))
+                    )
+                order by
+                    case when n.pinned = true then 0 else 1 end,
+                    n.createdAt desc
+            """)
+    Page<NoticeSummaryDto> searchSummariesClient(Pageable pageable, String keyword);
 }
