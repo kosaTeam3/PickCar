@@ -178,6 +178,7 @@ public class RentService {
                 .endRentDateTime(rent.getEndRentDateTime())
                 .branchName(rent.getCar().getBranch().getName())
                 .branchAddress(rent.getCar().getBranch().getAddress())
+                .isPickedUp(rent.getCar().getStatus() == com.erp.domain.car.entity.CarStatus.DRIVING)
                 .build();
     }
 
