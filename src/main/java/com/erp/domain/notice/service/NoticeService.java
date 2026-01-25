@@ -123,4 +123,8 @@ public class NoticeService {
                 .endDate(notice.getEndDate())
                 .build();
     }
+
+    public Page<NoticeSummaryDto> searchNoticesClient(Pageable pageable, String keyword) {
+        return noticeRepository.searchSummariesClient(pageable, keyword);
+    }
 }
