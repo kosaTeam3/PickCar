@@ -7,6 +7,7 @@ import com.erp.domain.branch.dto.response.BranchEmployeeList;
 import com.erp.domain.branch.dto.response.BranchList;
 import com.erp.domain.branch.dto.response.BranchNameList;
 import com.erp.domain.branch.service.BranchService;
+import com.erp.domain.car.dto.response.CarListResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,5 +62,10 @@ public class BranchController {
     @GetMapping("/employees/{branchId}")
     public Slice<BranchEmployeeList> getBranchEmployeeList(@PageableDefault(size = 20) Pageable pageRequest, @PathVariable Long branchId) {
         return branchService.getBranchEmployeeList(pageRequest, branchId);
+    }
+
+    @GetMapping("/cars/{branchId}")
+    public Page<CarListResponse> getBranchCarList(@PageableDefault(size = 20) Pageable pageRequest, @PathVariable Long branchId) {
+        return branchService.getBranchCarList(pageRequest, branchId);
     }
 }
