@@ -1,5 +1,6 @@
 package com.erp.domain.car.repository;
 
+import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.car.dto.response.CarStatusCountResponse;
 import com.erp.domain.car.entity.Car;
 import com.erp.domain.car.entity.CarStatus;
@@ -67,4 +68,6 @@ public interface CarRepository extends JpaRepository<Car, Long> {
         FROM Car c
     """)
     CarStatusCountResponse countCarByStatus();
+
+    Page<Car> findByBranch(Branch branch, Pageable pageable);
 }

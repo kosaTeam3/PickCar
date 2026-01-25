@@ -7,6 +7,7 @@ import com.erp.domain.branch.dto.response.*;
 import com.erp.domain.branch.entity.Branch;
 import com.erp.domain.branch.repository.BranchRepository;
 import com.erp.domain.branch.repository.BranchWithDistance;
+import com.erp.domain.car.dto.response.CarListResponse;
 import com.erp.domain.car.entity.CarStatus;
 import com.erp.domain.car.repository.CarRepository;
 import com.erp.domain.employee.entity.Employee;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class BranchService {
+
     private final BranchRepository branchRepository;
     private final CarRepository carRepository;
     private final RentRepository rentRepository;
@@ -180,5 +182,28 @@ public class BranchService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CarListResponse> getBranchCarList(Pageable pageRequest, Long branchId) {
+        Branch branch = branchRepository.findById(branchId).orElseThrow(
+                () -> new CustomException(404, "지점을 찾을 수 없습니다.")
+        );
+
+        return carRepository.findByBranch(branch, pageRequest).map(car -> CarListResponse.builder()
+                .carId(car.getId())
+                .vehicleIdNumber(car.getVehicleIdNumber())
+                .image(car.getImage())
+                .model(car.getModel())
+                .branchId(branch.getId())
+                .branchName(branch.getName())
+                .carNumber(car.getCarNumber())
+                .ageLimit(car.getAgeLimit())
+                .mileage(car.getMileage())
+                .status(car.getStatus().name())
+                .fuelType(car.getFuelType().name())
+                .seater(car.getSeater())
+                .color(car.getColor().name())
+                .build());
     }
 }
