@@ -16,8 +16,10 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class NoticeService {
 
@@ -106,6 +108,7 @@ public class NoticeService {
         return noticeRepository.searchSummaries(search.title(), search.writer(), search.active(), pageable);
     }
 
+    @Transactional(readOnly = true)
     public @Nullable NoticeDetailDto getNotice(Long id) {
         Notice notice = noticeRepository.findById(id).orElseThrow(
                 () -> new CustomException(404, "공지사항을 찾을 수 없습니다.")
@@ -124,6 +127,7 @@ public class NoticeService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public Page<NoticeSummaryDto> searchNoticesClient(Pageable pageable, String keyword) {
         return noticeRepository.searchSummariesClient(pageable, keyword);
     }
