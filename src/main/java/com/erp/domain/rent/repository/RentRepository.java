@@ -145,12 +145,12 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             Pageable pageable
     );
 
-    // 고객의 활성화된 예약(결제 대기 또는 예약 확정) 존재 여부 확인
+    // 고객의 확정된 예약 존재 여부 확인
     @Query("""
             SELECT COUNT(r) > 0
             FROM Rent r
             WHERE r.client.id = :clientId
-            AND r.status IN (com.erp.domain.rent.entity.RentStatus.WAITING_PAYMENT, com.erp.domain.rent.entity.RentStatus.RESERVED)
+            AND r.status = com.erp.domain.rent.entity.RentStatus.RESERVED
             """)
     boolean existsActiveRentByClientId(@Param("clientId") Long clientId);
 }

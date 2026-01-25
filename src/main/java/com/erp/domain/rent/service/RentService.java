@@ -56,9 +56,9 @@ public class RentService {
 
     @Transactional
     public RentCreateResponse createRent(RentCreateRequest request, Long userId) {
-        // 고객의 기존 활성 예약 여부 검증
+        // 고객의 기존 예약 여부 검증
         if (rentRepository.existsActiveRentByClientId(userId)) {
-            throw new CustomException(400, "이미 진행 중이거나 예약된 대여가 존재합니다. 1인당 1건의 예약만 가능합니다.");
+            throw new CustomException(400, "이미 확정된 예약 내역이 존재합니다. 1인당 1건의 예약만 가능합니다.");
         }
 
         // 차량 및 고객 조회
