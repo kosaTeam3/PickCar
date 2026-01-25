@@ -180,6 +180,11 @@ public class PaymentService {  // 결제 내역 저장 및 검증
         Rent rent = rentRepository.findById(rentId)
                 .orElseThrow(() -> new CustomException(404, "예약 정보를 찾을 수 없습니다."));
 
+        // 차량이 이미 인도되었는지(DRIVING 상태인지) 확인
+        if (rent.getCar().getStatus() == CarStatus.DRIVING) {
+            throw new CustomException(400, "이미 차량 인도가 완료되어 취소가 불가능합니다.");
+        }
+
         // 권한 및 상태 검증
         if (!rent.getClient().getId().equals(userId)) {
             throw new CustomException(403, "취소 권한이 없습니다.");
