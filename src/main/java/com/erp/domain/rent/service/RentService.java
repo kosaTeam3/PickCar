@@ -68,6 +68,11 @@ public class RentService {
         Client client = clientRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(404, "고객을 찾을 수 없습니다."));
 
+        // 블랙리스트 여부 검증
+        if (client.getBlacklisted()) {
+            throw new CustomException(403, "블랙리스트에 등록된 회원은 차량 대여가 불가능하다.");
+        }
+
         // 대여 기간 계산
         long totalHours = rentalFeeService.calculateRentalHours(request.startRentDateTime(), request.endRentDateTime());
 
