@@ -16,6 +16,7 @@ public record CurrentRentResponse(
         LocalDateTime startRentDateTime, // 대여시작시각
         LocalDateTime endRentDateTime,   // 대여종료시각
         String branchName,      // 대여 지점 이름
-        String branchAddress    // 대여 지점 주소
+        String branchAddress,   // 대여 지점 주소
+        Boolean isPickedUp      // 인도 여부
 ) {
 }
