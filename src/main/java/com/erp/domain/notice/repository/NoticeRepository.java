@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Query("""
-                select new com.erp.domain.notice.dto.NoticeSummaryDto(
+                select new com.erp.domain.notice.dto.response.NoticeSummaryDto(
                     n.id, n.employeeName, n.title, n.summary, n.active, n.pinned,
                     n.startDate, n.endDate, n.createdAt
                 )
