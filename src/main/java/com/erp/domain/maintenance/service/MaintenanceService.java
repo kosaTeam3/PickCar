@@ -97,8 +97,6 @@ public class MaintenanceService {
             maintenance.setConsumables(resolveConsumables(maintenance.getCar(), request));
         }
 
-        maintenanceRepository.save(maintenance);
-
         if (request.status() != null && request.status() != previousStatus) {
             applyCarMaintenanceStateIfCompleted(maintenance, maintenance.getCar());
         }
@@ -159,13 +157,17 @@ public class MaintenanceService {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new CustomException(404, "해당 정비 정보가 존재하지 않습니다."));
 
+        Car car = maintenance.getCar();
+
         return new MaintenanceDetailResponse(
                 maintenance.getId(),
-                maintenance.getCar().getId(),
+                car.getId(),
                 maintenance.getBranch().getId(),
                 maintenance.getEmployee().getId(),
                 maintenance.getEmployeeName(),
                 maintenance.getVehicleIdNumber(),
+                car.getBrand(),
+                car.getModel(),
                 maintenance.getTitle(),
                 maintenance.getMaintenanceDate(),
                 maintenance.getCost(),
