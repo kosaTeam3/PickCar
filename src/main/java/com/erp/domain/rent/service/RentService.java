@@ -70,7 +70,7 @@ public class RentService {
 
         // 블랙리스트 여부 검증
         if (client.getBlacklisted()) {
-            throw new CustomException(403, "블랙리스트에 등록된 회원은 차량 대여가 불가능하다.");
+            throw new CustomException(403, "블랙리스트에 등록된 회원은 차량 대여가 불가능합니다.");
         }
 
         // 대여 기간 계산
