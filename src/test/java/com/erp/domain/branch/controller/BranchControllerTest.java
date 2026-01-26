@@ -71,7 +71,7 @@ class BranchControllerTest {
             mockMvc.perform(MockMvcRequestBuilders.post("/api/manager/branches").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isBadRequest());
         }
     }
 
@@ -90,7 +90,7 @@ class BranchControllerTest {
         );
 
         //when & then
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/manager/branches/{branchId}", 1L).with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/manager/branches/{branchId}", 1L).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
