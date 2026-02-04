@@ -60,3 +60,8 @@ PickCar 프로젝트는 기능별 도메인에 따라 다음과 같이 역할을
 * **팀원 (조재표)**: 로그인/회원가입, 직원 등록
 
 ---
+
+## 5. ERD (Entity-Relationship Diagram)
+- https://www.erdcloud.com/d/2TqPzooJrKLYrFMn6
+
+[![ERD Diagram](image.png)](https://www.erdcloud.com/d/2TqPzooJrKLYrFMn6)
