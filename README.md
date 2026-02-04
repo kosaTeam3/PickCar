@@ -3,10 +3,12 @@
 
 ### Spring Boot 기반의 공유차량 통합운영관리 및 예약 플랫폼
 
+<br/>
 
 # 📅 개발 기간
 - **26.01.07 ~ 26.01.25**
 
+<br/>
 
 # 👨‍👩‍👧‍👦 팀원 소개
 > ### 💳 **[강화민](https://github.com/hamin-kang)**
@@ -39,8 +41,12 @@
 
 ---
 
+<br/>
+
 # Tech Stack
 ![Tech Stack](https://github.com/kosaTeam3/PickCar/blob/dev/20260203_223356.png)
+
+<br/>
 
 ### Backend 
 
@@ -60,6 +66,8 @@
 
 ### Database
 **MySQL:** 데이터 정합성과 신뢰성을 보장하는 오픈소스 RDBMS
+
+<br/>
 
 # [ERD](https://www.erdcloud.com/d/2TqPzooJrKLYrFMn6) 
 
