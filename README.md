@@ -25,7 +25,7 @@
 
 ### Frontend
 
-* **Library**: React (PickCarFront 프로젝트)
+* **Library**: React
 * **Style**: Tailwind CSS
 
 
